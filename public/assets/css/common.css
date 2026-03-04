@@ -1,0 +1,993 @@
+.ellipsis-text {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sidebar-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: #f8f9fa;
+    /* Optional: matches sidebar color */
+}
+
+input[readonly],
+textarea[readonly] {
+    background-color: #f0f0f0;
+    color: #888888;
+    border: 1px solid #ccc;
+    cursor: not-allowed;
+}
+html[data-bs-theme="dark"]
+    .select2-container--default
+    .select2-selection--multiple {
+    background-color: #121212 !important;
+    border: 1px solid #444 !important;
+    color: #eee !important;
+    min-height: 38px !important;
+}
+
+html[data-bs-theme="dark"]
+    .select2-container--default
+    .select2-selection--multiple
+    .select2-selection__choice {
+    background-color: #333366 !important;
+    color: #eee !important;
+    border: none !important;
+}
+
+html[data-bs-theme="dark"]
+    .select2-container--default
+    .select2-results
+    > .select2-results__options {
+    background-color: #121212 !important;
+    color: #eee !important;
+}
+
+html[data-bs-theme="dark"]
+    .select2-container--default
+    .select2-results__option--highlighted[aria-selected] {
+    background-color: #444466 !important;
+    color: #fff !important;
+}
+
+html[data-bs-theme="dark"]
+    .select2-container--default
+    .select2-search--dropdown
+    .select2-search__field {
+    background-color: #121212 !important;
+    color: #eee !important;
+    border: 1px solid #444 !important;
+}
+
+/* Also style the dropdown container itself */
+html[data-bs-theme="dark"] .select2-dropdown {
+    background-color: #121212 !important;
+    color: #eee !important;
+}
+.custom-dropdown {
+    min-width: 200px; /* keeps dropdown at least this wide */
+    width: auto; /* let it grow if needed */
+}
+.custom-dropdown-small {
+    min-width: 110px;
+    width: auto;
+}
+
+/* MOBILE FIX */
+@media (max-width: 576px) {
+    .custom-dropdown-small {
+        min-width: 100% !important; /* full width on small screens */
+        width: 100% !important;
+    }
+    .custom-dropdown {
+        min-width: 100% !important; /* full width on screens */
+        width: 100% !important;
+    }
+}
+
+/* Desktop square button */
+@media (min-width: 992px) {
+    .menuBtn {
+        width: 40px !important;
+        height: 40px !important;
+        padding: 0 !important;
+    }
+}
+
+/* Mobile full width fix */
+@media (max-width: 991px) {
+    .menuBtn {
+        width: 100% !important;
+        height: auto !important;
+    }
+}
+@media (min-width: 576px) {
+    .btn-desktop-rounded {
+        border-radius: 0.375rem !important;
+    }
+}
+
+.table-update td {
+    background-color: rgba(255, 193, 7, 0.15) !important; /* light mode */
+}
+
+[data-bs-theme="dark"] .table-update td {
+    background-color: rgba(255, 193, 7, 0.08) !important; /* dark mode */
+}
+
+/* Trigger icon animation when li is hovered */
+li:hover i {
+    animation: bounceZoom 0.4s ease-in-out;
+}
+
+/* Reuse the same animation */
+@keyframes bounceZoom {
+    0% {
+        transform: scale(1) rotate(0deg);
+    }
+
+    30% {
+        transform: scale(1.2) rotate(-5deg);
+    }
+
+    60% {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+#theme-icon {
+    transition:
+        transform 0.3s ease,
+        opacity 0.3s ease;
+}
+
+#theme-icon.fade-out {
+    opacity: 0;
+    transform: scale(0.6) rotate(-90deg);
+}
+
+#theme-icon.fade-in {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+}
+.ai-gradient-text {
+    background: linear-gradient(90deg, #00c6ff, #ff00ff, #45f17c, #ffbb00);
+    background-size: 300% 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+    animation: gradientShift 5s ease infinite;
+    /* text-shadow: 0 0 10px rgba(235, 178, 178, 0.4),
+        0 0 20px rgba(54, 239, 199, 0.6), 0 0 30px rgba(224, 153, 224, 0.5); */
+}
+
+@keyframes gradientShift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.td-break-col {
+    word-break: break-word !important;
+    white-space: normal !important;
+    min-width: 232px;
+    max-width: 300px;
+}
+table th.wide-col {
+    min-width: 200px !important;
+    max-width: 300px !important;
+    word-break: break-word !important;
+    white-space: normal !important;
+}
+
+/* wrapper handles scrolling */
+.custom-sticky-wrapper {
+    max-height: 600px !important; /* adjust as needed */
+    overflow-y: auto !important;
+    overflow-x: auto !important;
+    position: relative !important;
+}
+
+/* sticky header */
+.custom-sticky-table thead th {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 2 !important;
+}
+/* last updated at in the tables */
+.timestamp {
+    font-size: 0.6rem; /* smaller font */
+    color: #2575b5; /* light blue */
+    font-weight: 500;
+}
+.select2-container--default .select2-results__option--selected {
+    background-color: #5497ff !important;
+}
+
+/* pulse animations */
+
+:root {
+    --pulse-size: 8px;
+}
+
+.pulse {
+    width: var(--pulse-size);
+    height: var(--pulse-size);
+    border-radius: 50%;
+    animation: pulsing 2s infinite;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.pulse-dot {
+    width: var(--pulse-size);
+    height: var(--pulse-size);
+    border-radius: 50% !important;
+    cursor: pointer;
+}
+
+/* Active (click) scale */
+.pulse:active {
+    transform: scale(1);
+}
+
+/* Pulse color variants */
+.pulse-primary {
+    background: rgba(13, 110, 253, 0.65);
+    --pulse-color: rgba(13, 110, 253, 0.65);
+    --pulse-transparent: rgba(13, 110, 253, 0);
+}
+
+.pulse-success {
+    background: rgba(25, 135, 84, 0.65);
+    --pulse-color: rgba(25, 135, 84, 0.65);
+    --pulse-transparent: rgba(25, 135, 84, 0);
+}
+
+.pulse-warning {
+    background: rgba(255, 193, 7, 0.65);
+    --pulse-color: rgba(255, 193, 7, 0.65);
+    --pulse-transparent: rgba(255, 193, 7, 0);
+}
+
+.pulse-danger {
+    background: rgba(220, 53, 69, 0.65);
+    --pulse-color: rgba(220, 53, 69, 0.65);
+    --pulse-transparent: rgba(220, 53, 69, 0);
+}
+
+.pulse-info {
+    background: rgba(13, 202, 240, 0.65);
+    --pulse-color: rgba(13, 202, 240, 0.65);
+    --pulse-transparent: rgba(13, 202, 240, 0);
+}
+
+/* Hover effect (lighten slightly) */
+.pulse:hover {
+    filter: brightness(1.2);
+}
+
+/* Keyframes */
+@keyframes pulsing {
+    0% {
+        box-shadow: 0 0 0 0 var(--pulse-color);
+    }
+    70% {
+        box-shadow: 0 0 0 var(--pulse-size) var(--pulse-transparent);
+    }
+    100% {
+        box-shadow: 0 0 0 0 var(--pulse-transparent);
+    }
+}
+
+/* Base glancing style */
+.glance {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.glance::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 100%
+    );
+    animation: glance 2s infinite;
+}
+
+/* slower, thicker shimmer for larger elements */
+.glance-lg::after {
+    animation-duration: 4s; /* slower sweep */
+    background: linear-gradient(
+        120deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.3) 35%,
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 255, 255, 0.3) 65%,
+        transparent 100%
+    );
+}
+
+/* Keyframes for shimmer/glance animation */
+@keyframes glance {
+    0% {
+        transform: translateX(-100%);
+    }
+    50% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Color Variants (Bootstrap palette based) */
+.glance-primary {
+    background-color: rgba(13, 110, 253, 0.15) !important;
+    color: #0d6efd !important;
+}
+
+.glance-success {
+    background-color: rgba(12, 186, 105, 0.15) !important;
+    color: #34c38f !important;
+}
+
+.glance-warning {
+    background-color: rgba(255, 193, 7, 0.15) !important;
+    color: #ffc107 !important;
+}
+
+.glance-danger {
+    background-color: rgba(220, 53, 69, 0.15) !important;
+    color: #dc3545 !important;
+}
+
+.glance-info {
+    background-color: rgba(13, 202, 240, 0.15) !important;
+    color: #0dcaf0 !important;
+}
+.glance-light {
+    background-color: rgba(20, 60, 106, 0.15) !important;
+    color: #0000007d !important;
+}
+.glance-light:hover {
+    background-color: rgba(9, 124, 255, 0.888) !important;
+    color: #fffffff3 !important;
+}
+/* Jumping animation */
+.jump {
+    animation: jumpAnim 1.6s ease-in-out infinite;
+}
+
+@keyframes jumpAnim {
+    0% {
+        transform: translateY(0);
+    }
+    20% {
+        transform: translateY(-3px);
+    } /* small jump */
+    40% {
+        transform: translateY(0);
+    }
+    60% {
+        transform: translateY(-2px);
+    } /* tiny second bounce */
+    80% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+/* single class = width grow + stripes + moving stripes  */
+.progress-boost {
+    position: relative;
+    border-radius: 6px;
+
+    /* striped bg */
+    background-image: linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.15) 25%,
+        transparent 25%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.15) 50%,
+        rgba(255, 255, 255, 0.15) 75%,
+        transparent 75%,
+        transparent
+    );
+    background-size: var(--bs-progress-height) var(--bs-progress-height);
+
+    /* BOTH animations together */
+    animation:
+        animate-positive 2s ease,
+        progress-bar-stripes 1s linear infinite;
+}
+
+/* your width grow animation */
+@keyframes animate-positive {
+    from {
+        width: 0;
+    }
+}
+
+/* Mobile: full width buttons */
+/* Desktop (md+): auto width, like normal pills */
+
+.overview-period-nav {
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .overview-period-nav {
+        width: auto !important;
+    }
+}
+/* Itrend Custom Toast */
+.itr-toast {
+    background: #fff;
+    opacity: 0;
+    transform: translateX(40px);
+    transition:
+        transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
+        opacity 0.45s ease;
+}
+
+/* visible state */
+.itr-toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* hiding */
+.itr-toast.hide {
+    opacity: 0;
+    transform: translateX(40px);
+}
+
+/* optional style */
+.itr-toast-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 99999;
+}
+
+.itr-toast {
+    min-width: 400px;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    margin-bottom: 10px;
+    border: 2px solid #d1dce7;
+    border-width: 1px;
+}
+/* Dark mode – when Bootstrap theme is dark */
+[data-bs-theme="dark"] .itr-toast {
+    background: #1f2937; /* dark slate */
+    color: #e5e7eb; /* light gray text */
+    border-color: #031022; /* subtle darker border */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+/* Make close button visible in dark mode */
+[data-bs-theme="dark"] .itr-toast .btn-close {
+    filter: invert(1);
+    opacity: 0.8;
+}
+
+[data-bs-theme="dark"] .itr-toast .btn-close:hover {
+    opacity: 1;
+}
+
+.clickable-card {
+    transition:
+        transform 0.15s ease-out,
+        box-shadow 0.15s ease-out;
+}
+
+.clickable-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+}
+
+.hover-card:hover h5,
+.hover-card:hover h6 {
+    color: #000;
+}
+.spinner-loading-rounded {
+    width: 55px;
+    height: 55px;
+    display: inline-block;
+}
+
+.spinner-svg {
+    width: 100%;
+    height: 100%;
+    animation: spinner-rotate 1.2s linear infinite;
+}
+
+.spinner-circle {
+    fill: none;
+    stroke-width: 6; /* Thicker */
+    stroke-linecap: round; /* ⬅ THIS MAKES THE END ROUNDED */
+    stroke: #4285f4;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 75;
+    animation:
+        spinner-dash 1.5s ease-in-out infinite,
+        spinner-color 4s ease-in-out infinite;
+}
+
+/* Rotation */
+@keyframes spinner-rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Dash animation (Google style) */
+@keyframes spinner-dash {
+    0% {
+        stroke-dashoffset: 100;
+    }
+    50% {
+        stroke-dashoffset: 20;
+        stroke-dasharray: 150;
+    }
+    100% {
+        stroke-dashoffset: 100;
+    }
+}
+
+/* Color cycling */
+@keyframes spinner-color {
+    0% {
+        stroke: #5390f2;
+    }
+    25% {
+        stroke: #16ff25;
+    }
+    50% {
+        stroke: #ffee31;
+    }
+    75% {
+        stroke: #f017ff;
+    }
+    100% {
+        stroke: #ff3131;
+    }
+}
+@keyframes copyPulse {
+    0% {
+        transform: scale(1);
+    }
+    40% {
+        transform: scale(1.25);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+.copy-pulse {
+    animation: copyPulse 0.4s ease;
+}
+.acc-btn-theme {
+    background: #d3e5ffb5;
+}
+
+.acc-btn-theme-light {
+    background: #e2e9f2b5;
+}
+
+html[data-bs-theme="dark"] .acc-btn-theme {
+    background: #1f242f !important;
+    color: #e5e7eb !important;
+}
+.campaign-name-truncate {
+    min-width: 0 !important; /* critical for flex ellipsis */
+    flex: 1 1 auto !important; /* can grow + shrink */
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+}
+
+.header-search-wide {
+    width: 200px;
+}
+
+@media (min-width: 1200px) {
+    .header-search-wide {
+        width: 250px;
+    }
+}
+
+@media (min-width: 1400px) {
+    .header-search-wide {
+        width: 280px;
+    }
+}
+/* ai gradient buttons */
+.btn-grad {
+    background-image: linear-gradient(
+        to right top,
+        #22744c,
+        #40b161,
+        #5cc654,
+        #7fd93e,
+        #a8eb12
+    );
+}
+.btn-grad {
+    text-align: center;
+    text-transform: uppercase;
+    transition: 0.5s;
+    background-size: 200% auto;
+    color: white;
+    border: none;
+    box-shadow: 0 0 20px #eee;
+    display: block;
+}
+
+.btn-grad:hover {
+    background-position: right center;
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Light + premium skeletons */
+.skel {
+    background-color: rgba(0, 0, 0, 0.06) !important;
+}
+.skel-sm {
+    height: 10px;
+    border-radius: 999px;
+}
+.skel-md {
+    height: 14px;
+    border-radius: 999px;
+}
+.skel-lg {
+    height: 18px;
+    border-radius: 999px;
+}
+.skel-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+}
+
+.skel-shimmer {
+    position: relative;
+    overflow: hidden;
+}
+.skel-shimmer::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150px;
+    height: 100%;
+    width: 150px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.55),
+        transparent
+    );
+    animation: skel-move 1.2s infinite;
+}
+@keyframes skel-move {
+    0% {
+        left: -150px;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* =========================================================
+   FLIP WEATHER CARD – Bootstrap Theme Aware
+   Dark mode via: [data-bs-theme="dark"]
+   ========================================================= */
+
+/* ---------- Base (Light) ---------- */
+
+.flip-card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    background: var(--bs-body-bg);
+}
+
+/* subtle gradient overlay */
+.flip-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        135deg,
+        rgba(3, 104, 255, 0.064),
+        rgba(7, 245, 174, 0.162)
+    );
+    opacity: 0.9;
+}
+
+/* Perspective container */
+.flip-stage {
+    position: relative;
+    width: 100%;
+    min-height: 165px; /* compact height */
+    perspective: 1200px;
+    transform-style: preserve-3d;
+}
+
+/* Flipping container */
+.flip-inner {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 560ms ease;
+    will-change: transform;
+}
+
+.flip-inner.is-flipped {
+    transform: rotateX(180deg);
+}
+
+/* Faces */
+.flip-face {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    overflow: hidden;
+}
+
+/* Z-fighting fix for Bootstrap/Skote */
+.flip-front {
+    transform: rotateX(0deg) translateZ(1px);
+}
+.flip-back {
+    transform: rotateX(180deg) translateZ(1px);
+}
+
+/* Inner content */
+.flip-face-content {
+    position: relative;
+    height: 100%;
+    padding: 0.75rem 0.9rem 0.75rem 0.9rem; /* slightly tighter than p-3 */
+    overflow: hidden;
+    z-index: 1; /* above gradient */
+}
+
+/* Make sure card-body doesn't add extra theme issues */
+.flip-card .card-body {
+    position: relative;
+    z-index: 1;
+}
+
+/* ---------- Weather Strip ---------- */
+
+.weather-strip {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+}
+
+/* Scrollbar (Light) */
+.weather-strip::-webkit-scrollbar {
+    height: 4px;
+}
+.weather-strip::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.22);
+    border-radius: 4px;
+}
+
+/* Each day card (Light glass) */
+.weather-day {
+    flex: 0 0 calc((100% - 2rem) / 5); /* 5 visible with gaps on wide screens */
+    min-width: 135px; /* scroll on small screens */
+    border-radius: 0.65rem;
+    padding: 0.5rem 0.55rem;
+    text-align: center;
+    scroll-snap-align: start;
+
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+.weather-day:hover {
+    border-color: rgba(13, 110, 253, 0.63);
+    transition-duration: 0.5s, 1s;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+.weather-icon img {
+    width: 34px;
+    height: 34px;
+}
+
+/* Bootstrap typography-friendly truncation */
+.weather-desc {
+    max-width: 140px;
+    margin: 0 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Today highlight (Light) */
+.weather-day.is-today {
+    border-color: rgba(13, 110, 253, 0.63);
+    box-shadow: 0 10px 24px rgba(13, 110, 253, 0.12);
+    background: linear-gradient(135deg, #0062ff38, #60ffba3c);
+}
+
+/* Today badge (Light) */
+.weather-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.1rem 0.3rem;
+    border-radius: 999px;
+    font-size: 0.55rem;
+    font-weight: 600;
+
+    background: rgba(13, 110, 253, 0.12);
+    color: #0d6efd;
+    border: 1px solid rgba(13, 110, 253, 0.18);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1199px) {
+    .weather-day {
+        flex: 0 0 auto;
+        min-width: 145px;
+    }
+}
+
+@media (max-width: 768px) {
+    .flip-stage {
+        min-height: 210px;
+    }
+}
+
+/* =========================================================
+   Dark Mode (Bootstrap 5.3): [data-bs-theme="dark"]
+   ========================================================= */
+
+[data-bs-theme="dark"] .flip-card {
+    border-color: rgba(255, 255, 255, 0.08);
+    background: var(--bs-body-bg);
+}
+
+[data-bs-theme="dark"] .flip-card::before {
+    background: linear-gradient(
+        135deg,
+        rgba(13, 110, 253, 0.18),
+        rgba(32, 201, 151, 0.1)
+    );
+    opacity: 0.85;
+}
+
+/* Weather cards in dark */
+[data-bs-theme="dark"] .weather-day {
+    background: rgba(20, 20, 24, 0.72);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+}
+
+/* Dark scrollbar */
+[data-bs-theme="dark"] .weather-strip::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+/* Today highlight dark */
+[data-bs-theme="dark"] .weather-day.is-today {
+    border-color: rgba(13, 110, 253, 0.55);
+    box-shadow: 0 10px 24px rgba(13, 110, 253, 0.18);
+    background: linear-gradient(
+        135deg,
+        rgba(13, 110, 253, 0.22),
+        rgba(32, 201, 151, 0.12)
+    );
+}
+
+/* Today badge dark */
+[data-bs-theme="dark"] .weather-badge {
+    background: rgba(13, 110, 253, 0.18);
+    border-color: rgba(13, 110, 253, 0.25);
+    color: #8ab4ff;
+}
+
+.ai-img {
+    transform-origin: 50% 50%;
+    animation: ai-img-twinkle 2.4s ease-in-out infinite;
+    transition:
+        transform 0.25s ease,
+        filter 0.25s ease;
+}
+
+@keyframes ai-img-twinkle {
+    0%,
+    100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 0 rgba(13, 110, 253, 0));
+    }
+    50% {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 8px rgba(13, 110, 253, 0.75));
+    }
+}
+
+.ai-btn:hover .ai-img {
+    transform: scale(1.18);
+    filter: drop-shadow(0 0 10px rgba(13, 110, 253, 0.9));
+}
+
+/* Skote Nav Link Hover Animation - Center to Sides */
+.nav-tabs-custom .nav-link {
+    position: relative !important;
+    transition: color 0.2s ease !important;
+    border-bottom: none !important;
+}
+
+.nav-tabs-custom .nav-link::before {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 0;
+    height: 3px;
+    background-color: #0d6efd !important;
+    transform: translateX(-50%) scaleX(0);
+    transform-origin: center;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+    opacity: 1 !important;
+}
+
+.nav-tabs-custom .nav-link:hover::before {
+    width: 100%;
+    transform: translateX(-50%) scaleX(1);
+}
+
+.nav-tabs-custom .nav-link.active::before {
+    width: 100%;
+    transform: translateX(-50%) scaleX(1);
+}
+.pointer {
+    cursor: pointer !important;
+}

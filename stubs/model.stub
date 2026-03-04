@@ -1,0 +1,32 @@
+<?php
+
+namespace {{ namespace }};
+
+{{ factoryImport }}
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class {{ class }} extends Model
+{
+    {{ factory }}
+    use SoftDeletes;
+
+    protected $table = '';
+
+    protected $fillable = [
+        'column1',
+        'column2',
+        // Add your fillable columns here
+    ];
+
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        // Add your date columns here
+    ];
+
+    protected $casts = [
+        'options' => 'array',
+    ];
+}
