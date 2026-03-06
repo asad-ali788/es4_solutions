@@ -16160,8 +16160,8 @@ fieldset:disabled .btn {
 }
 
 :root {
-    --bs-header-bg: #fff;
-    --bs-header-item-color: #555b6d;
+    --bs-header-bg: #2a3042;
+    --bs-header-item-color: #f2f2f5;
     --bs-header-dark-bg: #2a3042;
     --bs-header-dark-item-color: #e9ecef;
     --bs-topbar-search-bg: #f3f3f9;

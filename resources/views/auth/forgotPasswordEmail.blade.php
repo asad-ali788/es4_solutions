@@ -23,8 +23,8 @@
                             <div class="avatar-md profile-user-wid mb-4">
                                 <span
                                     class="avatar-title rounded-circle bg-light p-0 overflow-hidden d-flex align-items-center justify-content-center">
-                                    <img src="{{ asset('assets/images/logo-sm.png') }}" alt="Logo" class="w-100 h-100"
-                                        style="object-fit: cover;transform: scale(2.3);padding-left: 2px;padding-bottom: 3px;">
+                                    {{-- <img src="{{ asset('assets/images/logo-sm.png') }}" alt="Logo" class="w-100 h-100"
+                                        style="object-fit: cover;transform: scale(2.3);padding-left: 2px;padding-bottom: 3px;"> --}}
                                 </span>
                             </div>
                         </a>

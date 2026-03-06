@@ -6,23 +6,23 @@
             <div class="navbar-brand-box waves-effect">
                 <a href="{{ route('admin.dashboard') }}" class="logo logo-dark">
                     <span class="logo-sm">
-                        <img src="{{ asset('assets/images/logo-sm.png') }}" alt="itrend" height="70" width="100"
-                            style="margin-left: -14px;">
+                        {{-- <img src="{{ asset('assets/images/logo-sm.png') }}" alt="itrend" height="70" width="100"
+                            style="margin-left: -14px;"> --}}
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ asset('assets/images/logo-light.png') }}" alt="itrend" height="80"
-                            width="130">
+                        {{-- <img src="{{ asset('assets/images/logo-light.png') }}" alt="itrend" height="80"
+                            width="130"> --}}
                     </span>
                 </a>
 
                 <a href="{{ route('admin.dashboard') }}" class="logo logo-light">
                     <span class="logo-sm">
-                        <img src="{{ asset('assets/images/logo-sm.png') }}" alt="itrend" height="70" width="110"
-                            style="margin-left: -14px;">
+                        {{-- <img src="{{ asset('assets/images/logo-sm.png') }}" alt="itrend" height="70" width="110"
+                            style="margin-left: -14px;"> --}}
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ asset('assets/images/logo-light.png') }}" alt="itrend" height="75"
-                            width="130">
+                        {{-- <img src="{{ asset('assets/images/logo-light.png') }}" alt="itrend" height="75"
+                            width="130"> --}}
                     </span>
                 </a>
             </div>
@@ -50,12 +50,12 @@
             </a>
 
 
-            <a href="https://itrendsolutions.sharepoint.com/sites/ITrendInternalDocs" target="_blank">
+            {{-- <a href="https://itrendsolutions.sharepoint.com/sites/ITrendInternalDocs" target="_blank">
                 <button type="button" class="btn header-item noti-icon waves-effect" data-bs-toggle="tooltip"
                     data-bs-placement="bottom" title="Project Documentation">
                     <i class="mdi mdi-folder-information-outline"></i>
                 </button>
-            </a>
+            </a> --}}
             <div class="dropdown d-sm-inline-block ms-1">
                 <button type="button" class="btn header-item noti-icon waves-effect" id="theme-toggle-btn">
                     <i class="bx bx-moon" id="theme-icon"></i>
