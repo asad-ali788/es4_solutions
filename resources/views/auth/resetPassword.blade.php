@@ -1,125 +1,76 @@
 @extends('layouts.auth')
+@section('page_title', 'Create Password')
+@section('auth_page_title', 'Create Password')
+@section('auth_page_subtitle', 'Secure your account with a new password.')
 
 @section('auth')
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6 col-xl-5">
-            <div class="card overflow-hidden">
-                <!-- Header / Banner -->
-                <div class="bg-primary-subtle">
-                    <div class="row">
-                        <div class="col-7">
-                            <div class="text-primary p-4">
-                                <h5 class="text-primary">Create Password</h5>
-                                <p>Secure your account with ITrend.</p>
-                            </div>
-                        </div>
-                        <div class="col-5 align-self-end">
-                            <img src="{{ asset('assets/images/profile-img.png') }}" alt="" class="img-fluid">
-                        </div>
-                    </div>
-                </div>
+    {{-- <img src="{{ asset('assets/images/profile-img.png') }}" alt="" class="img-fluid"> --}}
+    {{-- <img src="{{ asset('assets/images/logo-itrend-solution.png') }}" alt="ITrend Logo" class="rounded-circle" height="34"> --}}
 
-                <!-- Body -->
-                <div class="card-body pt-0">
-                    <!-- Brand -->
-                    <div class="auth-logo">
-                        <a href="#" class="auth-logo-light">
-                            <div class="avatar-md profile-user-wid mb-4">
-                                <span class="avatar-title rounded-circle bg-light">
-                                    <img src="{{ asset('assets/images/logo-itrend-solution.png') }}" alt="ITrend Logo"
-                                        class="rounded-circle" height="34">
-                                </span>
-                            </div>
-                        </a>
+    @if (session('status'))
+        <div class="alert alert-success text-center">{{ session('status') }}</div>
+    @endif
 
-                        <a href="#" class="auth-logo-dark">
-                            <div class="avatar-md profile-user-wid mb-4">
-                                <span class="avatar-title rounded-circle bg-light" style="background-color:#f8f9fa;">
-                                    <img src="{{ asset('assets/images/favicon.png') }}" alt="ITrend Icon"
-                                        class="rounded-circle" height="34">
-                                </span>
-                            </div>
-                        </a>
-                    </div>
+    @if (session('info'))
+        <div class="alert alert-info text-center">{{ session('info') }}</div>
+    @endif
 
-                    <div class="p-2">
-                        @if (session('status'))
-                            <div class="alert alert-success text-center">{{ session('status') }}</div>
-                        @endif
-
-                        @if (session('info'))
-                            <div class="alert alert-info text-center">{{ session('info') }}</div>
-                        @endif
-
-                        <!-- Server-side errors -->
-                        @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul class="mb-0">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
-
-                        <form id="changePasswordForm" class="form-horizontal" action="{{ route('reset.password.update') }}"
-                            method="POST" novalidate>
-                            @csrf
-                            <input type="hidden" name="token" value="{{ $token }}">
-                            <input type="hidden" name="email" value="{{ request('email', old('email')) }}">
-
-                            <div class="mb-3">
-                                <label for="password" class="form-label">New Password</label>
-                                <div class="input-group">
-                                    <input type="password" name="password" id="password" class="form-control" required
-                                        minlength="8" placeholder="Enter new password" autocomplete="new-password">
-                                    <button class="btn btn-outline-secondary toggle-visibility" type="button"
-                                        data-target="#password" aria-label="Show/Hide">
-                                        <i class="mdi mdi-eye-off"></i>
-                                    </button>
-                                </div>
-                                <div class="form-text">Minimum 8 characters. Use letters, numbers & symbols for strength.
-                                </div>
-                                @error('password')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="password_confirmation" class="form-label">Confirm Password</label>
-                                <div class="input-group">
-                                    <input type="password" name="password_confirmation" id="password_confirmation"
-                                        class="form-control" required minlength="8" placeholder="Re-enter new password"
-                                        autocomplete="new-password">
-                                    <button class="btn btn-outline-secondary toggle-visibility" type="button"
-                                        data-target="#password_confirmation" aria-label="Show/Hide">
-                                        <i class="mdi mdi-eye-off"></i>
-                                    </button>
-                                </div>
-                                @error('password_confirmation')
-                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="mt-3 d-grid">
-                                <button class="btn btn-success waves-effect waves-light" type="submit"
-                                    onclick="btnLoad(this, 'Changing..')">
-                                    Change Password
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Footer -->
-            <div class="mt-5 text-center">
-                <p>Know your password now?
-                    <a href="{{ route('login') }}" class="fw-medium text-primary">Sign in</a>
-                </p>
-                <p>© {{ date('Y') }} Made with <i class="mdi mdi-heart text-danger"></i> and built by ES4 Solutions.</p>
-            </div>
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
+    @endif
+
+    <form id="changePasswordForm" class="form-horizontal" action="{{ route('reset.password.update') }}" method="POST"
+        novalidate>
+        @csrf
+        <input type="hidden" name="token" value="{{ $token }}">
+        <input type="hidden" name="email" value="{{ request('email', old('email')) }}">
+
+        <div class="mb-3">
+            <label for="password" class="form-label">New Password</label>
+            <div class="input-group">
+                <input type="password" name="password" id="password" class="form-control" required minlength="8"
+                    placeholder="Enter new password" autocomplete="new-password">
+                <button class="btn btn-outline-secondary toggle-visibility" type="button" data-target="#password"
+                    aria-label="Show/Hide">
+                    <i class="mdi mdi-eye-off"></i>
+                </button>
+            </div>
+            <div class="form-text">Minimum 8 characters. Use letters, numbers & symbols for strength.</div>
+            @error('password')
+                <div class="invalid-feedback d-block">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="mb-3">
+            <label for="password_confirmation" class="form-label">Confirm Password</label>
+            <div class="input-group">
+                <input type="password" name="password_confirmation" id="password_confirmation" class="form-control"
+                    required minlength="8" placeholder="Re-enter new password" autocomplete="new-password">
+                <button class="btn btn-outline-secondary toggle-visibility" type="button"
+                    data-target="#password_confirmation" aria-label="Show/Hide">
+                    <i class="mdi mdi-eye-off"></i>
+                </button>
+            </div>
+            @error('password_confirmation')
+                <div class="invalid-feedback d-block">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="mt-3 d-grid">
+            <button class="btn btn-success waves-effect waves-light" type="submit" onclick="btnLoad(this, 'Changing..')">
+                Change Password
+            </button>
+        </div>
+    </form>
+
+    <div class="mt-4 text-center">
+        <p class="mb-0">Know your password now? <a href="{{ route('login') }}" class="fw-medium text-primary">Sign in</a></p>
     </div>
 
     <script>

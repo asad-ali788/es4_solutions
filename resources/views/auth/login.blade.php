@@ -1,96 +1,59 @@
 @extends('layouts.auth')
+@section('page_title', 'Login')
+@section('auth_page_title', 'Welcome Back !')
+{{-- @section('auth_page_subtitle', 'Sign in to continue to ES4 Solutions.') --}}
+
 @section('auth')
-    {{-- <script type='text/javascript'>document.addEventListener('DOMContentLoaded', function () {window.setTimeout(document.querySelector('svg').classList.add('animated'),1000);})</script> --}}
-    <div class="row justify-content-center align-items-center" style="min-height: calc(100vh - 6rem);">
-        <div class="col-md-8 col-lg-6 col-xl-5">
-            <div class="card overflow-hidden">
-                <div class="bg-primary-subtle">
-                    <div class="row">
-                        <div class="col-7">
-                            <div class="text-primary p-4">
-                                <h5 class="text-primary">Welcome Back !</h5>
-                                <h6 id="login-msg">Sign in to continue to ES4 Solutions.</h6>
-                            </div>
-                        </div>
-                        <div class="col-5 align-self-end">
-                            <img src="{{ asset('assets/images/login-page.svg') }}" alt="" class="img-fluid"
-                                style="width: 1080px; height:123px !important">
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body pt-0">
-                    <div class="auth-logo">
-                        <a href="#">
-                            <div class="avatar-md profile-user-wid mb-4">
-                                <span
-                                    class="avatar-title rounded-circle bg-light p-0 overflow-hidden d-flex align-items-center justify-content-center">
-                                    {{-- <img src="{{ asset('assets/images/logo-sm.png') }}" alt="Logo" class="w-100 h-100"
-                                        style="object-fit: cover;transform: scale(2.3);padding-left: 2px;padding-bottom: 3px;"> --}}
-                                </span>
-                            </div>
-                        </a>
-                    </div>
+    {{-- <div class="text-muted mb-3" id="login-msg">Sign in to continue to ES4 Solutions.</div> --}}
 
-                    <div class="p-2">
-                        <span style="margin-top:10px ">
-                            <div class="text-danger text-center fw-bold">
+    {{-- <img src="{{ asset('assets/images/login-page.svg') }}" alt="" class="img-fluid"> --}}
 
-                                @error('email')
-                                    <p>{{ $message }}</p>
-                                @enderror
-                            </div>
-                        </span>
-                        <form id="loginForm" class="form-horizontal" action="{{ route('login') }}" method="POST">
-                            @csrf
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="text" id="email" class="form-control" id="email"
-                                    placeholder="Enter email" name="email" value="{{ old('email') }}">
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Password</label>
-                                <div class="input-group auth-pass-inputgroup">
-                                    <input type="password" class="form-control" name="password" placeholder="Enter password"
-                                        aria-label="Password" aria-describedby="password-addon">
-
-                                    <button class="btn btn-light " type="button" id="password-addon"><i
-                                            class="mdi mdi-eye-outline"></i></button>
-                                </div>
-                            </div>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="remember-check" name="remember">
-                                <label class="form-check-label" for="remember-check">
-                                    Remember me
-                                </label>
-                            </div>
-
-                            <div class="mt-3 d-grid">
-                                <button type="submit" class="btn btn-primary w-100 waves-effect waves-light"
-                                    onclick="btnLoad(this, 'Logging in...')">
-                                    Log In
-                                </button>
-                            </div>
-
-
-                        </form>
-                        <div class="mt-4 text-center">
-                            <a href="{{ route('password.forgot') }}" class="text-muted"><i class="mdi mdi-lock me-1"></i>
-                                Forgot
-                                your password?</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {{-- <div class="mt-5 text-center">
-
-                <div>
-                    <p>© {{ date('Y') }} Made with <i class="mdi mdi-heart text-danger"></i> and built by ES4 Solutions.
-                    </p>
-                </div>
-            </div> --}}
+    <span style="margin-top:10px ">
+        <div class="text-danger text-center fw-bold">
+            @error('email')
+                <p>{{ $message }}</p>
+            @enderror
         </div>
+    </span>
+
+    <form id="loginForm" class="form-horizontal" action="{{ route('login') }}" method="POST">
+        @csrf
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="text" id="email" class="form-control" placeholder="Enter email" name="email"
+                value="{{ old('email') }}">
+        </div>
+
+        <div class="mb-3">
+            <div class="float-end">
+                <a href="{{ route('password.forgot') }}" class="text-muted">Forgot password?</a>
+            </div>
+            <label class="form-label">Password</label>
+            <div class="input-group auth-pass-inputgroup">
+                <input type="password" class="form-control" name="password" placeholder="Enter password"
+                    aria-label="Password" aria-describedby="password-addon">
+
+                <button class="btn btn-light" type="button" id="password-addon"><i class="mdi mdi-eye-outline"></i></button>
+            </div>
+        </div>
+
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="remember-check" name="remember">
+            <label class="form-check-label" for="remember-check">
+                Remember me
+            </label>
+        </div>
+
+        <div class="mt-3 d-grid">
+            <button type="submit" class="btn btn-primary w-100 waves-effect waves-light"
+                onclick="btnLoad(this, 'Logging in...')">
+                Log In
+            </button>
+        </div>
+    </form>
+
+    <div class="mt-5 text-center">
+        <p class="mb-0">Need help? Contact Developer Team.</p>
     </div>
 
     <script>
@@ -169,7 +132,7 @@
                     .then(data => {
                         if (data.exists) {
                             document.getElementById('login-msg').innerText =
-                                `Hi, ${data.name}! 👋`;
+                                `Hi, ${data.name}!`;
                         } else {
                             document.getElementById('login-msg').innerText = "Sign in to continue to ES4 Solutions.";
                         }
