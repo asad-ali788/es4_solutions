@@ -9,7 +9,7 @@
                         <div class="col-7">
                             <div class="text-primary p-4">
                                 <h5 class="text-primary"> Change Password</h5>
-                                <p>Secure your account with ITrend.</p>
+                                <p>Secure your account with ES4 Solutions.</p>
                             </div>
                         </div>
                         <div class="col-5 align-self-end">
@@ -94,7 +94,7 @@
             <!-- Footer -->
             <div class="mt-5 text-center">
                 <p>Know your password now? <a href="{{ route('login') }}" class="fw-medium text-primary">Sign in</a></p>
-                <p>© {{ date('Y') }} Made with <i class="mdi mdi-heart text-danger"></i> and built by iTrends.</p>
+                <p>© {{ date('Y') }} Made with <i class="mdi mdi-heart text-danger"></i> and built by ES4 Solutions.</p>
             </div>
         </div>
     </div>

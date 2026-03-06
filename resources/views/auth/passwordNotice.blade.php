@@ -41,7 +41,7 @@
 
         <!-- Footer -->
         <div class="mt-5 text-center">
-            <p>© {{ date('Y') }} Made with <i class="mdi mdi-heart text-danger"></i> by ITrend Solution.</p>
+            <p>© {{ date('Y') }} Made with <i class="mdi mdi-heart text-danger"></i> by ES4 Solutions Solution.</p>
         </div>
     </div>
 </div>

@@ -9,7 +9,7 @@
                         <div class="col-7">
                             <div class="text-primary p-4">
                                 <h5 class="text-primary">Welcome Back !</h5>
-                                <h6 id="login-msg">Sign in to continue to Itrends.</h6>
+                                <h6 id="login-msg">Sign in to continue to ES4 Solutions.</h6>
                             </div>
                         </div>
                         <div class="col-5 align-self-end">
@@ -86,7 +86,7 @@
             {{-- <div class="mt-5 text-center">
 
                 <div>
-                    <p>© {{ date('Y') }} Made with <i class="mdi mdi-heart text-danger"></i> and built by iTrends.
+                    <p>© {{ date('Y') }} Made with <i class="mdi mdi-heart text-danger"></i> and built by ES4 Solutions.
                     </p>
                 </div>
             </div> --}}
@@ -171,7 +171,7 @@
                             document.getElementById('login-msg').innerText =
                                 `Hi, ${data.name}! 👋`;
                         } else {
-                            document.getElementById('login-msg').innerText = "Sign in to continue to Itrends.";
+                            document.getElementById('login-msg').innerText = "Sign in to continue to ES4 Solutions.";
                         }
 
                     });

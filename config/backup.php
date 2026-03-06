@@ -218,7 +218,7 @@ return [
 
             'from' => [
                 'address' => env('MAIL_FROM_ADDRESS', 'itrendsolution300@gmail.com'),
-                'name' => env('MAIL_FROM_NAME', 'ITrend Solution'),
+                'name' => env('MAIL_FROM_NAME', 'ES4 Solutions'),
             ],
         ],
 

@@ -3,11 +3,11 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ITrend Solution – Password Reset OTP</title>
+  <title>ES4 Solutions – Password Reset OTP</title>
 
   <!-- Hidden branding & domain metadata for spam filters -->
-  <meta name="organization" content="ITrend Solution">
-  <meta name="author" content="ITrend Solution">
+  <meta name="organization" content="ES4 Solutions">
+  <meta name="author" content="ES4 Solutions">
   <meta name="domain" content="itrendsolution.com">
   <meta name="reply-to" content="hr@itrendsolution.com">
 
@@ -19,7 +19,7 @@
 
   <!-- Preheader (hidden preview text in inbox snippet) -->
   <div style="display:none; max-height:0; overflow:hidden; opacity:0;">
-    Your ITrend Solution OTP is {{ $otp }}. It expires in 10 minutes.
+    Your ES4 Solutions OTP is {{ $otp }}. It expires in 10 minutes.
   </div>
 
   <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#f3f4f6;">
@@ -34,7 +34,7 @@
                 Hello {{ $user->name ?? 'User' }},
               </h1>
               <p style="margin:0; font-size:14px; color:#6b7280;">
-                We received a request to reset your password for your <strong>ITrend Solution</strong> account.
+                We received a request to reset your password for your <strong>ES4 Solutions</strong> account.
               </p>
             </td>
           </tr>
@@ -73,12 +73,12 @@
             <td style="padding:16px 24px 24px 24px; font-size:12px; color:#6b7280; border-top:1px solid #f3f4f6;">
               <p style="margin:0 0 8px 0;">
                 Thanks,<br>
-                <strong>ITrend Solution</strong><br>
+                <strong>ES4 Solutions</strong><br>
                 <a href="https://itrendsolution.com" target="_blank" style="color:#2563eb; text-decoration:none;">itrendsolution.com</a>
               </p>
 
               <p style="margin:0;">
-                This automated message was sent by ITrend Solution.  
+                This automated message was sent by ES4 Solutions.  
                 For help, contact <a href="mailto:hr@itrendsolution.com" style="color:#2563eb;">hr@itrendsolution.com</a>
               </p>
             </td>
@@ -87,13 +87,13 @@
 
         <!-- Subtle brand line -->
         <div style="font-size:11px; color:#9ca3af; margin-top:12px;">
-          © {{ date('Y') }} ITrend Solution — All rights reserved.  
+          © {{ date('Y') }} ES4 Solutions — All rights reserved.  
           <a href="https://itrendsolution.com" style="color:#9ca3af; text-decoration:none;">itrendsolution.com</a>
         </div>
 
         <!-- Invisible domain signature (helps Outlook trust mail) -->
         <div style="display:none; font-size:0;">
-          This email is digitally sent from itrendsolution.com through verified systems.
+          This email is digitally sent from ES4 Solutionsolution.com through verified systems.
         </div>
 
       </td>

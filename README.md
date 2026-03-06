@@ -36,7 +36,7 @@ This script is intended to streamline your Laravel app deployment process for a 
 ```bash
 #!/bin/bash
 
-cd /var/www/itrend-commerce || exit
+cd /var/www/es4-solutions || exit
 
 echo "🔐 Please enter your sudo password..."
 sudo -v

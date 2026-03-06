@@ -117,7 +117,7 @@
                 <p>Know your password now?
                     <a href="{{ route('login') }}" class="fw-medium text-primary">Sign in</a>
                 </p>
-                <p>© {{ date('Y') }} Made with <i class="mdi mdi-heart text-danger"></i> and built by iTrends.</p>
+                <p>© {{ date('Y') }} Made with <i class="mdi mdi-heart text-danger"></i> and built by ES4 Solutions.</p>
             </div>
         </div>
     </div>

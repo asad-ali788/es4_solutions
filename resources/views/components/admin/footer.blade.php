@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="text-sm-end d-none d-sm-block">
-                © {{ date('Y') }} Design & Develop by Itrend Solution.
+                © {{ date('Y') }} Design & Develop by ES4 Solutions.
             </div>
         </div>
     </div>

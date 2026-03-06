@@ -8,7 +8,7 @@
                         <div class="col-7">
                             <div class="text-primary p-4">
                                 <h5 class="text-primary"> Reset Password</h5>
-                                <p>Reset Password with ITrend.</p>
+                                <p>Reset Password with ES4 Solutionslutionslutions.</p>
                             </div>
                         </div>
                         <div class="col-5 align-self-end">
@@ -61,7 +61,7 @@
             </div>
             <div class="mt-5 text-center">
                 <p>Remember It ? <a href="{{ route('login') }}" class="fw-medium text-primary"> Sign In here</a> </p>
-                <p>© {{ date('Y') }} Made with <i class="mdi mdi-heart text-danger"></i> and built by iTrends.
+                <p>© {{ date('Y') }} Made with <i class="mdi mdi-heart text-danger"></i> and built by ES4 Solutions.
                 </p>
             </div>
         </div>

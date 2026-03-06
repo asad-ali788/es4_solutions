@@ -68,7 +68,7 @@
             <div class="mt-5 text-center">
                 <p>Didn’t receive OTP? <a href="{{ route('password.forgot') }}" class="fw-medium text-primary">Try again</a>
                 </p>
-                <p>© {{ date('Y') }} Made with <i class="mdi mdi-heart text-danger"></i> and built by iTrends.</p>
+                <p>© {{ date('Y') }} Made with <i class="mdi mdi-heart text-danger"></i> and built by ES4 Solutions.</p>
             </div>
         </div>
     </div>
