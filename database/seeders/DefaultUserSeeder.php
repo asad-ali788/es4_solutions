@@ -16,37 +16,37 @@ class DefaultUserSeeder extends Seeder
      */
     public function run(): void
     {
-        if (!User::where('email', 'admin@itrend.com')->exists()) {
+        if (!User::where('email', 'admin@es4solutions.com')->exists()) {
             User::factory()->create([
                 'name'     => 'Administrator',
-                'email'    => 'admin@itrend.com',
+                'email'    => 'admin@es4solutions.com',
                 'password' => Hash::make('Password@123'),
             ]);
         }
 
-        if (!User::where('email', 'user@itrend.com')->exists()) {
+        if (!User::where('email', 'user@es4solutions.com')->exists()) {
             User::factory()->create([
                 'name'     => 'User',
-                'email'    => 'user@itrend.com',
+                'email'    => 'user@es4solutions.com',
                 'password' => Hash::make('Password@123'),
             ]);
         }
 
-        if (!User::where('email', 'supplier@itrend.com')->exists()) {
+        if (!User::where('email', 'supplier@es4solutions.com')->exists()) {
             User::factory()->create([
                 'name'     => 'Supplier',
-                'email'    => 'supplier@itrend.com',
+                'email'    => 'supplier@es4solutions.com',
                 'password' => Hash::make('Password@123'),
             ]);
         }
-        if (!User::where('email', 'developer@itrend.com')->exists()) {
+        if (!User::where('email', 'developer@es4solutions.com')->exists()) {
             User::factory()->create([
                 'name'     => 'Developer',
-                'email'    => 'developer@itrend.com',
+                'email'    => 'developer@es4solutions.com',
                 'password' => Hash::make('Password@123'),
             ]);
         }
-        
+
         // $role = RoleEnum::User->value;
 
         // User::factory()->count(50)->create()->each(function ($user) use ($role) {

@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('daily_ads_product_performances')) {
+            return;
+        }
+
         Schema::create('daily_ads_product_performances', function (Blueprint $table) {
             $table->id();
             $table->string('sku');
@@ -23,7 +27,7 @@ return new class extends Migration
             $table->unsignedInteger('ad_units')->nullable()->comment('purchase values');
             $table->decimal('acos', 8, 2)->nullable();
             $table->decimal('tacos', 8, 2)->nullable();
-            $table->unique(['sku', 'asin', 'month']);
+            $table->unique(['sku', 'asin', 'sale_date']);
             $table->index(['sku', 'asin']);
             $table->timestamps();
             $table->softDeletes();

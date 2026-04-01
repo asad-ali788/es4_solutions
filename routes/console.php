@@ -90,6 +90,7 @@ use App\Console\Commands\Monitoring\CheckDailyDataAvailability;
 use Illuminate\Support\Facades\DB;
 use App\Console\Commands\Ads\CampaignsBudgetUsage;
 use App\Console\Commands\SyncUnifiedPerformanceLite;
+use App\Console\Commands\Demo\GenerateDashboardDemoData;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -103,6 +104,9 @@ Artisan::command('inspire', function () {
 
 Schedule::command(HourlyProductSalesReport::class)->hourlyAt(32);
 Schedule::command(HourlyProductSalesReportSave::class)->hourlyAt(37);
+
+// Demo-only data generation for dashboard/selling/ads overview.
+Schedule::command(GenerateDashboardDemoData::class, ['--days' => 45, '--cleanup' => true])->dailyAt('04:10');
 /**
  * 📊 Daily Sales Report (lightweight)
  * Run after 12:30 PM IST so it completes before 1 PM.
