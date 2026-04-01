@@ -121,10 +121,10 @@ class AuthorizeSeeder extends Seeder
          *                           USER HAS ROLE
          *========================================================================**/
 
-        $administrator = User::where('email', 'admin@itrend.com')->first();
-        $user          = User::where('email', 'user@itrend.com')->first();
-        $developer     = User::where('email', 'developer@itrend.com')->first();
-        $supplier      = User::where('email', 'supplier@itrend.com')->first();
+        $administrator = User::where('email', 'admin@es4solutions.com')->first();
+        $user          = User::where('email', 'user@es4solutions.com')->first();
+        $developer     = User::where('email', 'developer@es4solutions.com')->first();
+        $supplier      = User::where('email', 'supplier@es4solutions.com')->first();
 
         $administrator->syncRoles([DefaultRoleEnum::Administrator->value]);
         $user->syncRoles([RoleEnum::User->value]);
