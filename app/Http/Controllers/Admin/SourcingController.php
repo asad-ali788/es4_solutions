@@ -42,7 +42,7 @@ class SourcingController extends Controller
 
         $sourcing = SourcingContainerItem::where('sourcing_container_id', $activeContainerId)
             ->where('add_to_pl', $completedFlag)
-            ->paginate($request->input('per_page', 15));
+            ->paginate($request->get('per_page', 15));
 
         return view('pages.admin.sourcing.index', compact('sourcing', 'containers', 'activeContainerUuid'));
     }

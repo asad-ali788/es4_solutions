@@ -15,7 +15,7 @@ class HourlyProductSalesReport extends Command
 {
     protected $signature = 'app:hourly-product-sales-report';
 
-    protected $description = 'Create hourly product sales report';
+    protected $description = 'SP: Request Hourly Order Sales Report (GET_FLAT_FILE_ALL_ORDERS)';
 
     public function __construct(
         protected SellerConnector $connector

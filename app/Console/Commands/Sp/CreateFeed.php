@@ -19,7 +19,7 @@ class CreateFeed extends Command
      *
      * @var string
      */
-    protected $description = 'Price Update Queue';
+    protected $description = 'SP: Create Price-Update Feed for USA Marketplace';
 
     /**
      * Execute the console command.

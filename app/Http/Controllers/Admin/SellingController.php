@@ -112,7 +112,7 @@ class SellingController extends Controller
                     'listings.discontinueInfo',
                     'asins.categorisation'
                 ])
-                ->paginate($request->input('per_page', 15));
+                ->paginate($request->get('per_page', 15));
 
 
             return view('pages.admin.selling.index', compact('products', 'reportingUsers', 'targetUserId'));

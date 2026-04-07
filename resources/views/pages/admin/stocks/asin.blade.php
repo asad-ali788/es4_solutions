@@ -62,11 +62,33 @@
                                 <tr>
                                     <th>#</th>
                                     <th>ASIN</th>
-                                    <th>AFN</th>
-                                    <th>FBA</th>
-                                    <th>Inbound</th>
+                                    <th>Product Name</th>
+                                    <th>
+                                        <div>AFN</div>
+                                        <div class="timestamp">Updated at:
+                                            {{ \Carbon\Carbon::parse($lastUpdated['afn'])->format('M-d H:i') }}</div>
+                                    </th>
+                                    <!-- <th>
+                                        <div>FBA</div>
+                                        <div class="timestamp">Updated at:
+                                            {{ \Carbon\Carbon::parse($lastUpdated['fba'])->format('M-d H:i') }}</div>
+                                    </th> -->
+                                    <th>
+                                        <div>Inbound</div>
+                                        <div class="timestamp">Updated at:
+                                            {{ \Carbon\Carbon::parse($lastUpdated['inbound'])->format('M-d H:i') }}</div>
+                                    </th>
                                     @foreach ($warehouses as $wh)
-                                        <th>{{ $wh->warehouse_name }}</th>
+                                        <th>
+                                            <div>{{ $wh->warehouse_name }}</div>
+                                            <div class="timestamp">
+                                                Updated
+                                                at:
+                                                {{ isset($lastUpdated['warehouses'][$wh->id])
+                                                    ? \Carbon\Carbon::parse($lastUpdated['warehouses'][$wh->id])->format('M-d H:i')
+                                                    : '—' }}
+                                            </div>
+                                        </th>
                                     @endforeach
                                 </tr>
                             </thead>
@@ -75,8 +97,9 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $stock->asin1 ?? '--' }}</td>
+                                        <td>{{ $stock->product_name ?? '--' }}</td>
                                         <td>{{ $stock->afn_quantity ?? 0 }}</td>
-                                        <td>{{ $stock->fba_total_stock ?? 0 }}</td>
+                                        <!-- <td>{{ $stock->fba_total_stock ?? 0 }}</td> -->
                                         <td>{{ $stock->inbound_qty ?? 0 }}</td>
                                         @foreach ($warehouses as $wh)
                                             <td>{{ $stock->{'wh_' . $wh->id . '_available'} ?? 0 }}</td>

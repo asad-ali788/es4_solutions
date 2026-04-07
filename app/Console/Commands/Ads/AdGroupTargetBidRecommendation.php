@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 class AdGroupTargetBidRecommendation extends Command
 {
     protected $signature = 'app:adgroup-target-bid-recommendation';
-    protected $description = 'Fetch bid recommendations for ad groups from Amazon Ads API';
+    protected $description = 'ADS: Fetch Ad Group Bid Recommendations [US/CA]';
 
     public function handle()
     {

@@ -20,7 +20,7 @@ class AfnInventoryDataReportSave extends Command
      *
      * @var string
      */
-    protected $description = 'Save AFN Inventory Report';
+    protected $description = 'SP: Save AFN Inventory Levels to Database';
 
     /**
      * Execute the console command.

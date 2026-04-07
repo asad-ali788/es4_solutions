@@ -20,7 +20,7 @@ class GetCatalogItem extends Command
      *
      * @var string
      */
-    protected $description = 'Get Catalog Item by Asin';
+    protected $description = 'SP: Fetch Product Catalog Details by ASIN from SP-API';
 
     /**
      * Execute the console command.

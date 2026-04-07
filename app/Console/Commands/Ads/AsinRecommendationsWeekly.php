@@ -24,7 +24,7 @@ class AsinRecommendationsWeekly extends Command
      *
      * @var string
      */
-    protected $description = 'Amz Ads Asin Performance Daily Report';
+    protected $description = 'ADS: Generate Weekly ASIN Performance Recommendations';
 
     /**
      * Execute the console command.

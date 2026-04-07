@@ -20,7 +20,7 @@ class DailySalesReport extends Command
      *
      * @var string
      */
-    protected $description = 'Generate daily Sales Report';
+    protected $description = 'SP: Request Daily Order Sales Report (All Marketplaces)';
 
     /**
      * Execute the console command.

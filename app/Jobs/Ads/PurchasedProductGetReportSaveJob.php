@@ -18,16 +18,19 @@ class PurchasedProductGetReportSaveJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public string $country;
+    public ?string $reportType;
 
-    public function __construct(string $country)
+    public function __construct(string $country, ?string $reportType = null)
     {
         $this->country = $country;
+        $this->reportType = $reportType;
     }
 
     public function handle(AmazonAdsService $client)
     {
+        $reportType = $this->reportType ?? 'sbPurchasedProduct';
         $reportLog = AmzAdsReportLog::where('country', $this->country)
-            ->where('report_type', 'sbPurchasedProduct')
+            ->where('report_type', $reportType)
             ->where('report_status', 'IN_PROGRESS')
             ->latest()
             ->first();
@@ -90,9 +93,13 @@ class PurchasedProductGetReportSaveJob implements ShouldQueue
                     ];
                 }
 
-                // bulk insert in chunks
+                // bulk upsert in chunks to handle updates/corrections
                 foreach (array_chunk($records, 1000) as $chunk) {
-                    AmzAdsSbPurchasedProductReport::insert($chunk);
+                    AmzAdsSbPurchasedProductReport::upsert(
+                        $chunk,
+                        ['campaign_id', 'ad_group_id', 'asin', 'c_date', 'country'],
+                        ['campaign_name', 'ad_group_name', 'product_name', 'product_cat', 'orders14d', 'sales14d', 'units_sold14d', 'ntb_orders14d', 'ntb_orders_pct14d', 'ntb_purchases14d', 'ntb_purchases_pct14d', 'ntb_sales14d', 'ntb_sales_pct14d', 'ntb_units14d', 'ntb_units_pct14d', 'updated_at']
+                    );
                 }
 
                 $reportLog->update(['report_status' => 'COMPLETED']);

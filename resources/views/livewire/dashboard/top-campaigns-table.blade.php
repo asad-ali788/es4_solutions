@@ -5,7 +5,7 @@
 
             {{-- SP card --}}
             <div class="col-12 col-md-6 d-flex">
-                <div class="card h-100 w-100">
+                <div class="card h-100 w-100 shadow-sm">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
                             <div class="avatar-xs me-2">
@@ -74,7 +74,7 @@
 
             {{-- SB card --}}
             <div class="col-12 col-md-6 d-flex">
-                <div class="card h-100 w-100">
+                <div class="card h-100 w-100 shadow-sm">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
                             <div class="avatar-xs me-2">

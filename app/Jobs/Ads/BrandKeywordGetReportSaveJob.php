@@ -20,19 +20,27 @@ class BrandKeywordGetReportSaveJob implements ShouldQueue
 
     public string $country;
     public bool $isTodayReport;
+    public ?string $reportType;
 
-    public function __construct(string $country, bool $isTodayReport = false)
+    public function __construct(string $country, bool $isTodayReport = false, ?string $reportType = null)
     {
         $this->country = $country;
         $this->isTodayReport = $isTodayReport;
+        $this->reportType = $reportType;
     }
 
     public function handle(AmazonAdsService $client)
     {
         $marketTz = config('timezone.market');
         $date = Carbon::now($marketTz)->subDay()->toDateString();
-
-        $reportType = $this->isTodayReport ? 'sbTargeting_SB_daily' : 'sbTargeting_SB';
+        
+        if ($this->reportType) {
+            $reportType = $this->reportType;
+        } elseif ($this->isTodayReport) {
+            $reportType = 'sbTargeting_SB_daily';
+        } else {
+            $reportType = 'sbTargeting_SB';
+        }
 
         $reportLog = AmzAdsReportLog::where('country', $this->country)
             ->where('report_type', $reportType)
@@ -41,7 +49,7 @@ class BrandKeywordGetReportSaveJob implements ShouldQueue
             ->first();
 
         if (!$reportLog) {
-            Log::channel('ads')->info("[BrandKeywordGetReportSave][{$this->country}] No brand keyword report in progress.");
+            Log::channel('ads')->info("[BrandKeywordGetReportSave][{$this->country}] No brand keyword report in progress for type: {$reportType}");
             return;
         }
 
@@ -115,9 +123,13 @@ class BrandKeywordGetReportSaveJob implements ShouldQueue
                         );
                     }
                 } else {
-                    // bulk insert for regular model
+                    // upsert for regular model
                     foreach (array_chunk($records, 1000) as $chunk) {
-                        AmzAdsKeywordPerformanceReportSb::insert($chunk);
+                        AmzAdsKeywordPerformanceReportSb::upsert(
+                            $chunk,
+                            ['campaign_id', 'keyword_id', 'c_date', 'country'],
+                            ['cost', 'sales1d', 'sales7d', 'sales30d', 'purchases1d', 'purchases7d', 'purchases30d', 'clicks', 'impressions', 'keyword_bid', 'targeting', 'keyword_text', 'match_type', 'added', 'updated_at']
+                        );
                     }
                 }
 

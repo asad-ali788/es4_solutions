@@ -13,6 +13,8 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Artisan;
+use App\Console\Commands\SyncUnifiedPerformanceLite;
 
 class KeywordGetReportSaveJob implements ShouldQueue
 {
@@ -20,16 +22,24 @@ class KeywordGetReportSaveJob implements ShouldQueue
 
     public string $country;
     public bool $isTodayReport;
+    public ?string $reportType;
 
-    public function __construct(string $country, bool $isTodayReport = false)
+    public function __construct(string $country, bool $isTodayReport = false, ?string $reportType = null)
     {
         $this->country = $country;
         $this->isTodayReport = $isTodayReport;
+        $this->reportType = $reportType;
     }
 
     public function handle(AmazonAdsService $client)
     {
-        $reportType = $this->isTodayReport ? 'spTargeting_daily' : 'spTargeting';
+        if ($this->reportType) {
+            $reportType = $this->reportType;
+        } elseif ($this->isTodayReport) {
+            $reportType = 'spTargeting_daily';
+        } else {
+            $reportType = 'spTargeting';
+        }
 
         $reportLog = AmzAdsReportLog::where([
             'country' => $this->country,
@@ -38,7 +48,7 @@ class KeywordGetReportSaveJob implements ShouldQueue
         ])->latest()->first();
 
         if (!$reportLog) {
-            Log::info("🚫 [KeywordGetReportSave] No in-progress report for {$this->country}.");
+            Log::info("🚫 [KeywordGetReportSave] No in-progress report for {$this->country} type: {$reportType}.");
             return;
         }
 
@@ -92,25 +102,25 @@ class KeywordGetReportSaveJob implements ShouldQueue
 
             $model = $this->isTodayReport ? TempAmzKeywordPerformanceReport::class : AmzAdsKeywordPerformanceReport::class;
 
-            if ($this->isTodayReport) {
-                foreach ($records as $record) {
-                    $model::updateOrCreate(
-                        [
-                            'campaign_id' => $record['campaign_id'],
-                            'keyword_id'  => $record['keyword_id'],
-                            'c_date'      => $record['c_date'],
-                            'country'     => $record['country'],
-                        ],
-                        $record
-                    );
-                }
-            } else {
-                foreach (array_chunk($records, 1000) as $chunk) {
-                    $model::insert($chunk);
-                }
+            foreach (array_chunk($records, 2000) as $chunk) {
+                $model::upsert(
+                    $chunk,
+                    ['campaign_id', 'keyword_id', 'c_date', 'country'],
+                    ['cost', 'clicks', 'impressions', 'sales1d', 'sales7d', 'sales30d', 'purchases1d', 'purchases7d', 'purchases30d', 'keyword_bid', 'targeting', 'keyword_text', 'match_type', 'added', 'updated_at']
+                );
             }
 
             $reportLog->update(['report_status' => 'COMPLETED']);
+
+            // 🚀 Refresh recommendations if this was an update fetch
+            if ($this->reportType === 'spTargeting_update' && !empty($records)) {
+                $targetDate = $records[0]['c_date'] ?? null;
+                if ($targetDate) {
+                    Artisan::call('app:keyword-recommendations', ['date' => $targetDate->toDateString()]);
+                    SyncUnifiedPerformanceLite::dispatch($targetDate);
+                    Log::info("🔄 Keyword recommendation refresh dispatched for date: {$targetDate->toDateString()}");
+                }
+            }
 
             if ($this->isTodayReport) {
                 $client->deleteReport($reportLog->report_id);

@@ -9,12 +9,22 @@ use Carbon\Carbon;
 
 class TargetsSbRequestReport extends Command
 {
-    protected $signature = 'app:targets-sb-request-report';
-    protected $description = 'Generate SD Targeting Daily Report';
+    protected $signature = 'app:targets-sb-request-report {targetDate?}';
+    protected $description = 'ADS: Request SB Targeting Performance Report [US/CA]';
 
     public function handle(AmazonAdsService $clients, AdsReportsService $adsReportsService)
     {
         $marketTz = config('timezone.market');
+        $targetDate = $this->argument('targetDate');
+
+        if ($targetDate) {
+            $date = Carbon::parse($targetDate)->toDateString();
+            $this->requestReportForCountry($clients, $adsReportsService, config('amazon_ads.profiles.CA'), $date, 'CA');
+            $this->requestReportForCountry($clients, $adsReportsService, config('amazon_ads.profiles.US'), $date, 'US');
+            $this->info("✅ Sponsored Brands Targeting reports requested for $date.");
+            return;
+        }
+
         $date = Carbon::now($marketTz)->subDay()->toDateString();
 
         $this->requestReportForCountry($clients, $adsReportsService, config('amazon_ads.profiles.CA'), $date, 'CA');

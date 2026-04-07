@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Log;
 use App\Models\AmzAdsCampaignSBPerformanceReport;
 use App\Models\TempAmzCampaignSBPerformanceReport;
 use App\Services\Ads\CampaignPerformanceSnapshotService;
+use App\Jobs\Ads\CampaignRecommendationJob;
+use App\Console\Commands\Ai\SyncCampaignPerformanceLite;
 
 class CampaignSbGetReportSave implements ShouldQueue
 {
@@ -21,18 +23,24 @@ class CampaignSbGetReportSave implements ShouldQueue
 
     public string $country;
     public bool $isTodayReport;
+    public ?string $reportType;
 
-    public function __construct(string $country, bool $isTodayReport = false)
+    public function __construct(string $country, bool $isTodayReport = false, ?string $reportType = null)
     {
         $this->country = $country;
         $this->isTodayReport = $isTodayReport;
+        $this->reportType = $reportType;
     }
 
     public function handle(
         AmazonAdsService $client,
         CampaignPerformanceSnapshotService $snapshotService
     ) {
-        $reportType = $this->isTodayReport ? 'sbCampaigns_daily' : 'sbCampaigns';
+        if ($this->reportType) {
+            $reportType = $this->reportType;
+        } else {
+            $reportType = $this->isTodayReport ? 'sbCampaigns_daily' : 'sbCampaigns';
+        }
 
         $reportLog = AmzAdsReportLog::where('country', $this->country)
             ->where('report_type', $reportType)
@@ -116,12 +124,27 @@ class CampaignSbGetReportSave implements ShouldQueue
                     }
                 } else {
                     foreach (array_chunk($records, 1000) as $chunk) {
-                        AmzAdsCampaignSBPerformanceReport::insert($chunk);
+                        AmzAdsCampaignSBPerformanceReport::upsert(
+                            $chunk,
+                            ['campaign_id', 'date', 'country'],
+                            ['impressions', 'clicks', 'unitsSold', 'purchases', 'cost', 'c_budget', 'c_currency', 'c_status', 'sales', 'budget_gap', 'updated_at']
+                        );
                     }
                 }
 
                 $reportLog->update(['report_status' => 'COMPLETED']);
                 Log::channel('ads')->info('CampaignSBGetReportSave Report inserted and marked as COMPLETED.');
+
+                // 🚀 Refresh recommendations if this was an update fetch
+                if (($this->reportType === 'sbCampaigns_update') && !empty($records)) {
+                    $targetDate = $records[0]['date'] ?? null;
+                    if ($targetDate) {
+                        CampaignRecommendationJob::dispatch($targetDate);
+                        SyncCampaignPerformanceLite::dispatch($targetDate);
+                        Log::channel('ads')->info("🔄 Recommendation refresh (SB) dispatched for date: {$targetDate}");
+                    }
+                }
+
                 if ($this->isTodayReport) {
                     $snapshotService->captureDeltaForType('SB');
                 }

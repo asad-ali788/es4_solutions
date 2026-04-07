@@ -20,7 +20,7 @@ class MonthlySalesReportSave extends Command
      *
      * @var string
      */
-    protected $description = 'Save monthly Sales Report';
+    protected $description = 'SP: Save Monthly Order Sales Data to Database';
 
     /**
      * Execute the console command.

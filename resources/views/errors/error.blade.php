@@ -4,7 +4,7 @@
 <head>
 
     <meta charset="utf-8" />
-    <title>ES4 Solutions</title>
+    <title>Itrends</title>
     <link rel="shortcut icon" href="assets/images/favicon.ico">
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}">
 

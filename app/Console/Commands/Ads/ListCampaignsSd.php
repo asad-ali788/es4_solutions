@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 class ListCampaignsSd extends Command
 {
     protected $signature = 'app:list-campaigns-sd';
-    protected $description = 'Get SD Campaigns Daily Report';
+    protected $description = 'ADS: Sync SD Campaigns [US/CA] from Amazon Ads API';
 
     public function handle()
     {

@@ -20,17 +20,24 @@ class ProductGetReportSaveJob implements ShouldQueue
 
     public string $country;
     public bool $isTodayReport;
+    public ?string $reportType;
 
-    public function __construct(string $country, bool $isTodayReport = false)
+    public function __construct(string $country, bool $isTodayReport = false, ?string $reportType = null)
     {
-
         $this->country = $country;
         $this->isTodayReport = $isTodayReport;
+        $this->reportType = $reportType;
     }
 
     public function handle(AmazonAdsService $client)
     {
-        $reportType = $this->isTodayReport ? 'spAdvertisedProduct_daily' : 'spAdvertisedProduct';
+        if ($this->reportType) {
+            $reportType = $this->reportType;
+        } elseif ($this->isTodayReport) {
+            $reportType = 'spAdvertisedProduct_daily';
+        } else {
+            $reportType = 'spAdvertisedProduct';
+        }
 
         $reportLog = AmzAdsReportLog::where('country', $this->country)
             ->where('report_type', $reportType)
@@ -39,7 +46,7 @@ class ProductGetReportSaveJob implements ShouldQueue
             ->first();
 
         if (!$reportLog) {
-            Log::channel('ads')->info("[ProductGetReportSave][{$this->country}] No report found in progress.");
+            Log::channel('ads')->info("[ProductGetReportSave][{$this->country}] No report found in progress for type: {$reportType}");
             return;
         }
 
@@ -112,9 +119,13 @@ class ProductGetReportSaveJob implements ShouldQueue
                         );
                     }
                 } else {
-                    // bulk insert for regular report
-                    foreach (array_chunk($records, 1000) as $chunk) {
-                        AmzAdsProductPerformanceReport::insert($chunk);
+                    // upsert for regular and update reports
+                    foreach (array_chunk($records, 2000) as $chunk) {
+                        AmzAdsProductPerformanceReport::upsert(
+                            $chunk,
+                            ['campaign_id', 'ad_group_id', 'ad_id', 'sku', 'c_date', 'country'],
+                            ['cost', 'sales1d', 'sales7d', 'sales30d', 'purchases1d', 'purchases7d', 'purchases30d', 'clicks', 'impressions', 'asin', 'added', 'updated_at']
+                        );
                     }
                 }
 

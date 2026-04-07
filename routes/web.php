@@ -3,9 +3,11 @@
 use App\Http\Controllers\Admin\AdsOverviewController;
 use App\Http\Controllers\Admin\AiRecommendationController;
 use App\Http\Controllers\Admin\AmzAdsCampaignSchedulerController;
+use App\Http\Controllers\Admin\BrandAnalyticsController;
 use App\Http\Controllers\Admin\CurrencyController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AiExportController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -45,6 +47,7 @@ use Illuminate\Http\Request;
 use App\Livewire\Dashboard\HourlyProductSalesPage;
 use App\Livewire\Ai\AiPlayground;
 use App\Models\RagDocument;
+use Illuminate\Support\Facades\Log;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -248,6 +251,8 @@ Route::prefix('admin')->as('admin.')->middleware('auth')->group(function () {
 
     // Users
     Route::get('changeStatus/{id}', [UserController::class, 'changeStatus'])->name('users.changeStatus');
+    Route::get('users/{user}/impersonate', [UserController::class, 'impersonate'])->name('users.impersonate');
+    Route::get('users/leave-impersonation', [UserController::class, 'leave'])->name('users.leave');
 
     /*
     |--------------------------------------------------------------------------
@@ -480,6 +485,13 @@ Route::prefix('admin')->as('admin.')->middleware('auth')->group(function () {
         Route::get('campaigns/create/{type?}', 'campaignCreate')->name('campaigns.create');
     });
 
+    Route::prefix('ads/brand-analytics')->as('ads.brandAnalytics.')->controller(BrandAnalyticsController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('competitor-rank', 'competitorRank')->name('competitorRank');
+        Route::get('analytics-2024', 'analytics2024')->name('analytics2024');
+        Route::get('weekly-analytics', 'weeklyAnalytics')->name('weeklyAnalytics');
+    });
+
     Route::prefix('ads/performance')->as('ads.performance.')->controller(AmzAdsPerformanceController::class)->group(function () {
         Route::get('asins', 'asinPerformance')->name('asins.index');
         Route::get('campaigns', 'capaignPerformance')->name('capaigns.index');
@@ -639,6 +651,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::get('/ai/chat', AiPlayground::class)->name('ai.chat');
+    Route::get('/ai/export', [AiExportController::class, 'download'])->name('ai.export');
 
     /*
     |--------------------------------------------------------------------------

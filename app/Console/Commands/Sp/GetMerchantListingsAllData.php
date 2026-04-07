@@ -13,7 +13,7 @@ class GetMerchantListingsAllData extends Command
 {
     protected $signature = 'app:get-merchant-listings';
 
-    protected $description = 'Fetch GET_MERCHANT_LISTINGS_ALL_DATA report from SP-API and process it.';
+    protected $description = 'SP: Fetch GET_MERCHANT_LISTINGS_ALL_DATA from SP-API';
 
     public function handle(SellerConnector $connector, ReportService $reportService)
     {

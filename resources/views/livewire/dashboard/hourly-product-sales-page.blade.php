@@ -38,6 +38,71 @@
             background-color: rgba(85, 110, 230, 0.2) !important;
         }
 
+        /* Prevent header text wrapping */
+        .table thead th {
+            white-space: nowrap;
+            min-width: 100px;
+        }
+
+        .table thead th:first-child {
+            min-width: 150px;
+        }
+
+        /* Totals row styling */
+        .table tbody tr.totals-row {
+            background-color: rgba(85, 110, 230, 0.08);
+            font-weight: 600;
+            border-top: 2px solid #556ee6;
+            border-bottom: 2px solid #556ee6;
+        }
+
+        html[data-bs-theme="dark"] .table tbody tr.totals-row,
+        body[data-bs-theme="dark"] .table tbody tr.totals-row {
+            background-color: rgba(85, 110, 230, 0.15);
+        }
+
+        .table tbody tr.totals-row td {
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+        }
+
+        /* Accent color borders for totals row */
+        .table tbody tr.totals-row td.accent-today {
+            border-bottom: 3px solid #008FFB !important;
+        }
+
+        .table tbody tr.totals-row td.accent-yesterday {
+            border-bottom: 3px solid #ffc107 !important;
+        }
+
+        .table tbody tr.totals-row td.accent-day-1 {
+            border-bottom: 3px solid #cbd5e1 !important;
+        }
+
+        .table tbody tr.totals-row td.accent-day-2 {
+            border-bottom: 3px solid #a5b4fc !important;
+        }
+
+        .table tbody tr.totals-row td.accent-day-3 {
+            border-bottom: 3px solid #c4b5fd !important;
+        }
+
+        .table tbody tr.totals-row td.accent-day-4 {
+            border-bottom: 3px solid #f0abfc !important;
+        }
+
+        .table tbody tr.totals-row td.accent-day-5 {
+            border-bottom: 3px solid #fda4af !important;
+        }
+
+        .table tbody tr.totals-row td.accent-day-6 {
+            border-bottom: 3px solid #fed7aa !important;
+        }
+
+        .table tbody tr.totals-row td.accent-day-7 {
+            border-bottom: 3px solid #fde68a !important;
+        }
+
         .pagination {
             margin-bottom: 0;
         }
@@ -78,7 +143,7 @@
     </div>
 
     {{-- Overlay Chart (TOP) --}}
-    <div class="card mb-3">
+    <div class="card mb-3 shadow-sm">
         <div class="card-body position-relative" style="min-height: 380px;">
 
             {{-- REAL Header (backend rendered; hide while loading) --}}
@@ -123,7 +188,7 @@
     </div>
 
     {{-- Filters --}}
-    <div class="card mb-3">
+    <div class="card mb-3 shadow-sm">
         <div class="card-body py-2">
             <div class="row g-2 align-items-center">
 
@@ -135,6 +200,20 @@
                             <i class="bx bx-calendar"></i>
                         </span>
                         <input type="date" class="form-control" wire:model.live="date">
+                    </div>
+                </div>
+
+                {{-- Date Range --}}
+                <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6">
+                    <label class="form-label mb-0 small text-muted">Compare With</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bx bx-time"></i>
+                        </span>
+                        <select class="form-select" wire:model.live="dateRange">
+                            <option value="current">Yesterday</option>
+                            <option value="last_7_days">Last 7 Days</option>
+                        </select>
                     </div>
                 </div>
 
@@ -182,11 +261,15 @@
     </div>
 
     {{-- Product table --}}
-    <div class="card">
+    <div class="card shadow-sm">
         <div class="card-body">
             <div class="d-flex align-items-center justify-content-between mb-2">
                 <div class="fw-semibold">
-                    Products ({{ $tableLabelCurrent }} vs {{ $tableLabelPrev }}) — click row to toggle selection
+                    @if($dateRange === 'last_7_days')
+                        Products ({{ $tableLabelCurrent }} vs Last 7 Days) — click row to toggle selection
+                    @else
+                        Products ({{ $tableLabelCurrent }} vs {{ $tableLabelPrev }}) — click row to toggle selection
+                    @endif
                 </div>
             </div>
 
@@ -199,14 +282,64 @@
                             <th>SKU</th>
 
                             <th class="text-end">Units - {{ $tableLabelCurrent }}</th>
-                            <th class="text-end">Sales - {{ $tableLabelCurrent }}</th>
+                            <th class="text-end">Sales (USD) - {{ $tableLabelCurrent }}</th>
 
-                            <th class="text-end">Units - {{ $tableLabelPrev }}</th>
-                            <th class="text-end">Sales - {{ $tableLabelPrev }}</th>
+                            @if($dateRange === 'last_7_days' && !empty($dayLabels))
+                                @foreach($dayLabels as $dayLabel)
+                                    <th class="text-end">Units - {{ $dayLabel['label'] }}</th>
+                                    <th class="text-end">Sales (USD) - {{ $dayLabel['label'] }}</th>
+                                @endforeach
+                            @else
+                                <th class="text-end">Units - {{ $tableLabelPrev }}</th>
+                                <th class="text-end">Sales (USD) - {{ $tableLabelPrev }}</th>
+                            @endif
                         </tr>
                     </thead>
 
                     <tbody>
+                        {{-- Totals Summary Row --}}
+                        <tr class="totals-row">
+                            <td colspan="3" class="fw-bold">
+                                @if($selectedAsin || $selectedSku)
+                                    <i class="bx bx-target-lock me-1"></i> Selected Product Totals
+                                @else
+                                    <i class="bx bx-calculator me-1"></i> All Products Totals
+                                @endif
+                            </td>
+
+                            <td class="text-end text-primary accent-today">
+                                {{ number_format((int) ($totals->units_today ?? 0)) }}
+                            </td>
+
+                            <td class="text-end text-success accent-today">
+                                ${{ number_format((float) ($totals->sales_today ?? 0), 2) }}
+                            </td>
+
+                            @if($dateRange === 'last_7_days' && !empty($dayLabels))
+                                @foreach($dayLabels as $index => $dayLabel)
+                                    @php
+                                        $dayNum = $index + 1;
+                                        $units = $totals->{"units_day_{$dayNum}"} ?? 0;
+                                        $sales = $totals->{"sales_day_{$dayNum}"} ?? 0;
+                                    @endphp
+                                    <td class="text-end text-info accent-day-{{ $dayNum }}">
+                                        {{ number_format((int) $units) }}
+                                    </td>
+                                    <td class="text-end text-info accent-day-{{ $dayNum }}">
+                                        ${{ number_format((float) $sales, 2) }}
+                                    </td>
+                                @endforeach
+                            @else
+                                <td class="text-end text-info accent-yesterday">
+                                    {{ number_format((int) ($totals->units_yesterday ?? 0)) }}
+                                </td>
+
+                                <td class="text-end text-info accent-yesterday">
+                                    ${{ number_format((float) ($totals->sales_yesterday ?? 0), 2) }}
+                                </td>
+                            @endif
+                        </tr>
+
                         @forelse($products as $row)
                             @php
                                 $isSelected =
@@ -229,17 +362,33 @@
                                     ${{ number_format((float) $row->sales_today, 2) }}
                                 </td>
 
-                                <td class="text-end text-muted">
-                                    {{ number_format((int) $row->units_yesterday) }}
-                                </td>
+                                @if($dateRange === 'last_7_days' && !empty($dayLabels))
+                                    @foreach($dayLabels as $index => $dayLabel)
+                                        @php
+                                            $dayNum = $index + 1;
+                                            $units = $row->{"units_day_{$dayNum}"} ?? 0;
+                                            $sales = $row->{"sales_day_{$dayNum}"} ?? 0;
+                                        @endphp
+                                        <td class="text-end text-muted">
+                                            {{ number_format((int) $units) }}
+                                        </td>
+                                        <td class="text-end text-muted">
+                                            ${{ number_format((float) $sales, 2) }}
+                                        </td>
+                                    @endforeach
+                                @else
+                                    <td class="text-end text-muted">
+                                        {{ number_format((int) ($row->units_yesterday ?? 0)) }}
+                                    </td>
 
-                                <td class="text-end fw-semibold text-primary">
-                                    ${{ number_format((float) $row->sales_yesterday, 2) }}
-                                </td>
+                                    <td class="text-end text-muted">
+                                        ${{ number_format((float) ($row->sales_yesterday ?? 0), 2) }}
+                                    </td>
+                                @endif
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted py-4">
+                                <td colspan="{{ $dateRange === 'last_7_days' ? 17 : 7 }}" class="text-center text-muted py-4">
                                     No products found for current filters.
                                 </td>
                             </tr>
@@ -407,16 +556,17 @@
 
                         fill: {
                             type: 'gradient',
-                            opacity: [0.6, 0.35],
+                            opacity: 0.35,
                             gradient: {
                                 shadeIntensity: 1,
-                                opacityFrom: 1,
+                                opacityFrom: 0.6,
                                 opacityTo: 0,
                                 stops: [0, 96, 100]
                             }
                         },
 
-                        colors: ['#ffc107', '#008FFB'],
+                        // Colors: 7 past days (light colors) + Yesterday (yellow) + Today (blue)
+                        colors: ['#ffc107', '#008FFB', '#c4b5fd', '#f0abfc', '#fda4af', '#fed7aa', '#fde68a', '#ffc107', '#008FFB'],
 
                         yaxis: {
                             decimalsInFloat: 0,

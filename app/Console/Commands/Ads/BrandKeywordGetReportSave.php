@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 class BrandKeywordGetReportSave extends Command
 {
     protected $signature = 'app:brand-keyword-get-report-save';
-    protected $description = 'Save SB Keyword Performance Daily Report';
+    protected $description = 'ADS: Save SB Keyword Performance Report [US/CA]';
 
     public function handle()
     {

@@ -3,12 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SpSearchTermSummaryReport extends Model
 {
-    //
-    use SoftDeletes;
 
     protected $table = 'sp_search_term_summary_reports';
 

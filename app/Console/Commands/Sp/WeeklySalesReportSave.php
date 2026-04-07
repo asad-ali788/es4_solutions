@@ -20,7 +20,7 @@ class WeeklySalesReportSave extends Command
      *
      * @var string
      */
-    protected $description = 'Save Weekly sales report';
+    protected $description = 'SP: Save Weekly Order Sales Data to Database';
 
     /**
      * Execute the console command.

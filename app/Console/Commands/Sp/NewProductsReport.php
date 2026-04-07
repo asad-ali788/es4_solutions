@@ -12,7 +12,7 @@ use SellingPartnerApi\Seller\ReportsV20210630\Dto\CreateReportSpecification;
 class NewProductsReport extends Command
 {
     protected $signature        = 'app:new-products-report';
-    protected $description      = 'Fetch and process GET_MERCHANT_LISTINGS_ALL_DATA reports for all marketplaces';
+    protected $description      = 'SP: Fetch and Save New Merchant Listings from SP-API (All Marketplaces)';
     private   const REPORT_TYPE = 'GET_MERCHANT_LISTINGS_ALL_DATA';
 
     private const MAX_ATTEMPTS  = 30;

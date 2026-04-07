@@ -20,7 +20,7 @@ class HourlySalesReport extends Command
     }
 
     protected $signature = 'app:hourly-sales-report';
-    protected $description = 'Generate hourly sales report';
+    protected $description = 'SP: Request Hourly Summary Sales Report (Legacy)';
 
     public function handle(): int
     {

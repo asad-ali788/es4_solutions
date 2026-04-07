@@ -15,14 +15,14 @@ class CampaignRequestReport extends Command
      *
      * @var string
      */
-    protected $signature = 'app:campaign-request-report';
+    protected $signature = 'app:campaign-request-report {targetDate?}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Generate campaign SP Daily Report';
+    protected $description = 'ADS: Request SP Campaign Performance Report [US/CA]';
 
     protected int $maxRetries = 3;
     protected int $retryDelaySeconds = 60;
@@ -33,9 +33,26 @@ class CampaignRequestReport extends Command
     public function handle(AmazonAdsService $clients)
     {
         $marketTz = config('timezone.market');
+        $targetDate = $this->argument('targetDate');
+
+        if ($targetDate) {
+            $date = Carbon::parse($targetDate)->toDateString();
+            $this->requestReportForCountry($clients, config('amazon_ads.profiles.CA'), $date, 'CA', 'spCampaigns_update');
+            $this->requestReportForCountry($clients, config('amazon_ads.profiles.US'), $date, 'US', 'spCampaigns_update');
+            $this->info("✅ Campaign reports processed for $date.");
+            return;
+        }
+        
+        // 📅 Standard: Sub 1 day
         $date     = Carbon::now($marketTz)->subDays()->toDateString();
         $this->requestReportForCountry($clients, config('amazon_ads.profiles.CA'), $date, 'CA');
         $this->requestReportForCountry($clients, config('amazon_ads.profiles.US'), $date, 'US');
+        
+        // 📅 Update: Sub 2 days (One more day behind)
+        $updateDate = Carbon::now($marketTz)->subDays(2)->toDateString();
+        $this->requestReportForCountry($clients, config('amazon_ads.profiles.CA'), $updateDate, 'CA', 'spCampaigns_update');
+        $this->requestReportForCountry($clients, config('amazon_ads.profiles.US'), $updateDate, 'US', 'spCampaigns_update');
+
         echo "✅ Campaign reports processed for US and CA.\n";
     }
 
@@ -43,7 +60,8 @@ class CampaignRequestReport extends Command
         AmazonAdsService $clients,
         string $profileId,
         string $date,
-        string $country
+        string $country,
+        string $reportTypeOverride = null
     ): void {
         $attempt = 0;
 
@@ -85,7 +103,7 @@ class CampaignRequestReport extends Command
                     $responseData = json_decode($response['response'], true);
                     AmzAdsReportLog::create([
                         'country'       => $country,
-                        'report_type'   => $responseData['configuration']['reportTypeId'] ?? null,
+                        'report_type'   => $reportTypeOverride ?? ($responseData['configuration']['reportTypeId'] ?? null),
                         'report_id'     => $responseData['reportId'] ?? null,
                         'report_status' => 'IN_PROGRESS',
                         'r_iteration'   => 0,

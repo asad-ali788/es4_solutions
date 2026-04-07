@@ -10,11 +10,12 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "franbarbalopez/mirror": "^1.4",
         "highsidelabs/laravel-spapi": "^2.1",
         "intervention/image": "^3.11",
         "jenssegers/agent": "^2.6",
         "lai3221/amzn_adv_api_php": "^3.0",
-        "laravel/ai": "^0.1.3",
+        "laravel/ai": "^0.3.2",
         "laravel/framework": "^12.0",
         "laravel/nightwatch": "^1.19",
         "laravel/pulse": "^1.5",

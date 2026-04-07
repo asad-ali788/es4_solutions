@@ -47,11 +47,18 @@ class StocksExportSku implements FromCollection, WithHeadings, ShouldAutoSize, W
 
         // --- Base Query ---
         $query = Product::query()
+            ->leftJoin('product_asins', 'products.id', '=', 'product_asins.product_id')
+            ->leftJoin('product_categorisations as pc', function($join) {
+                $join->on('pc.child_asin', '=', 'product_asins.asin1')
+                     ->whereNull('pc.deleted_at');
+            })
             ->leftJoinSub($afnSub, 'afn', fn($join) => $join->on('products.sku', '=', 'afn.seller_sku'))
             ->leftJoinSub($fbaSub, 'fba', fn($join) => $join->on('products.sku', '=', 'fba.sku'))
             ->leftJoinSub($inboundSub, 'inbound', fn($join) => $join->on('products.sku', '=', 'inbound.sku'))
             ->select([
                 'products.sku',
+                'product_asins.asin1 as asin',
+                'pc.child_short_name as product_name',
                 DB::raw('COALESCE(afn.afn_quantity, 0) as afn_quantity'),
                 DB::raw('COALESCE(fba.fba_totalstock, 0) as fba_totalstock'),
                 DB::raw('COALESCE(inbound.inbound_qty, 0) as inbound_qty'),
@@ -79,7 +86,11 @@ class StocksExportSku implements FromCollection, WithHeadings, ShouldAutoSize, W
         }
 
         if ($this->sku) {
-            $query->where('products.sku', 'like', '%' . $this->sku . '%');
+            $query->where(function($q) {
+                $q->where('products.sku', 'like', '%' . $this->sku . '%')
+                  ->orWhere('product_asins.asin1', 'like', '%' . $this->sku . '%')
+                  ->orWhere('pc.child_short_name', 'like', '%' . $this->sku . '%');
+            });
         }
 
         return $query->get();
@@ -87,7 +98,7 @@ class StocksExportSku implements FromCollection, WithHeadings, ShouldAutoSize, W
 
     public function headings(): array
     {
-        $headings = ['SKU', 'AFN Quantity', 'FBA Total Stock', 'Inbound Qty'];
+        $headings = ['SKU', 'ASIN', 'Product Name', 'AFN Quantity', 'FBA Total Stock', 'Inbound Qty'];
 
         foreach ($this->warehouses as $wh) {
             $headings[] = $wh->warehouse_name;

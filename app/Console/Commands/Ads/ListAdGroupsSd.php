@@ -20,7 +20,7 @@ class ListAdGroupsSd extends Command
      *
      * @var string
      */
-    protected $description = 'Get SD Ad Groups Daily Report';
+    protected $description = 'ADS: Sync SD Ad Groups [US/CA] from Amazon Ads API';
 
     /**
      * Execute the console command.

@@ -1,5 +1,5 @@
 <div class="col-12 col-lg-6 d-flex">
-    <div class="card w-100 mb-0">
+    <div class="card w-100 mb-0 shadow-sm">
         <div class="card-body">
             <div class="clearfix">
                 <div class="d-flex align-items-center mb-2">

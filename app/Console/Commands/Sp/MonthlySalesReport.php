@@ -20,7 +20,7 @@ class MonthlySalesReport extends Command
      *
      * @var string
      */
-    protected $description = 'Generate monthly Sales Report';
+    protected $description = 'SP: Request Monthly Order Sales Report (All Marketplaces)';
 
     /**
      * Execute the console command.

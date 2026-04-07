@@ -28,7 +28,7 @@ class AmzScheduleCampaignUpdates extends Command
      *
      * @var string
      */
-    protected $description = 'Amz Ads Campaign Scheduling Status Updates';
+    protected $description = 'ADS: Sync Scheduled Campaign Status Changes';
 
     /**
      * Execute the console command.

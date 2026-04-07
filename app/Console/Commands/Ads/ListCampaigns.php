@@ -20,7 +20,7 @@ class ListCampaigns extends Command
      *
      * @var string
      */
-    protected $description = 'Get SP Campaigns Daily Report';
+    protected $description = 'ADS: Sync SP Campaigns [US/CA] from Amazon Ads API';
 
     /**
      * Execute the console command.

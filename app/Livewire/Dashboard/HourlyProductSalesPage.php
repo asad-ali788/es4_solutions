@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Dashboard;
 
+use App\Models\Currency;
 use App\Models\HourlyProductSales;
 use App\Models\ProductCategorisation;
 use Carbon\Carbon;
@@ -35,6 +36,12 @@ class HourlyProductSalesPage extends Component
     public string $tableLabelCurrent = 'Today';
     public string $tableLabelPrev = 'Yesterday';
 
+    // Store individual day labels for the table
+    public array $dayLabels = [];
+
+    #[Url]
+    public string $dateRange = 'current';
+
     #[Url]
     public string $date = '';
 
@@ -67,6 +74,11 @@ class HourlyProductSalesPage extends Component
             $this->date = Carbon::now($this->marketTz)->toDateString();
         }
 
+        // Validate and reset to today if invalid
+        if (!$this->isValidDate($this->date)) {
+            $this->date = Carbon::now($this->marketTz)->toDateString();
+        }
+
         // Set initial title/subtitle for first paint
         $day = Carbon::createFromFormat('Y-m-d', $this->date, $this->marketTz)->startOfDay();
         $this->chartTitle = $this->selectionTitle();
@@ -82,9 +94,15 @@ class HourlyProductSalesPage extends Component
 
     public function updated(string $name, mixed $value): void
     {
-        if (!in_array($name, ['date', 'search', 'perPage', 'salesChannel'], true)) {
+        if (!in_array($name, ['date', 'search', 'perPage', 'salesChannel', 'dateRange'], true)) {
             return;
         }
+
+        // Validate date if it changed
+        if ($name === 'date' && !$this->isValidDate($this->date)) {
+            $this->date = Carbon::now($this->marketTz)->toDateString();
+        }
+
         $this->applyDateLabels();
         $this->resetPage();
         $this->clearSelection();
@@ -136,6 +154,7 @@ class HourlyProductSalesPage extends Component
     public function clearAll(): void
     {
         $this->date = Carbon::now($this->marketTz)->toDateString();
+        $this->dateRange = 'current';
         $this->salesChannel = null;
         $this->search = '';
 
@@ -152,17 +171,20 @@ class HourlyProductSalesPage extends Component
     }
 
     /**
-     * CHANGED: chart always uses selected date and selected date - 1 day.
-     * No more "today/yesterday" unless selected date is literally today.
+     * CHANGED: chart shows individual days (today + 7 separate lines when last_7_days is selected)
      */
     public function loadChart(): void
     {
         $this->applyDateLabels();
 
+        // Validate date before processing
+        if (!$this->isValidDate($this->date)) {
+            $this->date = Carbon::now($this->marketTz)->toDateString();
+        }
+
         $tz = $this->marketTz;
 
         $selectedDay = Carbon::createFromFormat('Y-m-d', $this->date, $tz)->startOfDay();
-        $prevDay     = $selectedDay->copy()->subDay();
 
         $nowMarket = Carbon::now($tz);
         $isToday   = $selectedDay->isSameDay($nowMarket);
@@ -171,18 +193,37 @@ class HourlyProductSalesPage extends Component
         $cutoff = $isToday ? $nowMarket : null;
 
         $selectedRows = $this->fetchDayRows($selectedDay);
-        $prevRows     = $this->fetchDayRows($prevDay);
-
         $selectedPoints = $this->toOverlayPoints($selectedRows, $tz, $cutoff);
-        $prevPoints     = $this->toOverlayPoints($prevRows, $tz, null);
 
         $series = [];
 
-        if ($prevPoints !== []) {
-            $series[] = [
-                'name' => $isToday ? 'Yesterday' : $prevDay->toDateString(),
-                'data' => $prevPoints,
-            ];
+        // Handle comparison period based on dateRange
+        if ($this->dateRange === 'last_7_days') {
+            // Add individual lines for each of the 7 days
+            for ($i = 1; $i <= 7; $i++) {
+                $day = $selectedDay->copy()->subDays($i);
+                $dayRows = $this->fetchDayRows($day);
+                $dayPoints = $this->toOverlayPoints($dayRows, $tz, null);
+                
+                if ($dayPoints !== []) {
+                    $series[] = [
+                        'name' => $day->format('M d') . ' (' . $day->format('D') . ')',
+                        'data' => $dayPoints,
+                    ];
+                }
+            }
+        } else {
+            // Default: yesterday
+            $prevDay = $selectedDay->copy()->subDay();
+            $prevRows = $this->fetchDayRows($prevDay);
+            $prevPoints = $this->toOverlayPoints($prevRows, $tz, null);
+            
+            if ($prevPoints !== []) {
+                $series[] = [
+                    'name' => $isToday ? 'Yesterday' : $prevDay->toDateString(),
+                    'data' => $prevPoints,
+                ];
+            }
         }
 
         if ($selectedPoints !== []) {
@@ -202,6 +243,11 @@ class HourlyProductSalesPage extends Component
 
     private function isSelectedDayToday(): bool
     {
+        // Validate date before processing
+        if (!$this->isValidDate($this->date)) {
+            return true; // Reset to today if invalid
+        }
+
         $tz = $this->marketTz;
 
         $selectedDay = Carbon::createFromFormat('Y-m-d', $this->date, $tz)->startOfDay();
@@ -212,12 +258,36 @@ class HourlyProductSalesPage extends Component
 
     private function applyDateLabels(): void
     {
+        // Validate date before processing
+        if (!$this->isValidDate($this->date)) {
+            $this->date = Carbon::now($this->marketTz)->toDateString();
+        }
+
         $tz = $this->marketTz;
-
         $selectedDay = Carbon::createFromFormat('Y-m-d', $this->date, $tz)->startOfDay();
-        $prevDay     = $selectedDay->copy()->subDay();
+        $isToday = $this->isSelectedDayToday();
 
-        if ($this->isSelectedDayToday()) {
+        if ($this->dateRange === 'last_7_days') {
+            // Build labels for 7 individual days
+            $this->dayLabels = [];
+            for ($i = 1; $i <= 7; $i++) {
+                $day = $selectedDay->copy()->subDays($i);
+                $this->dayLabels[] = [
+                    'label' => $day->format('M d'),
+                    'full' => $day->toDateString(),
+                ];
+            }
+            
+            $this->tableLabelCurrent = $isToday ? 'Today' : $selectedDay->toDateString();
+            $this->tableLabelPrev = 'Last 7 Days';
+            return;
+        }
+
+        // Default: current (today + yesterday)
+        $prevDay = $selectedDay->copy()->subDay();
+        $this->dayLabels = [];
+
+        if ($isToday) {
             $this->tableLabelCurrent = 'Today';
             $this->tableLabelPrev    = 'Yesterday';
             return;
@@ -236,10 +306,15 @@ class HourlyProductSalesPage extends Component
             ->paginate($this->perPage);
 
         $channels = $this->salesChannelsForDay($todayStart, $todayEnd);
+        
+        // Calculate totals across all products (not just current page)
+        $totals = $this->calculateTotals($todayStart, $todayEnd);
 
         return view('livewire.dashboard.hourly-product-sales-page', [
             'products' => $products,
             'channels' => $channels,
+            'dayLabels' => $this->dayLabels,
+            'totals' => $totals,
         ]);
     }
 
@@ -265,9 +340,13 @@ class HourlyProductSalesPage extends Component
         $nowMarket = Carbon::now($tz);
         $isToday  = $selectedDay->isSameDay($nowMarket);
 
-        $compareLabel = $isToday
-            ? 'Yesterday'
-            : $selectedDay->copy()->subDay()->toDateString();
+        if ($this->dateRange === 'last_7_days') {
+            $compareLabel = 'Last 7 Days (Individual)';
+        } else {
+            $compareLabel = $isToday
+                ? 'Yesterday'
+                : $selectedDay->copy()->subDay()->toDateString();
+        }
 
         $mainLabel = $isToday
             ? 'Today'
@@ -279,6 +358,11 @@ class HourlyProductSalesPage extends Component
 
     private function dayRangeMarket(string $date): array
     {
+        // Validate date before processing
+        if (!$this->isValidDate($date)) {
+            $date = Carbon::now($this->marketTz)->toDateString();
+        }
+
         $day = Carbon::createFromFormat('Y-m-d', $date, $this->marketTz)->startOfDay();
 
         return [
@@ -289,15 +373,14 @@ class HourlyProductSalesPage extends Component
 
     private function productsQuery(Carbon $todayStart, Carbon $todayEnd): Builder
     {
-        $yesterdayStart = $todayStart->copy()->subDay();
-        $yesterdayEnd   = $todayEnd->copy()->subDay();
-
         $salesTable = (new HourlyProductSales())->getTable();
         $catTable   = (new ProductCategorisation())->getTable();
+        $currencyTable = (new Currency())->getTable();
 
-        return HourlyProductSales::query()
+        $query = HourlyProductSales::query()
             ->from($salesTable)
             ->leftJoin($catTable . ' as pc', 'pc.child_asin', '=', $salesTable . '.asin')
+            ->leftJoin($currencyTable . ' as cur', 'cur.currency_code', '=', $salesTable . '.currency')
             ->select([
                 $salesTable . '.asin',
                 $salesTable . '.sku',
@@ -308,18 +391,46 @@ class HourlyProductSalesPage extends Component
                 [$todayStart, $todayEnd]
             )
             ->selectRaw(
-                "SUM(CASE WHEN {$salesTable}.sale_hour BETWEEN ? AND ? THEN {$salesTable}.total_units ELSE 0 END) as units_yesterday",
-                [$yesterdayStart, $yesterdayEnd]
-            )
-            ->selectRaw(
-                "SUM(CASE WHEN {$salesTable}.sale_hour BETWEEN ? AND ? THEN {$salesTable}.item_price ELSE 0 END) as sales_today",
+                "SUM(CASE WHEN {$salesTable}.sale_hour BETWEEN ? AND ? THEN ({$salesTable}.item_price * COALESCE(cur.conversion_rate_to_usd, 1)) ELSE 0 END) as sales_today",
                 [$todayStart, $todayEnd]
+            );
+
+        // Determine comparison period based on dateRange
+        if ($this->dateRange === 'last_7_days') {
+            // Add individual columns for each of the 7 days
+            for ($i = 1; $i <= 7; $i++) {
+                $dayStart = $todayStart->copy()->subDays($i)->startOfDay();
+                $dayEnd = $todayStart->copy()->subDays($i)->endOfDay();
+                
+                $query->selectRaw(
+                    "SUM(CASE WHEN {$salesTable}.sale_hour BETWEEN ? AND ? THEN {$salesTable}.total_units ELSE 0 END) as units_day_{$i}",
+                    [$dayStart, $dayEnd]
+                )
+                ->selectRaw(
+                    "SUM(CASE WHEN {$salesTable}.sale_hour BETWEEN ? AND ? THEN ({$salesTable}.item_price * COALESCE(cur.conversion_rate_to_usd, 1)) ELSE 0 END) as sales_day_{$i}",
+                    [$dayStart, $dayEnd]
+                );
+            }
+            
+            $comparisonStart = $todayStart->copy()->subDays(7)->startOfDay();
+            $comparisonEnd   = $todayStart->copy()->subSecond();
+        } else {
+            // Default: current (yesterday only)
+            $comparisonStart = $todayStart->copy()->subDay();
+            $comparisonEnd   = $todayEnd->copy()->subDay();
+            
+            $query->selectRaw(
+                "SUM(CASE WHEN {$salesTable}.sale_hour BETWEEN ? AND ? THEN {$salesTable}.total_units ELSE 0 END) as units_yesterday",
+                [$comparisonStart, $comparisonEnd]
             )
             ->selectRaw(
-                "SUM(CASE WHEN {$salesTable}.sale_hour BETWEEN ? AND ? THEN {$salesTable}.item_price ELSE 0 END) as sales_yesterday",
-                [$yesterdayStart, $yesterdayEnd]
-            )
-            ->whereBetween($salesTable . '.sale_hour', [$yesterdayStart, $todayEnd])
+                "SUM(CASE WHEN {$salesTable}.sale_hour BETWEEN ? AND ? THEN ({$salesTable}.item_price * COALESCE(cur.conversion_rate_to_usd, 1)) ELSE 0 END) as sales_yesterday",
+                [$comparisonStart, $comparisonEnd]
+            );
+        }
+
+        return $query
+            ->whereBetween($salesTable . '.sale_hour', [$comparisonStart, $todayEnd])
             ->when($this->salesChannel, fn(Builder $q) => $q->where($salesTable . '.sales_channel', $this->salesChannel))
             ->when($this->search !== '', function (Builder $q) use ($salesTable) {
                 $s = '%' . str_replace('%', '\\%', $this->search) . '%';
@@ -332,7 +443,7 @@ class HourlyProductSalesPage extends Component
             })
             ->groupBy($salesTable . '.asin', $salesTable . '.sku', 'pc.child_short_name')
             ->orderByDesc('units_today')
-            ->orderByDesc('units_yesterday');
+            ->orderByDesc('sales_today');
     }
 
     private function fetchDayRows(Carbon $dayMarket): Collection
@@ -388,5 +499,92 @@ class HourlyProductSalesPage extends Component
             ->map(fn($v) => (string) $v)
             ->values()
             ->all();
+    }
+
+    /**
+     * Calculate totals across all products (respecting filters)
+     */
+    private function calculateTotals(Carbon $todayStart, Carbon $todayEnd): object
+    {
+        $salesTable = (new HourlyProductSales())->getTable();
+        $currencyTable = (new Currency())->getTable();
+        
+        $query = HourlyProductSales::query()
+            ->from($salesTable)
+            ->leftJoin($currencyTable . ' as cur', 'cur.currency_code', '=', $salesTable . '.currency')
+            ->selectRaw(
+                "SUM(CASE WHEN {$salesTable}.sale_hour BETWEEN ? AND ? THEN {$salesTable}.total_units ELSE 0 END) as units_today",
+                [$todayStart, $todayEnd]
+            )
+            ->selectRaw(
+                "SUM(CASE WHEN {$salesTable}.sale_hour BETWEEN ? AND ? THEN ({$salesTable}.item_price * COALESCE(cur.conversion_rate_to_usd, 1)) ELSE 0 END) as sales_today",
+                [$todayStart, $todayEnd]
+            );
+
+        // Determine comparison period based on dateRange
+        if ($this->dateRange === 'last_7_days') {
+            // Add individual columns for each of the 7 days
+            for ($i = 1; $i <= 7; $i++) {
+                $dayStart = $todayStart->copy()->subDays($i)->startOfDay();
+                $dayEnd = $todayStart->copy()->subDays($i)->endOfDay();
+                
+                $query->selectRaw(
+                    "SUM(CASE WHEN {$salesTable}.sale_hour BETWEEN ? AND ? THEN {$salesTable}.total_units ELSE 0 END) as units_day_{$i}",
+                    [$dayStart, $dayEnd]
+                )
+                ->selectRaw(
+                    "SUM(CASE WHEN {$salesTable}.sale_hour BETWEEN ? AND ? THEN ({$salesTable}.item_price * COALESCE(cur.conversion_rate_to_usd, 1)) ELSE 0 END) as sales_day_{$i}",
+                    [$dayStart, $dayEnd]
+                );
+            }
+            
+            $comparisonStart = $todayStart->copy()->subDays(7)->startOfDay();
+            $comparisonEnd   = $todayStart->copy()->subSecond();
+        } else {
+            // Default: current (yesterday only)
+            $comparisonStart = $todayStart->copy()->subDay();
+            $comparisonEnd   = $todayEnd->copy()->subDay();
+            
+            $query->selectRaw(
+                "SUM(CASE WHEN {$salesTable}.sale_hour BETWEEN ? AND ? THEN {$salesTable}.total_units ELSE 0 END) as units_yesterday",
+                [$comparisonStart, $comparisonEnd]
+            )
+            ->selectRaw(
+                "SUM(CASE WHEN {$salesTable}.sale_hour BETWEEN ? AND ? THEN ({$salesTable}.item_price * COALESCE(cur.conversion_rate_to_usd, 1)) ELSE 0 END) as sales_yesterday",
+                [$comparisonStart, $comparisonEnd]
+            );
+        }
+
+        $query->whereBetween($salesTable . '.sale_hour', [$comparisonStart, $todayEnd])
+            ->when($this->salesChannel, fn(Builder $q) => $q->where($salesTable . '.sales_channel', $this->salesChannel))
+            ->when($this->selectedAsin, fn(Builder $q) => $q->where($salesTable . '.asin', $this->selectedAsin))
+            ->when(!$this->selectedAsin && $this->selectedSku, fn(Builder $q) => $q->where($salesTable . '.sku', $this->selectedSku))
+            ->when($this->search !== '', function (Builder $q) use ($salesTable) {
+                $s = '%' . str_replace('%', '\\%', $this->search) . '%';
+                $q->where(function (Builder $w) use ($s, $salesTable) {
+                    $w->where($salesTable . '.asin', 'like', $s)
+                        ->orWhere($salesTable . '.sku', 'like', $s);
+                });
+            });
+
+        return (object) ($query->first() ?? []);
+    }
+
+    /**
+     * Validate if a date string is in the correct format and represents a valid date
+     */
+    private function isValidDate(string $date): bool
+    {
+        if (empty($date)) {
+            return false;
+        }
+
+        try {
+            $parsed = Carbon::createFromFormat('Y-m-d', $date, $this->marketTz);
+            // Ensure the parsed date matches the input to catch invalid dates like 00-02-2026
+            return $parsed->toDateString() === $date;
+        } catch (\Exception) {
+            return false;
+        }
     }
 }

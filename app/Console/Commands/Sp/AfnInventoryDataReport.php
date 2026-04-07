@@ -20,7 +20,7 @@ class AfnInventoryDataReport extends Command
      *
      * @var string
      */
-    protected $description = 'Generate AFN Inventory Report';
+    protected $description = 'SP: Request AFN (Amazon-Fulfilled) Inventory Report - USA';
 
     /**
      * Execute the console command.

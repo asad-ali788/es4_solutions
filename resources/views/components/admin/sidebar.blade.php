@@ -172,6 +172,11 @@
                                     </a>
                                 </li>
                             @endcan
+                            <li @class(['mm-active' => Request::is('admin/ads/brand-analytics*')])>
+                                <a href="{{ route('admin.ads.brandAnalytics.index') }}">
+                                    Brand Analytics
+                                </a>
+                            </li>
                             @can('amazon-ads.data')
                                 <li @class([
                                     'mm-active' =>
@@ -179,6 +184,7 @@
                                         !Request::is('admin/ads/performance*') &&
                                         !Request::is('admin/ads/schedule*') &&
                                         !Request::is('admin/ads/budget*') &&
+                                        !Request::is('admin/ads/brand-analytics*') &&
                                         !Request::is('admin/ads/overview*'),
                                 ])>
                                     <a href="{{ route('admin.ads.campaigns') }}">Ads Data</a>
@@ -263,7 +269,12 @@
     </div>
 
     <div class="sidebar-footer text-center py-2"
-        style="position: absolute; bottom: 0; width: 100%; background-color: #2a3042;">
+        style="position: absolute; bottom: 0; width: 100%; background-color: #2a3042; z-index: 2;">
         <small class="text-white-50">v.12.48.1</small>
+    </div>
+
+    <!-- Massive Concave Sidebar Section -->
+    <div class="curve">
+      <div class="concave"></div>
     </div>
 </div>

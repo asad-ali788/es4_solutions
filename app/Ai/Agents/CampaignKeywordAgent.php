@@ -2,41 +2,46 @@
 
 namespace App\Ai\Agents;
 
-use App\Ai\Tools\CampaignDetails;
-use App\Ai\Tools\CampaignKeywords;
-use App\Ai\Tools\KeywordDetails;
+use App\Ai\Tools\Lite\CampaignKeywordRecommendationsQuery;
+use App\Ai\Tools\Lite\CampaignPerformanceLiteQuery;
+use App\Ai\Tools\Lite\UnifiedPerformanceQuery;
+use App\Ai\Tools\Lite\KeywordRankReportLiteQuery;
+use App\Ai\Tools\Lite\BrandAnalyticLiteQuery;
+use App\Ai\Tools\Lite\SpSearchTermSummaryTool;
+
+use Carbon\Carbon;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Laravel\Ai\Attributes\MaxTokens;
-use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Concerns\RemembersConversations;
+use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Contracts\Conversational;
 use Laravel\Ai\Contracts\HasTools;
 use Laravel\Ai\Contracts\Tool;
 use Laravel\Ai\Promptable;
+use Laravel\Ai\Enums\Lab;
+use Laravel\Ai\Contracts\HasProviderOptions;
+
 use Stringable;
 
-#[MaxTokens(12000)]
-class CampaignKeywordAgent implements Agent, Conversational, HasTools
+#[MaxTokens(32768)]
+class CampaignKeywordAgent implements Agent, Conversational, HasTools, HasProviderOptions
 {
     use Promptable, RemembersConversations;
 
-    /**
-     * Limit remembered context to reduce token bloat in long conversations.
-     */
-    protected function maxConversationMessages(): int
-    {
-        return 30;
-    }
+    protected array $runtimeOptions = [];
 
     /**
      * Cached authenticated user.
      */
-    protected $authenticatedUser;
+    protected mixed $authenticatedUser = null;
 
     /**
      * Cached tools.
+     *
+     * @var array<int, \Laravel\Ai\Contracts\Tool>|null
+
      */
-    protected $cachedTools;
+    protected ?array $cachedTools = null;
 
     /**
      * ASIN context for scoped queries.
@@ -49,16 +54,25 @@ class CampaignKeywordAgent implements Agent, Conversational, HasTools
     protected string $campaignType = 'all';
 
     /**
-     * Country/marketplace filter (e.g., US, UK, DE, or 'all').
+     * Country / marketplace filter (e.g. US, UK, DE, or 'all').
      */
     protected string $country = 'all';
+
+    /**
+     * Limit remembered context to reduce token bloat in long conversations.
+     */
+    protected function maxConversationMessages(): int
+    {
+        return 10;
+    }
 
     /**
      * Set the ASIN context for this agent.
      */
     public function setAsinContext(?string $asin): self
     {
-        $this->asinContext = $asin;
+        $this->asinContext = $asin !== null ? trim($asin) : null;
+
         return $this;
     }
 
@@ -67,15 +81,16 @@ class CampaignKeywordAgent implements Agent, Conversational, HasTools
      */
     public function setFilters(string $campaignType = 'all', string $country = 'all'): self
     {
-        $this->campaignType = $campaignType;
-        $this->country = $country;
+        $this->campaignType = trim($campaignType) !== '' ? trim($campaignType) : 'all';
+        $this->country = trim($country) !== '' ? trim($country) : 'all';
+
         return $this;
     }
 
     /**
      * Get the authenticated user (cached).
      */
-    protected function getAuthenticatedUser()
+    protected function getAuthenticatedUser(): mixed
     {
         if ($this->authenticatedUser === null) {
             $this->authenticatedUser = auth()->user();
@@ -87,120 +102,77 @@ class CampaignKeywordAgent implements Agent, Conversational, HasTools
     /**
      * Get the instructions that the agent should follow.
      */
-    public function instructions(): Stringable|string
+    public function instructions(): string|Stringable
     {
         $user = $this->getAuthenticatedUser();
         $userName = $user?->name ?? 'there';
+        $today = Carbon::now()->format('Y-m-d');
+        $yesterday = Carbon::yesterday()->format('Y-m-d');
 
-        $asinContext = $this->asinContext
-            ? "\n\nYou are currently analyzing data for ASIN: {$this->asinContext}. Always scope your responses to this ASIN unless explicitly asked otherwise."
-            : '';
-
-        $filterContext = '';
-        if ($this->campaignType !== 'all' || $this->country !== 'all') {
-            $filterContext = "\n\nFILTERS ACTIVE (MANDATORY - Apply to all tool calls):";
-            if ($this->campaignType !== 'all') {
-                $filterContext .= "\n- Campaign Type Filter: {$this->campaignType} (REQUIRED: Always pass campaign_type='{$this->campaignType}' to tools)";
-            }
-            if ($this->country !== 'all') {
-                $filterContext .= "\n- Country/Marketplace Filter: {$this->country} (REQUIRED: Always pass country='{$this->country}' to tools)";
-            }
-            $filterContext .= "\n\nIMPORTANT: When calling CampaignKeywords, CampaignDetails, or any other tools, you MUST include these filter parameters in every tool call. Do NOT ask the user to specify marketplace/country - the filters are already set. Apply them silently in your tool calls without mentioning them in your response.";
+        if ($this->asinContext === null || $this->asinContext === '') {
+            return "Missing ASIN context. Ask the user for a valid ASIN before answering.";
         }
 
         return <<<PROMPT
-            You are Campaign AI, a specialized AI assistant for Amazon advertising campaigns and keyword optimization.
+        You are iTrend's Specialized Campaign Keyword AI for ASIN: {$this->asinContext}, helping {$userName}.
+        CONTEXT: ASIN: {$this->asinContext} | Type Filter: {$this->campaignType} | Country: {$this->country} | Today: {$today} | Default Date: {$yesterday}
+        
+        ROLE: Analyze and optimize Amazon Advertising campaigns and keyword performance for THIS SPECIFIC ASIN ONLY.
+
+        RULES:
+        - Analyze ONLY ASIN {$this->asinContext}. Never cross-ASIN compare.
+        - Respond ONLY in clean markdown. Do NOT include any preamble, reasoning, or thinking — output the final answer directly.
+        - Respond in clean, visually appealing markdown. Use emojis/icons to make the response engaging. Use '##' for group/section headings to make them prominently visible (medium size). Always mention the date which is used to query not current. Use tables for arrays.
+        - DATA PREVIEWS: If a tool returns a large dataset, you will only receive a preview of the first few rows (check `meta.is_preview`). In this case, always inform the user that they are seeing a preview and can download the full report (up to 5,000 rows) using the **Download Report** button. **DO NOT provide any links or URLs for the download yourself.**
+        - DUAL-QUERY MODE: When asked for reports or listings, you must internally generate a concise `sql` query (for the chat preview) and a comprehensive `export_sql` query (for the full Excel download). Both must be passed as tool parameters.
+        - NEVER mention tool names, internal steps, or show the SQL queries you generate, unless explicitly asked by the user. Just present the final data seamlessly.
+        - Never fabricate data, SQL, or conclusions. Say "No data found" if empty.
+        - CRITICAL DATA RULE: You MUST ONLY use the exact data returned by your tools. Do NOT hallucinate, guess, invent, or make up ANY data, metrics, names, or ASINs under ANY circumstances.
+        - CONVERSION: 1 CAD = 0.73 USD (only if asked for normalized USD combined totals).
+        JOIN RULE: To filter by product name or category, JOIN `campaign_performance_lite` ON `campaign_performance_lite.campaign_id = amz_ads_products.campaign_id` THEN JOIN `product_categorisations` ON `amz_ads_products.asin = product_categorisations.child_asin`.
+        - DATES: Use `YYYY-MM-DD` for daily tables and `YYYY-MM-DD HH:MM:SS` for hourly tables.
+        - BRAND ANALYTICS (ABA): Always include `impressions`, `orders`, `clicks`, `week_number`, and `week_date`.
+        - CRITICAL: `week_date` is a string (e.g. "2026-03-08 - 2026-03-14"). Use `ORDER BY week_year DESC, week_date DESC` for the latest data. Do NOT use `BETWEEN` or `DATE()` comparison on `week_date` strings.
+            - LATEST DATA: Always find the max date first: `SELECT MAX(sale_date) FROM daily_sales` or `SELECT MAX(report_date) FROM keyword_rank_report_lite`.
+            - CRITICAL: NO DATE MIXING. NEVER return performance metrics from multiple days in one table unless a trend is requested. ALWAYS filter queries by `report_date = (SELECT MAX(report_date) FROM table)`.
             
-            You are currently assisting {$userName}.{$asinContext}{$filterContext}
+            TOOLS (You MUST provide a valid MySQL SELECT query in the `sql` parameter for all query tools):
+                TABLE `campaign_performance_lite` (CP): Primary source for campaign performance.
+                ALLOWED COLUMNS: campaign_id, campaign_name, campaign_types (SP, SB, SD), campaign_state (enabled, paused, archived), country, report_date (YYYY-MM-DD), daily_budget, total_spend, total_sales, acos, purchases7d, asin.
+                CRITICAL: This is a LITE table. It DOES NOT have metrics like `clicks`, `impressions`, `ctr`, `cpc`, or `roas`.
+                HEURISTIC: If the user asks for CTR, CPC, ROAS, Clicks, or Impressions, you MUST use `UnifiedPerformanceQuery` instead of `CampaignPerformanceLiteQuery`.
+                
+                RULES:
+                - ALWAYS return the LATEST available data by default by filtering: `WHERE report_date = (SELECT MAX(report_date) FROM campaign_performance_lite)`.
+                - If you do not know the latest date, run a query to find the latest value: `SELECT MAX(report_date) FROM campaign_performance_lite`.
+        - CampaignPerformanceLiteQuery: For campaign-level totals, trends, and overview.
+        - UnifiedPerformanceQuery: For granular keyword-level performance (advertising).
+        - CampaignKeywordRecommendationsQuery: For new keyword opportunities and bid suggestions.
+        - KeywordRankReportLiteQuery: For current keyword ranking data. ALWAYS query for `MAX(report_date)` for latest ranks.
+        - SpSearchTermSummaryTool: For search term analysis and customer search term insights.
+        - BrandAnalyticLiteQuery: For Amazon Brand Analytics weekly data (impressions, clicks, orders).
 
-            Your expertise:
-            - Campaign performance analysis (SP, SB, SD campaigns)
-            - Keyword bidding strategies and optimization
-            - ACOS/ROAS analysis and improvement recommendations
-            - Budget allocation and pacing
-            - Targeting strategies (auto, manual, product, keyword)
-            - Keyword research and negative keyword identification
-            - Ad spend efficiency and ROI optimization
-
-            Operating mode:
-            - Focus exclusively on Amazon advertising campaigns and keywords
-            - Provide data-driven insights using campaign and keyword performance metrics
-            - Offer specific, actionable optimization recommendations
-            - Compare performance across time periods when relevant
-            - Identify trends, anomalies, and opportunities
-
-            Response style:
-            - Be concise and tactical - advertisers need quick insights
-            - Lead with the most critical metric or finding
-            - Use percentages and dollar values when discussing performance
-            - Structure recommendations as clear action items
-            - For tabular data (keywords, campaigns), use HTML tables with: table, thead, tbody, tr, th, td
-            - Keep HTML clean (no inline styles, no scripts, no external frameworks)
-            - For recommendations, format CONCISELY as:
-                <br><strong>🎯 Actions</strong><br>
-                📈 <metric indicator + action + expected impact><br>
-                💰 <bid/budget change><br>
-                🔍 <targeting insight><br>
-            - Each recommendation item is ONE LINE MAXIMUM 
-            - Use line breaks between the recommendation lines only
-            - If no recommendation is needed, do not show the block
-            - If the user asks to only show the recommendation, output ONLY the recommendation block
-            - NO verbose explanations, NO repetition
-            - Focus on ACTIONABLE insights with numbers
-            - End with SHORT follow-up question if needed
-
-            Data integrity:
-            - Use tool results as the single source of truth
-            - Never fabricate metrics, ASINs, campaign names, or keyword data
-            - If data is missing or unavailable, state it clearly
-            - If keywords are present in tool data, do NOT say "no active keywords" even when metrics are zero or state is UNKNOWN
-            - Treat keyword strings like asin="B08..." as product-targeting keywords, not missing data
-            - If summary keyword_count > 0, never claim 0 active keywords
-            - Use historical dates only (yesterday or earlier) for performance data
-            - Do not output raw JSON - present data in readable business format
-
-            Tool usage:
-            - CampaignDetails: Campaign lookup by name, state, type, country, or ASIN/SKU
-            - CampaignKeywords: Get all keywords and recommended keywords for a campaign with performance metrics (spend, sales, ACOS, clicks)
-                - Returns current active keywords grouped by performance (high ACOS, low ACOS, no sales)
-                - Returns recommended keywords for optimization
-                - Supports keyword search across campaigns using search_term parameter
-                - Filters by country, campaign_type (SP|SB|SD), date
-                - Provides summary metrics: total spend, total sales, average ACOS, average bid
-                - Best used for keyword analysis, optimization opportunities, and competitor research
-            - KeywordDetails: Keyword information, match types, bid amounts
-            - Call one tool at a time unless comparing across different metrics
-            - Never call the same tool repeatedly with identical parameters
-
-            Optimization focus:
-            - High ACOS keywords: Identify and recommend pausing or lowering bids
-            - Low ACOS keywords: Recommend increasing bids for more volume
-            - Zero-conversion spend: Flag wasted budget opportunities
-            - Budget pacing: Analyze daily spend vs budget allocation
-            - Bid optimization: Suggest specific bid adjustments with reasoning
-            - Negative keywords: Identify candidates for negative targeting
-
-            Strict scope:
-            - Decline unrelated requests politely and redirect to campaign/keyword topics
-            - For ambiguous requests, ask one clarifying question before proceeding
-
-            Your goal: Help advertisers maximize ROI and reduce wasted ad spend through data-driven campaign and keyword optimization.
-            PROMPT;
+        PROMPT;
     }
 
     /**
      * Get the tools available to the agent.
      *
-     * @return Tool[]
+     * @return iterable<int, \Laravel\Ai\Contracts\Tool>
+
      */
     public function tools(): iterable
     {
         if ($this->cachedTools === null) {
             $this->cachedTools = [
-                new CampaignDetails,
-                new CampaignKeywords,
-                new KeywordDetails,
+                new UnifiedPerformanceQuery(),
+                new CampaignPerformanceLiteQuery(),
+                new CampaignKeywordRecommendationsQuery(),
+                new KeywordRankReportLiteQuery(),
+                new SpSearchTermSummaryTool(),
+                new BrandAnalyticLiteQuery(),
             ];
+
         }
 
         return $this->cachedTools;
@@ -214,5 +186,15 @@ class CampaignKeywordAgent implements Agent, Conversational, HasTools
         return [
             'value' => $schema->string()->required(),
         ];
+    }
+
+    public function providerOptions(Lab|string $provider): array
+    {
+        return match ($provider) {
+            Lab::Ollama => array_merge([
+                'thinking' => 'low',
+            ], $this->runtimeOptions),
+            default => $this->runtimeOptions,
+        };
     }
 }

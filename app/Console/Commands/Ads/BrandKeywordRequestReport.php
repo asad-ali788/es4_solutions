@@ -10,23 +10,38 @@ use Illuminate\Support\Facades\Log;
 
 class BrandKeywordRequestReport extends Command
 {
-    protected $signature = 'app:brand-keyword-request-report';
-    protected $description = 'Generate SB Keyword Performance Daily Report';
+    protected $signature = 'app:brand-keyword-request-report {targetDate?}';
+    protected $description = 'ADS: Request SB Keyword Performance Report [US/CA]';
 
     public function handle(AmazonAdsService $client)
     {
         $marketTz = config('timezone.market');
-        $date = Carbon::now($marketTz)->subDay()->toDateString();
+        $targetDate = $this->argument('targetDate');
 
+        if ($targetDate) {
+            $date = Carbon::parse($targetDate)->toDateString();
+            $this->requestReportForCountry($client, config('amazon_ads.profiles.US'), $date, 'US', 'sbTargeting_SB_update');
+            $this->requestReportForCountry($client, config('amazon_ads.profiles.CA'), $date, 'CA', 'sbTargeting_SB_update');
+            $this->info("✅ Sponsored Brands Keyword reports requested for $date.");
+            return;
+        }
+        
+        // 📅 Standard: Sub 1 day
+        $date = Carbon::now($marketTz)->subDay()->toDateString();
         $this->requestReportForCountry($client, config('amazon_ads.profiles.US'), $date, 'US');
         $this->requestReportForCountry($client, config('amazon_ads.profiles.CA'), $date, 'CA');
+
+        // 📅 Update: Sub 2 days
+        $updateDate = Carbon::now($marketTz)->subDays(2)->toDateString();
+        $this->requestReportForCountry($client, config('amazon_ads.profiles.US'), $updateDate, 'US', 'sbTargeting_SB_update');
+        $this->requestReportForCountry($client, config('amazon_ads.profiles.CA'), $updateDate, 'CA', 'sbTargeting_SB_update');
 
         $this->info("✅ Sponsored Brands Keyword reports requested for US and CA.");
     }
 
-    private function requestReportForCountry(AmazonAdsService $client, string $profileId, string $date, string $country): void
+    private function requestReportForCountry(AmazonAdsService $client, string $profileId, string $date, string $country, string $reportTypeOverride = null): void
     {
-        $reportType = 'sbTargeting_SB';
+        $reportType = $reportTypeOverride ?? 'sbTargeting_SB';
 
         $exists = AmzAdsReportLog::where('country', $country)
             ->where('report_type', $reportType)
@@ -86,7 +101,7 @@ class BrandKeywordRequestReport extends Command
 
             AmzAdsReportLog::create([
                 'country'       => $country,
-                'report_type'   => $res['configuration']['reportTypeId'] . '_SB',
+                'report_type'   => $reportType,
                 'report_id'     => $res['reportId'],
                 'report_status' => 'IN_PROGRESS',
                 'r_iteration'   => 0,

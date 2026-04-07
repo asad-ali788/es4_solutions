@@ -13,6 +13,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Artisan;
 
 class TargetsSbGetReportSaveJob implements ShouldQueue
 {
@@ -20,16 +21,23 @@ class TargetsSbGetReportSaveJob implements ShouldQueue
 
     public string $country;
     public bool $isTodayReport;
+    public ?string $reportType;
 
-    public function __construct(string $country, bool $isTodayReport = false)
+    public function __construct(string $country, bool $isTodayReport = false, ?string $reportType = null)
     {
         $this->country = $country;
         $this->isTodayReport = $isTodayReport;
+        $this->reportType = $reportType;
     }
 
     public function handle(AmazonAdsService $client)
     {
-        $reportType = $this->isTodayReport ? 'sbTargetingClause_daily' : 'sbTargetingClause';
+        if ($this->reportType) {
+            $reportType = $this->reportType;
+        } else {
+            $reportType = $this->isTodayReport ? 'sbTargetingClause_daily' : 'sbTargetingClause';
+        }
+
         $reportLog = AmzAdsReportLog::where('country', $this->country)
             ->where('report_type', $reportType)
             ->where('report_status', 'IN_PROGRESS')
@@ -37,7 +45,7 @@ class TargetsSbGetReportSaveJob implements ShouldQueue
             ->first();
 
         if (!$reportLog) {
-            Log::channel('ads')->info("[TargetsSbGetReportSave][{$this->country}] No SB report in progress.");
+            Log::channel('ads')->info("[TargetsSbGetReportSave][{$this->country}] No SB report in progress for type: {$reportType}.");
             return;
         }
 
@@ -100,6 +108,15 @@ class TargetsSbGetReportSaveJob implements ShouldQueue
                 }
 
                 $reportLog->update(['report_status' => 'COMPLETED']);
+
+                // 🚀 Refresh recommendations if this was an update fetch
+                if ($this->reportType === 'sbTargetingClause_update' && !empty($records)) {
+                    $targetDate = $records[0]['c_date'] ?? null;
+                    if ($targetDate) {
+                        Artisan::call('app:keyword-recommendations', ['date' => $targetDate]);
+                        Log::channel('ads')->info("🔄 Keyword recommendation refresh (SB) dispatched for date: {$targetDate}");
+                    }
+                }
             } elseif ($responseData['status'] === 'PENDING') {
                 $reportLog->increment('r_iteration');
             }

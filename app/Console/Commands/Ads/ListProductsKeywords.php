@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 class ListProductsKeywords extends Command
 {
     protected $signature = 'app:list-sp-keywords';
-    protected $description = 'Sync SP Keywords';
+    protected $description = 'ADS: Sync SP Keywords [US/CA] from Amazon Ads API';
 
     public function handle(): void
     {

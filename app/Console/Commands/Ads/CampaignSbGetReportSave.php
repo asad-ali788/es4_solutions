@@ -20,7 +20,7 @@ class CampaignSbGetReportSave extends Command
      *
      * @var string
      */
-    protected $description = 'Save campaign SB Daily Report';
+    protected $description = 'ADS: Save SB Campaign Performance Report [US/CA]';
 
     /**
      * Execute the console command.

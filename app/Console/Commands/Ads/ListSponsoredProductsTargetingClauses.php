@@ -23,7 +23,7 @@ class ListSponsoredProductsTargetingClauses extends Command
      *
      * @var string
      */
-    protected $description = 'Fetch Sponsored Products Targeting Clauses from Amazon Ads API';
+    protected $description = 'ADS: Sync SP Targeting Clauses [US/CA] from Amazon Ads API';
 
     /**
      * Execute the console command.

@@ -26,7 +26,7 @@ class CampaignKeywordRecommendation extends Command
      *
      * @var string
      */
-    protected $description = 'Amz Ads Get Reommendation of new keywords and bids';
+    protected $description = 'ADS: Generate Campaign Keyword and Bid Recommendations';
 
     /**
      * Execute the console command.

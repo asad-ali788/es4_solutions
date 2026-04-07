@@ -36,7 +36,7 @@ class PurchaseOrderController extends Controller
             });
         }
 
-        $purchaseOrder = $query->paginate($request->input('per_page', 10));
+        $purchaseOrder = $query->paginate($request->get('per_page', 10));
         return view('pages.admin.purchaseOrder.index', \compact('purchaseOrder'));
     }
 

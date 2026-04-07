@@ -12,7 +12,7 @@ use Carbon\Carbon;
 class GetSbBidRecommendations extends Command
 {
     protected $signature = 'app:get-sb-bid-recommendations';
-    protected $description = 'Fetch Sponsored Brand Bid Recommendations from Amazon Ads API';
+    protected $description = 'ADS: Fetch SB Bid Recommendations [US/CA]';
 
     public function handle()
     {

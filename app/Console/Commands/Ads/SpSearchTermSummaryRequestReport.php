@@ -9,12 +9,22 @@ use Carbon\Carbon;
 
 class SpSearchTermSummaryRequestReport extends Command
 {
-    protected $signature = 'app:sp-search-term-summary-request-report';
-    protected $description = 'Request Sponsored Products Search Term Summary reports for US and CA';
+    protected $signature = 'app:sp-search-term-summary-request-report {targetDate?}';
+    protected $description = 'ADS: Request SP Search Term Summary Report [US/CA]';
 
     public function handle(AmazonAdsService $clients, AdsReportsService $adsReportsService)
     {
         $marketTz = config('timezone.market');
+        $targetDate = $this->argument('targetDate');
+
+        if ($targetDate) {
+            $date = Carbon::parse($targetDate)->toDateString();
+            $this->requestReportForCountry($clients, $adsReportsService, config('amazon_ads.profiles.CA'), $date, 'CA');
+            $this->requestReportForCountry($clients, $adsReportsService, config('amazon_ads.profiles.US'), $date, 'US');
+            $this->info("✅ Sponsored Products Search Term Summary reports requested for $date.");
+            return;
+        }
+
         $date = Carbon::now($marketTz)->subDay()->toDateString();
 
         $this->requestReportForCountry($clients, $adsReportsService, config('amazon_ads.profiles.CA'), $date, 'CA');

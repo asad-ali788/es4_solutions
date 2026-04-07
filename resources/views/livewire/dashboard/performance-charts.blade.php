@@ -13,7 +13,7 @@
         <div class="row g-3 mt-2 align-items-stretch">
             <!-- Daily Performance -->
             <div class="col-12 col-md-4 d-flex">
-                <div class="card w-100 mb-0">
+                <div class="card w-100 mb-0 shadow-sm">
                     <div class="card-body mb-0 pb-0">
                         <div class="d-flex align-items-center mb-2">
                             <div class="avatar-xs me-2">
@@ -31,7 +31,7 @@
 
             <!-- Weekly Performance -->
             <div class="col-12 col-md-4 d-flex">
-                <div class="card w-100 mb-0">
+                <div class="card w-100 mb-0 shadow-sm">
                     <div class="card-body mb-0 pb-0">
                         <div class="d-flex align-items-center mb-2">
                             <div class="avatar-xs me-2">
@@ -49,7 +49,7 @@
 
             <!-- Monthly Performance -->
             <div class="col-12 col-md-4 d-flex">
-                <div class="card w-100 mb-0">
+                <div class="card w-100 mb-0 shadow-sm">
                     <div class="card-body mb-0 pb-0">
                         <div class="d-flex align-items-center mb-2">
                             <div class="avatar-xs me-2">

@@ -20,7 +20,7 @@ class HourlyProductSalesReportSave extends Command
      *
      * @var string
      */
-    protected $description = 'Save hourly sales report';
+    protected $description = 'SP: Save Hourly Order Sales Data to Database';
 
     /**
      * Execute the console command.

@@ -20,7 +20,7 @@ class DailySalesReportSave extends Command
      *
      * @var string
      */
-    protected $description = 'Save daily Sales Report';
+    protected $description = 'SP: Process and Save Daily Order Sales Data';
 
     /**
      * Execute the console command.

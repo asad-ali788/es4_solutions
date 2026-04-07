@@ -193,9 +193,28 @@
                                 <div
                                     class="ai-popup-bubble {{ ($m['is_html'] ?? false) === true ? 'ai-popup-bubble-rich' : '' }}">
                                     @if (($m['is_html'] ?? false) === true)
-                                        {!! $m['content'] !!}
+                                        <div class="ai-rich-content">
+                                            {!! $m['content'] !!}
+                                        </div>
                                     @else
                                         <div style="white-space: pre-wrap;">{{ $m['content'] }}</div>
+                                    @endif
+
+                                    {{-- Excel download button --}}
+                                    @if(($m['role'] ?? '') === 'assistant' && !empty($m['trace_id']))
+                                        <div class="ai-msg-actions mt-2 pt-2 border-top border-opacity-10 d-flex justify-content-end">
+                                            <a href="{{ route('admin.ai.export', ['trace_id' => $m['trace_id']]) }}" target="_blank"
+                                                class="ai-export-btn d-inline-flex align-items-center gap-2"
+                                                title="Download this result as Excel">
+                                                <div class="ai-export-icon">
+                                                    <i class='bx bxs-file-export'></i>
+                                                </div>
+                                                <div class="ai-export-text text-start">
+                                                    <span class="ai-export-label">Download Report</span>
+                                                    <span class="ai-export-ext">.XLSX</span>
+                                                </div>
+                                            </a>
+                                        </div>
                                     @endif
                                 </div>
                             </div>
@@ -232,11 +251,73 @@
                                         stroke="url(#avatar-stream-grad)" stroke-width="10" />
                                 </svg>
                             </div>
-                            <div class="ai-popup-bubble">
-                                <div class="ai-typing" wire:loading wire:target="askStream">
-                                    Typing <span class="ai-dots"><span></span><span></span><span></span></span>
+                            <div class="ai-popup-bubble ai-popup-bubble-bot ai-popup-bubble-streaming">
+                                <div class="ai-thinking-modern" wire:loading wire:target="askStream">
+                                    <div class="ai-thinking-active">
+                                        <i class="bx bx-loader bx-spin ai-spin-icon"></i>
+                                        <div class="ai-stream-ctx" id="aiStreamContext">💡 Preparing analysis...</div>
+                                    </div>
+                                    <div class="ai-thinking-steps" id="aiThinkingSteps">
+                                        <div class="ai-thinking-step is-visible">🔎 Understanding your question</div>
+                                    </div>
                                 </div>
-                                <div wire:stream="answer" style="white-space: pre-wrap;">{{ $answer }}</div>
+
+                                <div x-data="{
+                                    parsedAnswer: '',
+                                    sanitize(text) {
+                                        text = text.replace(/<think[^>]*>[\s\S]*?<\/think>/gi, '');
+                                        text = text.replace(/<think[^>]*>[\s\S]*$/gi, '');
+                                        return text.trim();
+                                    },
+                                    init() {
+                                        const ob = new MutationObserver(() => {
+                                            const raw = this.$refs.rawStreamAnswer.innerText;
+                                            const clean = this.sanitize(raw);
+                                            if (clean.length > 0) {
+                                                if (typeof marked !== 'undefined') {
+                                                    marked.setOptions({ breaks: true });
+                                                    this.parsedAnswer = marked.parse(clean);
+                                                } else {
+                                                    this.parsedAnswer = clean.replace(/\n/g, '<br>');
+                                                }
+                                                __scrollCampaignAiBottom();
+                                            }
+                                        });
+                                        ob.observe(this.$refs.rawStreamAnswer, { childList: true, characterData: true, subtree: true, attributes: true });
+                                        
+                                        const prob = new MutationObserver(() => {
+                                            const raw = this.$refs.rawStreamProgress.innerText;
+                                            try {
+                                                const data = JSON.parse(raw);
+                                                const ctx = document.getElementById('aiStreamContext');
+                                                const steps = document.getElementById('aiThinkingSteps');
+                                                if (ctx) ctx.innerText = '💡 ' + data.label;
+                                                } else if (data.type === 'tool') {
+                                                    if (steps) {
+                                                        const stepId = 'step-' + btoa(data.label).substring(0, 8);
+                                                        if (!document.getElementById(stepId)) {
+                                                            const step = document.createElement('div');
+                                                            step.id = stepId;
+                                                            step.className = 'ai-thinking-step is-visible';
+                                                            step.innerText = '🔨 ' + data.label;
+                                                            steps.appendChild(step);
+                                                        }
+                                                    }
+                                                }
+                                            } catch(e) {}
+                                        });
+                                        prob.observe(this.$refs.rawStreamProgress, { childList: true, characterData: true, subtree: true });
+                                    }
+                                }">
+                                    <div x-show="parsedAnswer.length > 0" x-html="parsedAnswer" class="markdown-body ai-rich-content"></div>
+
+                                    <div x-ref="rawStreamAnswer" class="ai-stream-hidden" wire:stream="answer"></div>
+                                    <div x-ref="rawStreamProgress" class="ai-stream-hidden" wire:stream="progress"></div>
+                                </div>
+
+                                <div class="ai-typing-indicator" wire:loading wire:target="askStream">
+                                    <span></span><span></span><span></span>
+                                </div>
                             </div>
                         </div>
                     @endif
@@ -283,7 +364,7 @@
                             stroke-width="8" />
                     </svg>
                     <span>{{ $conversationTitle }}</span>
-                    <span class="ai-fullscreen-asin">ASIN: {{ $asin }}</span>
+                    <span class="ai-fullscreen-asin">{{ $asin }}</span>
                     <div style="display: flex; gap: 8px; align-items: center;">
                         @if ($campaignType !== 'all')
                             <span class="ai-filter-badge">{{ $campaignType }}</span>
@@ -448,9 +529,28 @@
                                 <div
                                     class="ai-fullscreen-bubble {{ ($m['is_html'] ?? false) === true ? 'ai-fullscreen-bubble-rich' : '' }}">
                                     @if (($m['is_html'] ?? false) === true)
-                                        {!! $m['content'] !!}
+                                        <div class="ai-rich-content">
+                                            {!! $m['content'] !!}
+                                        </div>
                                     @else
                                         <div style="white-space: pre-wrap;">{{ $m['content'] }}</div>
+                                    @endif
+
+                                    {{-- Excel download button --}}
+                                    @if(($m['role'] ?? '') === 'assistant' && !empty($m['trace_id']))
+                                        <div class="ai-msg-actions mt-3 pt-2 border-top border-opacity-10 d-flex justify-content-end">
+                                            <a href="{{ route('admin.ai.export', ['trace_id' => $m['trace_id']]) }}" target="_blank"
+                                                class="ai-export-btn d-inline-flex align-items-center gap-2"
+                                                title="Download this result as Excel">
+                                                <div class="ai-export-icon">
+                                                    <i class='bx bxs-file-export'></i>
+                                                </div>
+                                                <div class="ai-export-text text-start">
+                                                    <span class="ai-export-label">Download Report</span>
+                                                    <span class="ai-export-ext">.XLSX</span>
+                                                </div>
+                                            </a>
+                                        </div>
                                     @endif
                                 </div>
                             </div>
@@ -487,11 +587,73 @@
                                         stroke="url(#fs-avatar-stream-grad)" stroke-width="10" />
                                 </svg>
                             </div>
-                            <div class="ai-fullscreen-bubble">
-                                <div class="ai-typing" wire:loading wire:target="askStream">
-                                    Typing <span class="ai-dots"><span></span><span></span><span></span></span>
+                            <div class="ai-fullscreen-bubble ai-fullscreen-bubble-bot ai-fullscreen-bubble-streaming">
+                                <div class="ai-thinking-modern" wire:loading wire:target="askStream">
+                                    <div class="ai-thinking-active">
+                                        <i class="bx bx-loader bx-spin ai-spin-icon"></i>
+                                        <div class="ai-stream-ctx" id="aiStreamContextFull">💡 Preparing analysis...</div>
+                                    </div>
+                                    <div class="ai-thinking-steps" id="aiThinkingStepsFull">
+                                        <div class="ai-thinking-step is-visible">🔎 Understanding your question</div>
+                                    </div>
                                 </div>
-                                <div wire:stream="answer" style="white-space: pre-wrap;">{{ $answer }}</div>
+
+                                <div x-data="{
+                                    parsedAnswer: '',
+                                    sanitize(text) {
+                                        text = text.replace(/<think[^>]*>[\s\S]*?<\/think>/gi, '');
+                                        text = text.replace(/<think[^>]*>[\s\S]*$/gi, '');
+                                        return text.trim();
+                                    },
+                                    init() {
+                                        const ob = new MutationObserver(() => {
+                                            const raw = this.$refs.rawStreamAnswerFull.innerText;
+                                            const clean = this.sanitize(raw);
+                                            if (clean.length > 0) {
+                                                if (typeof marked !== 'undefined') {
+                                                    marked.setOptions({ breaks: true });
+                                                    this.parsedAnswer = marked.parse(clean);
+                                                } else {
+                                                    this.parsedAnswer = clean.replace(/\n/g, '<br>');
+                                                }
+                                                __scrollCampaignAiBottom();
+                                            }
+                                        });
+                                        ob.observe(this.$refs.rawStreamAnswerFull, { childList: true, characterData: true, subtree: true, attributes: true });
+                                        
+                                        const prob = new MutationObserver(() => {
+                                            const raw = this.$refs.rawStreamProgressFull.innerText;
+                                            try {
+                                                const data = JSON.parse(raw);
+                                                const ctx = document.getElementById('aiStreamContextFull');
+                                                const steps = document.getElementById('aiThinkingStepsFull');
+                                                if (ctx) ctx.innerText = '💡 ' + data.label;
+                                                } else if (data.type === 'tool') {
+                                                    if (steps) {
+                                                        const stepId = 'step-fs-' + btoa(data.label).substring(0, 8);
+                                                        if (!document.getElementById(stepId)) {
+                                                            const step = document.createElement('div');
+                                                            step.id = stepId;
+                                                            step.className = 'ai-thinking-step is-visible';
+                                                            step.innerText = '🔨 ' + data.label;
+                                                            steps.appendChild(step);
+                                                        }
+                                                    }
+                                                }
+                                            } catch(e) {}
+                                        });
+                                        prob.observe(this.$refs.rawStreamProgressFull, { childList: true, characterData: true, subtree: true });
+                                    }
+                                }">
+                                    <div x-show="parsedAnswer.length > 0" x-html="parsedAnswer" class="markdown-body ai-rich-content"></div>
+
+                                    <div x-ref="rawStreamAnswerFull" class="ai-stream-hidden" wire:stream="answer"></div>
+                                    <div x-ref="rawStreamProgressFull" class="ai-stream-hidden" wire:stream="progress"></div>
+                                </div>
+
+                                <div class="ai-typing-indicator" wire:loading wire:target="askStream">
+                                    <span></span><span></span><span></span>
+                                </div>
                             </div>
                         </div>
                     @endif
@@ -563,8 +725,119 @@
         }
 
         .ai-orb-blob-bg svg {
-            width: 60%;
+            width: 100%;
             height: 100%;
+        }
+
+        /* Excel Download Button Styling */
+        .ai-export-btn {
+            background: linear-gradient(135deg, rgba(46, 125, 50, 0.08), rgba(46, 125, 50, 0.04));
+            border: 1px solid rgba(46, 125, 50, 0.15);
+            border-radius: 12px;
+            padding: 6px 12px;
+            text-decoration: none !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #2e7d32 !important;
+            box-shadow: 0 2px 8px rgba(46, 125, 50, 0.04);
+        }
+
+        .ai-export-btn:hover {
+            background: linear-gradient(135deg, rgba(46, 125, 50, 0.12), rgba(46, 125, 50, 0.08));
+            border-color: rgba(46, 125, 50, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.08);
+        }
+
+        html[data-bs-theme="dark"] .ai-export-btn {
+            background: linear-gradient(135deg, rgba(74, 222, 128, 0.08), rgba(74, 222, 128, 0.04));
+            border-color: rgba(74, 222, 128, 0.2);
+            color: #4ade80 !important;
+        }
+
+        .ai-export-icon {
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+        }
+
+        .ai-export-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .ai-export-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .ai-export-ext {
+            font-size: 8px;
+            font-weight: 800;
+            opacity: 0.7;
+            margin-top: 1px;
+        }
+
+        /* Streaming & Typing Indicator */
+        .ai-popup-bubble-streaming, .ai-fullscreen-bubble-streaming {
+            position: relative;
+            min-height: 45px;
+            padding-bottom: 20px !important;
+        }
+
+        .ai-streaming-content {
+            white-space: pre-wrap;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #475569;
+        }
+
+        html[data-bs-theme="dark"] .ai-streaming-content {
+            color: #cbd5e1;
+        }
+
+        .ai-typing-indicator {
+            display: flex;
+            gap: 4px;
+            margin-top: 8px;
+            height: 12px;
+            align-items: center;
+        }
+
+        .ai-typing-indicator span {
+            width: 6px;
+            height: 6px;
+            background-color: #8A5BFF;
+            border-radius: 50%;
+            display: inline-block;
+            animation: aiTyping 1.4s infinite ease-in-out both;
+        }
+
+        .ai-typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .ai-typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes aiTyping {
+            0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .ai-streaming-pulse {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 8px;
+            height: 8px;
+            background: #8A5BFF;
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(138, 91, 255, 0.7);
+            animation: aiPulse 2s infinite;
+        }
+
+        @keyframes aiPulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(138, 91, 255, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(138, 91, 255, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(138, 91, 255, 0); }
         }
 
         .ai-blob {
@@ -1438,6 +1711,334 @@
             padding: 12px;
         }
 
+        /* AI Thinking Card */
+        .ai-thinking-card {
+            border: 1px solid var(--ai-border);
+            background: linear-gradient(180deg, rgba(59, 130, 246, .06), rgba(59, 130, 246, .02));
+            border-radius: var(--ai-radius-md);
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            animation: aiPulseCard 1.8s ease-in-out infinite;
+            width: min(720px, 100%);
+            max-width: 100%;
+            margin-bottom: 12px;
+        }
+
+        .ai-thinking-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ai-text);
+        }
+
+        .ai-thinking-sub {
+            font-size: 13px;
+            color: var(--ai-muted);
+            min-height: 20px;
+        }
+
+        .ai-thinking-summary {
+            font-size: 13px;
+            color: var(--ai-muted);
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        }
+
+        @keyframes aiPulseCard {
+            0%,
+            100% {
+                box-shadow: 0 0 0 rgba(59, 130, 246, 0);
+            }
+
+            50% {
+                box-shadow: 0 4px 14px rgba(59, 130, 246, .08);
+            }
+        }
+
+        /* Markdown Content Rendering */
+        .markdown-body {
+            width: 100%;
+        }
+
+        .markdown-body {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        html[data-bs-theme="dark"] .markdown-body {
+            color: #e5e7eb;
+        }
+
+        .markdown-body h1,
+        .markdown-body h2,
+        .markdown-body h3,
+        .markdown-body h4,
+        .markdown-body h5,
+        .markdown-body h6 {
+            margin-top: 12px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .markdown-body h1 {
+            font-size: 18px;
+        }
+
+        .markdown-body h2 {
+            font-size: 16px;
+        }
+
+        .markdown-body h3 {
+            font-size: 14px;
+        }
+
+        .markdown-body ul, .ai-rich-content ul,
+        .markdown-body ol, .ai-rich-content ol {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .markdown-body li, .ai-rich-content li {
+            margin: 4px 0;
+        }
+
+        .markdown-body code, .ai-rich-content code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+        }
+
+        html[data-bs-theme="dark"] .markdown-body code,
+        html[data-bs-theme="dark"] .ai-rich-content code {
+            background: #374151;
+        }
+
+        .markdown-body pre, .ai-rich-content pre {
+            background: #f3f4f6;
+            padding: 12px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 8px 0;
+        }
+
+        html[data-bs-theme="dark"] .markdown-body pre,
+        html[data-bs-theme="dark"] .ai-rich-content pre {
+            background: #1f2937;
+        }
+
+        .markdown-body table, .ai-rich-content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 12px 0;
+            font-size: 12px;
+        }
+
+        .markdown-body table th, .ai-rich-content table th,
+        .markdown-body table td, .ai-rich-content table td {
+            border: 1px solid #e5e7eb;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        html[data-bs-theme="dark"] .markdown-body table th, html[data-bs-theme="dark"] .ai-rich-content table th,
+        html[data-bs-theme="dark"] .markdown-body table td, html[data-bs-theme="dark"] .ai-rich-content table td {
+            border-color: #374151;
+        }
+
+        .markdown-body table th {
+            background: #f9fafb;
+            font-weight: 600;
+        }
+
+        html[data-bs-theme="dark"] .markdown-body table th {
+            background: #1f2937;
+        }
+
+        .markdown-body blockquote {
+            border-left: 4px solid #8A5BFF;
+            padding-left: 12px;
+            margin: 8px 0;
+            color: #6b7280;
+        }
+
+        html[data-bs-theme="dark"] .markdown-body blockquote {
+            color: #9ca3af;
+        }
+
+        /* Table Copy Button */
+        .markdown-table-wrapper {
+            position: relative;
+            margin: 12px 0;
+        }
+
+        .markdown-table-copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s ease;
+            z-index: 10;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .markdown-table-copy-btn:hover {
+            background: #e5e7eb;
+            color: #374151;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+        }
+
+        .markdown-table-copy-btn.copied {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+
+        html[data-bs-theme="dark"] .markdown-table-copy-btn {
+            background: #374151;
+            border-color: #4b5563;
+            color: #9ca3af;
+        }
+
+        html[data-bs-theme="dark"] .markdown-table-copy-btn:hover {
+            background: #4b5563;
+            color: #e5e7eb;
+        }
+
+        html[data-bs-theme="dark"] .markdown-table-copy-btn.copied {
+            background: #10b981;
+            border-color: #10b981;
+        }
+
+        /* Modern Thinking State */
+        /* Table Export Helpers */
+        .ai-table-wrapper {
+            position: relative;
+            margin: 12px 0;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .ai-table-copy-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            padding: 4px 10px;
+            background: #8A5BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            z-index: 10;
+            opacity: 0.8;
+            transition: all 0.2s;
+        }
+
+        .ai-table-copy-btn:hover {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        .ai-table-wrapper table {
+            margin: 0 !important;
+            border: none !important;
+        }
+
+        .ai-thinking-active {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #8A5BFF;
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .ai-spin-icon {
+            font-size: 18px;
+        }
+
+        .ai-thinking-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-left: 28px;
+        }
+
+        .ai-thinking-step {
+            font-size: 13px;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .ai-thinking-step.is-visible {
+            opacity: 1;
+            color: #d1d5db;
+        }
+
+        .ai-thinking-step::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background: currentColor;
+            border-radius: 50%;
+        }
+
+        .ai-stream-hidden {
+            display: none !important;
+        }
+
+        .ai-rich-content {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .ai-typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            width: fit-content;
+        }
+
+        .ai-typing-indicator span {
+            width: 6px;
+            height: 6px;
+            background: #8A5BFF;
+            border-radius: 50%;
+            animation: ai-typing 1.4s infinite ease-in-out both;
+        }
+
+        .ai-typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .ai-typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes ai-typing {
+            0%, 80%, 100% { transform: scale(0); opacity: 0.3; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
         /* Mobile Responsiveness */
         @media (max-width: 768px) {
             .ai-popup {
@@ -1454,12 +2055,13 @@
         }
     </style>
 
+    {{-- Load marked.js once --}}
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
         const __scrollCampaignAiBottom = () => {
             const popup = document.getElementById('campaignAiBody');
             const full = document.getElementById('campaignAiBodyFull');
             const target = popup || full;
-
             if (!target) return;
 
             requestAnimationFrame(() => {
@@ -1467,33 +2069,234 @@
             });
         };
 
+        const __addTableCopyButtons = () => {
+            const containers = document.querySelectorAll('.ai-rich-content');
+            containers.forEach(container => {
+                const tables = container.querySelectorAll('table');
+                tables.forEach(table => {
+                    if (table.parentElement.classList.contains('ai-table-wrapper')) return;
+
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'ai-table-wrapper';
+
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = 'ai-table-copy-btn';
+                    copyBtn.innerHTML = '<i class="bx bx-copy"></i> Copy Table';
+                    copyBtn.type = 'button';
+
+                    copyBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const markdown = __tableToAlignedMarkdown(table);
+                        if (markdown) {
+                            navigator.clipboard.writeText(markdown).then(() => {
+                                copyBtn.innerHTML = '<i class="bx bx-check"></i> Copied!';
+                                setTimeout(() => {
+                                    copyBtn.innerHTML = '<i class="bx bx-copy"></i> Copy Table';
+                                }, 2000);
+                            });
+                        }
+                    });
+
+                    table.parentNode.insertBefore(wrapper, table);
+                    wrapper.appendChild(copyBtn);
+                    wrapper.appendChild(table);
+                });
+            });
+        };
+
         document.addEventListener('livewire:initialized', () => {
+            Livewire.on('campaign-assistant-scroll-bottom', () => {
+                __scrollCampaignAiBottom();
+            });
+
+            // Reliable interval for UI enhancements (Copy buttons, etc.)
+            setInterval(() => {
+                __addTableCopyButtons();
+            }, 500);
+        });
+
+        const __tableToAlignedMarkdown = (table) => {
+            const rows = Array.from(table.querySelectorAll('tr')).map(row => {
+                return Array.from(row.querySelectorAll('th, td')).map(cell => {
+                    return cell.textContent
+                        .replace(/\|/g, '\\|')
+                        .replace(/\s+/g, ' ')
+                        .trim();
+                });
+            }).filter(row => row.length > 0);
+
+            if (rows.length === 0) return '';
+
+            const maxCols = Math.max(...rows.map(row => row.length));
+            const normalizedRows = rows.map(row => {
+                const copy = row.slice();
+                while (copy.length < maxCols) copy.push('');
+                return copy;
+            });
+
+            const widths = Array.from({ length: maxCols }, (_, colIndex) => {
+                return normalizedRows.reduce((max, row) => {
+                    return Math.max(max, row[colIndex].length);
+                }, 0);
+            });
+
+            const formatRow = (row) => {
+                return '| ' + row.map((value, index) => value.padEnd(widths[index], ' ')).join(' | ') + ' |';
+            };
+
+            const header = formatRow(normalizedRows[0]);
+            const separator = '| ' + widths.map(width => '-'.repeat(Math.max(3, width))).join(' | ') + ' |';
+            const body = normalizedRows.slice(1).map(formatRow);
+
+            return [header, separator, ...body].join('\n');
+        };
+
+        const __writeToClipboard = async (text) => {
+            if (!text) return false;
+
+            // Preferred path: secure context clipboard API.
+            if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    return true;
+                } catch (err) {
+                    // Fall through to legacy fallback.
+                }
+            }
+
+            // Fallback for HTTP / restricted environments.
+            try {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.setAttribute('readonly', '');
+                textarea.style.position = 'fixed';
+                textarea.style.top = '-9999px';
+                textarea.style.left = '-9999px';
+                textarea.style.opacity = '0';
+
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+
+                const copied = document.execCommand('copy');
+                document.body.removeChild(textarea);
+                return copied;
+            } catch (err) {
+                return false;
+            }
+        };
+
+        const __addTableCopyButtons = (container) => {
+            const tables = container.querySelectorAll('table');
+            if (tables.length === 0) return;
+            
+            tables.forEach((table) => {
+                // Skip if already wrapped
+                if (table.parentElement.classList.contains('markdown-table-wrapper')) return;
+
+                // Create wrapper
+                const wrapper = document.createElement('div');
+                wrapper.className = 'markdown-table-wrapper';
+                
+                // Create copy button
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'markdown-table-copy-btn';
+                copyBtn.innerHTML = '<i class="bx bx-copy"></i> Copy Table';
+                copyBtn.type = 'button';
+                
+                // Add click handler
+                copyBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const markdown = __tableToAlignedMarkdown(table);
+                    if (!markdown) return;
+                    
+                    try {
+                        const ok = await __writeToClipboard(markdown);
+                        if (!ok) throw new Error('Clipboard unavailable');
+
+                        // Visual feedback
+                            copyBtn.innerHTML = '<i class="bx bx-check"></i> Copied!';
+                            copyBtn.classList.add('copied');
+                            
+                            setTimeout(() => {
+                                copyBtn.innerHTML = '<i class="bx bx-copy"></i> Copy Table';
+                                copyBtn.classList.remove('copied');
+                            }, 2000);
+                    } catch (err) {
+                        console.error('Copy failed:', err);
+                    }
+                });
+                
+                // Wrap table
+                table.parentNode.insertBefore(wrapper, table);
+                wrapper.appendChild(copyBtn);
+                wrapper.appendChild(table);
+            });
+        };
+
+        document.addEventListener('livewire:initialized', () => {
+            // Configure marked
+            if (typeof marked !== 'undefined') {
+                marked.setOptions({
+                    breaks: true,
+                    gfm: true
+                });
+            }
+
             // Scroll on explicit event
             Livewire.on('campaign-assistant-scroll-bottom', () => __scrollCampaignAiBottom());
 
             // Scroll when component updates (new messages)
             Livewire.hook('effect.processed', () => {
-                setTimeout(() => __scrollCampaignAiBottom(), 50);
+                setTimeout(() => {
+                    __scrollCampaignAiBottom();
+                    __renderMarkdown();
+                }, 50);
             });
 
-            // Scroll on component first load
-            setTimeout(() => __scrollCampaignAiBottom(), 100);
+            // Initial render
+            setTimeout(() => {
+                __scrollCampaignAiBottom();
+                __renderMarkdown();
+            }, 100);
 
-            // Watch for DOM changes and scroll to bottom
-            const popup = document.getElementById('campaignAiBody');
-            const full = document.getElementById('campaignAiBodyFull');
-            const target = popup || full;
+            // MutationObserver for auto-scrolling and live markdown rendering
+            const watchTargets = [
+                document.getElementById('campaignAiBody'),
+                document.getElementById('campaignAiBodyFull')
+            ].filter(Boolean);
 
-            if (target) {
-                const observer = new MutationObserver(() => {
-                    __scrollCampaignAiBottom();
+            watchTargets.forEach(target => {
+                const observer = new MutationObserver((mutations) => {
+                    // Optimized check: only scroll if content changed
+                    let contentChanged = false;
+                    for(const mutation of mutations) {
+                        if (mutation.type === 'childList' || mutation.type === 'characterData') {
+                           contentChanged = true;
+                           break;
+                        }
+                    }
+
+                    if (contentChanged) {
+                        __scrollCampaignAiBottom();
+
+                        // 1. Render all static markdown blocks that haven't been rendered yet
+                        __renderMarkdown();
+
+                        // 2. Optimized: Handle live-streaming feedback (the active response)
+                        // Note: Streaming is now handled by Alpine.js MutationObservers in the template
+                        return;
+                    }
                 });
 
                 observer.observe(target, {
                     childList: true,
-                    subtree: true
+                    subtree: true,
+                    characterData: true
                 });
-            }
+            });
         });
     </script>
 </div>

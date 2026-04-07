@@ -13,7 +13,7 @@ use Illuminate\Console\Command;
 class TargetRecommendations extends Command
 {
     protected $signature = 'app:target-recommendations';
-    protected $description = 'Generate target performance recommendations and store them.';
+    protected $description = 'ADS: Generate SD/SP Target Performance Recommendations';
 
     public function handle()
     {

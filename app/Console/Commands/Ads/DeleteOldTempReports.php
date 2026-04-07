@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Log;
 class DeleteOldTempReports extends Command
 {
     protected $signature = 'app:truncate-temp-reports';
-    protected $description = 'Truncate all Temp Amazon Ads reports';
+    protected $description = 'ADS: Clean Up Old Temp Amazon Ads Report Logs';
 
     public function handle()
     {

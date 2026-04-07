@@ -126,6 +126,11 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+        'ai_tools' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/ai_tools.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],
 
         'ai' => [
             'driver' => 'daily',
@@ -148,9 +153,13 @@ return [
             'days'   => 7,
         ],
 
-        'deprecations' => [
-            'driver' => 'single',
-            'path' => storage_path('logs/php-deprecation-warnings.log'),
+        'sqlite_tools' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/sqlite-tools.log'),
+            'level' => env('LOG_SQLITE_TOOLS_LEVEL', 'debug'),
+            'days' => env('LOG_SQLITE_TOOLS_DAYS', 30),
+            'include_interpolated_sql' => env('LOG_SQLITE_TOOLS_INTERPOLATED_SQL', false),
+            'replace_placeholders' => true,
         ],
 
     ],

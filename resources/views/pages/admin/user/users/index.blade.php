@@ -96,6 +96,17 @@
                                                         <i class="mdi mdi-dots-horizontal font-size-18"></i>
                                                     </a>
                                                     <ul class="dropdown-menu dropdown-menu-end">
+                                                        @if (auth()->user()?->canImpersonate() && auth()->id() !== $user->id)
+                                                            <li>
+                                                                <a href="{{ route('admin.users.impersonate', $user->id) }}"
+                                                                    class="dropdown-item"
+                                                                    onclick="return confirm('Impersonate this user?');">
+                                                                    <i
+                                                                        class="mdi mdi-account-switch font-size-16 text-warning me-1"></i>
+                                                                    Impersonate
+                                                                </a>
+                                                            </li>
+                                                        @endif
                                                         @can('user.update')
                                                             <li>
                                                                 <a href="{{ route('admin.users.edit', $user->id) }}"

@@ -21,6 +21,8 @@ final class WarehouseStockDetails implements Tool
             'Optional stock_bucket filter supports AFN, FBA, INBOUND, SHIPOUT, TACTICAL, AWD.',
             'Use this tool when user asks stock available or not, warehouse stock breakdown, or stock by SKU/ASIN.',
             'Optimized for bulk queries - prefer passing multiple SKUs/ASINs in one call instead of multiple calls.',
+            'PARTIAL MATCHING: When searching for a single SKU or ASIN, partial matching is supported. Searching for "Accordion" will match "Accordion Small", "Accordion Large", etc.',
+            'CRITICAL RULE: DO NOT MAKE UP OR HALLUCINATE DATA. ONLY return exactly what this tool provides. Do not invent stock numbers, SKUs, or ASINs.',
         ]);
     }
 

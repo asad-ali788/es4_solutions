@@ -20,7 +20,7 @@ class FbaInventoryUsaReportSave extends Command
      *
      * @var string
      */
-    protected $description = 'Save FBA Inventory Report	';
+    protected $description = 'SP: Save FBA USA Inventory Data to Database';
 
     /**
      * Execute the console command.

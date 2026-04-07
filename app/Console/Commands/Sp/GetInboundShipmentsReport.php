@@ -12,7 +12,7 @@ use GuzzleHttp\Exception\ClientException;
 class GetInboundShipmentsReport extends Command
 {
     protected $signature = 'app:get-inbound-shipments-report';
-    protected $description = 'Fetch inbound FBA shipments and shipment items';
+    protected $description = 'SP: Fetch and Save FBA Inbound Shipments and Items (All Marketplaces)';
 
     protected const BASE_SLEEP = 5;
     protected const MAX_RETRIES = 5;

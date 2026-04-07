@@ -10,21 +10,36 @@ use Illuminate\Support\Facades\Log;
 
 class KeywordRequestReport extends Command
 {
-    protected $signature = 'app:keyword-request-report';
-    protected $description = 'Generate SP Keyword Performance Daily Report';
+    protected $signature = 'app:keyword-request-report {targetDate?}';
+    protected $description = 'ADS: Request SP Keyword Performance Report [US/CA]';
 
     public function handle(AmazonAdsService $clients)
     {
         $marketTz = config('timezone.market');
-        $date = Carbon::now($marketTz)->subDay()->toDateString();
+        $targetDate = $this->argument('targetDate');
 
+        if ($targetDate) {
+            $date = Carbon::parse($targetDate)->toDateString();
+            $this->requestReportForCountry($clients, config('amazon_ads.profiles.CA'), $date, 'CA', 'spTargeting_update');
+            $this->requestReportForCountry($clients, config('amazon_ads.profiles.US'), $date, 'US', 'spTargeting_update');
+            $this->info("✅ Keyword reports processed for $date.");
+            return;
+        }
+        
+        // 📅 Standard: Sub 1 day
+        $date = Carbon::now($marketTz)->subDay()->toDateString();
         $this->requestReportForCountry($clients, config('amazon_ads.profiles.CA'), $date, 'CA');
         $this->requestReportForCountry($clients, config('amazon_ads.profiles.US'), $date, 'US');
+
+        // 📅 Update: Sub 2 days
+        $updateDate = Carbon::now($marketTz)->subDays(2)->toDateString();
+        $this->requestReportForCountry($clients, config('amazon_ads.profiles.CA'), $updateDate, 'CA', 'spTargeting_update');
+        $this->requestReportForCountry($clients, config('amazon_ads.profiles.US'), $updateDate, 'US', 'spTargeting_update');
 
         echo "✅ Keyword reports processed for US and CA.\n";
     }
 
-    private function requestReportForCountry(AmazonAdsService $clients, string $profileId, string $date, string $country): void
+    private function requestReportForCountry(AmazonAdsService $clients, string $profileId, string $date, string $country, string $reportTypeOverride = null): void
     {
         $data = [
             "name" => "",
@@ -65,7 +80,7 @@ class KeywordRequestReport extends Command
 
             AmzAdsReportLog::create([
                 'country' => $country,
-                'report_type' => $res['configuration']['reportTypeId'] ?? null,
+                'report_type' => $reportTypeOverride ?? ($res['configuration']['reportTypeId'] ?? null),
                 'report_id' => $res['reportId'] ?? null,
                 'report_status' => 'IN_PROGRESS',
                 'r_iteration' => 0,

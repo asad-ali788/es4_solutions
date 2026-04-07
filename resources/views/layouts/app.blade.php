@@ -6,11 +6,11 @@
 
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>ES4 Solutions</title>
-    {{-- <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}"> --}}
+    <title>Itrend Solution</title>
+    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#37288f">
-    @php($v = '1.33')
+    @php($v = '1.50')
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="mobile-web-app-capable" content="yes">
@@ -32,7 +32,7 @@
 
 {{-- data-topbar="dark" --}}
 
-<body data-sidebar="light" class="relative">
+<body data-sidebar="dark" class="relative">
     <!-- Loading Spinner -->
     @include('components.loading')
 

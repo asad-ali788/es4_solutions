@@ -10,7 +10,7 @@ use Illuminate\Console\Command;
 class CampaignRequestLastTwoDays extends Command
 {
     protected $signature = 'app:campaign-request-last-two-days';
-    protected $description = 'Request SP, SB, and SD campaign reports for last 2 days for US and CA';
+    protected $description = 'ADS: Request SP/SB/SD Campaign Reports - Last 2 Days [US/CA]';
 
     public function handle(AmazonAdsService $client, AdsReportsService $service)
     {

@@ -21,48 +21,65 @@
     <div class="row g-3 align-items-stretch">
         <!-- Left Card -->
         <div class="col-12 col-xl-4 d-flex">
-            <div class="card w-100 ">
-                <div class="card-body">
-
-                    <!-- Top right dropdown -->
-                    <div class="d-flex justify-content-end position-relative mb-n2 mt-n1">
-                        <div class="dropdown">
-                            <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                                <i class="mdi mdi-dots-horizontal fs-4"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <a class="dropdown-item" href="{{ route('admin.dashboard.clearCache') }}">Reset
-                                        Cache</a>
-                                </li>
-                            </ul>
+            <div class="card w-100 flip-card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <div class="flip-face-content h-100 d-flex flex-column">
+                        <!-- Top right dropdown -->
+                        <div class="d-flex justify-content-end position-relative mb-n3 mt-n1">
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-light backdrop-blur border-white-50 shadow-sm" type="button" data-bs-toggle="dropdown"
+                                    aria-expanded="false">
+                                    <i class="mdi mdi-dots-horizontal fs-5"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <a class="dropdown-item" href="{{ route('admin.dashboard.clearCache') }}">Reset
+                                            Cache</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Content -->
-                    <div class="d-flex">
-                        <div class="me-3">
-                            @if ($user->profile)
-                                <img src="{{ asset('storage/' . $user->profile) }}" alt="Profile Image"
-                                    class="rounded-circle" style="width:60px;height:60px;object-fit:cover;">
-                            @else
-                                <img class="rounded-circle" src="{{ $user->profile_photo_url ?? 'null' }}" alt="">
-                            @endif
-                        </div>
-                        <div>
-                            <h5 class="mb-1">{{ $user->name ?? 'User' }}</h5>
-                            <p class="text-muted mb-1">{{ $user->getRoleNames()->first() ?? 'role' }}</p>
-                            <div class="d-flex flex-column ">
-                                <!-- First line: PST label + clock -->
-                                <div class="d-flex align-items-center">
-                                    <i class="mdi mdi-clock-time-four-outline me-1 text-muted"></i>
-                                    <span class="pst-clock font-size-16 text-muted"></span>
-                                    <span class="fw-light fs-6 ms-2">PST</span>
+                        <!-- Content -->
+                        <div class="d-flex align-items-center flex-grow-1">
+                            <div class="me-3">
+                                <div class="position-relative">
+                                    @if ($user->profile)
+                                        <img src="{{ asset('storage/' . $user->profile) }}" alt="Profile Image"
+                                            class="rounded-circle border border-2 border-white shadow-sm" style="width:72px;height:72px;object-fit:cover;">
+                                    @else
+                                        <div class="avatar-md rounded-circle border border-2 border-white shadow-sm">
+                                            <span class="avatar-title rounded-circle bg-primary-subtle text-primary font-size-24 fw-bold">
+                                                {{ strtoupper(substr($user->name ?? 'U', 0, 1)) }}
+                                            </span>
+                                        </div>
+                                    @endif
+                                    <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-white rounded-circle shadow-sm" title="Online"></span>
                                 </div>
-                                <div class="d-flex align-items-center text-muted">
-                                    <i class="mdi mdi-calendar me-1"></i>
-                                    <span class="pst-date"></span>
+                            </div>
+                            <div class="flex-grow-1 overflow-hidden">
+                                <h4 class="mb-1 fw-bold text-truncate">{{ $user->name ?? 'User' }}</h4>
+                                <p class="text-muted mb-2 fs-13 fw-medium">{{ $user->getRoleNames()->first() ?? 'role' }}</p>
+                                
+                                <div class="d-flex flex-column gap-1">
+                                    <!-- First line: PST label + clock -->
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-xs me-2">
+                                            <span class="avatar-title rounded-circle bg-info-subtle text-info font-size-14">
+                                                <i class="mdi mdi-clock-outline"></i>
+                                            </span>
+                                        </div>
+                                        <span class="pst-clock fw-bold text-primary fs-15"></span>
+                                        <span class="text-muted ms-2 small fw-semibold">PST</span>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-xs me-2">
+                                            <span class="avatar-title rounded-circle bg-warning-subtle text-warning font-size-14">
+                                                <i class="mdi mdi-calendar"></i>
+                                            </span>
+                                        </div>
+                                        <span class="pst-date text-muted fs-12 fw-medium"></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -82,7 +99,7 @@
             <div class="row g-3 align-items-stretch">
                 <!-- LEFT: Hourly Sales Snapshot (full height) -->
                 <div class="col-12 col-xl-4">
-                    <div class="card w-100 mb-3">
+                    <div class="card w-100 shadow-sm mb-3">
                         <div class="card-body">
                             <div class="d-flex align-items-center">
                                 <div class="avatar-xs me-3">
@@ -189,7 +206,7 @@
                     <div class="row g-3">
                         <!-- Hourly Revenue -->
                         <div class="col-12 col-md-6 d-flex">
-                            <div class="card w-100 mb-0">
+                            <div class="card w-100 shadow-sm mb-0">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-3">
                                         <div class="avatar-xs me-3">
@@ -232,7 +249,7 @@
 
                         <!-- Hourly Units -->
                         <div class="col-12 col-md-6 d-flex">
-                            <div class="card w-100 mb-0">
+                            <div class="card w-100 shadow-sm mb-0">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-3">
                                         <div class="avatar-xs me-3">
@@ -294,7 +311,7 @@
                                     <div class="w-100 cursor-not-allowed"
                                         title="ASIN monthly forecast access restricted. Contact admin.">
                                     @endcan
-                                    <div class="card w-100 mb-0 hover-card clickable-card">
+                                    <div class="card w-100 mb-0 shadow-sm">
                                         <div class="card-body">
                                             <div class="d-flex align-items-center mb-3">
                                                 <div class="avatar-xs me-3">
@@ -336,7 +353,7 @@
 
                     <!-- Forecast SKU -->
                     <div class="col-12 col-md-6 d-flex">
-                        <div class="card w-100 mb-0">
+                        <div class="card w-100 shadow-sm mb-0">
                             <div class="card-body">
                                 <div class="d-flex align-items-center mb-3">
                                     <div class="avatar-xs me-3">
@@ -364,7 +381,7 @@
 
                 <!-- Yesterday's Sales Summary (bottom full width) -->
                 <div class="col-12">
-                    <div class="card w-100 mb-0">
+                    <div class="card w-100 shadow-sm mb-0">
                         <div class="card-body">
                             <div class="d-flex mb-2 justify-content-between gap-2 flex-wrap">
                                 <div class="d-flex align-items-center">

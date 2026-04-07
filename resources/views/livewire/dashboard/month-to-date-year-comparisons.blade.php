@@ -18,7 +18,7 @@
         $lastMonthLyRev = data_get($monthToDateSummary, 'summary.total_revenue_usd_last_month_ly', null);
     @endphp
 
-    <div class="card w-100 mb-0">
+    <div class="card w-100 mb-0 shadow-sm">
         <div class="card-body">
             <div class="d-flex mb-2 justify-content-between gap-2 flex-wrap">
                 <div class="d-flex align-items-center">

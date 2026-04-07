@@ -20,7 +20,7 @@ class ListProductAdsSb extends Command
      *
      * @var string
      */
-    protected $description = 'Get SB Products Daily Report';
+    protected $description = 'ADS: Sync SB Product Ads [US/CA] from Amazon Ads API';
 
     /**
      * https://advertising.amazon.com/API/docs/en-us/sponsored-brands/3-0/openapi/prod#tag/Ads/operation/ListSponsoredBrandsAds

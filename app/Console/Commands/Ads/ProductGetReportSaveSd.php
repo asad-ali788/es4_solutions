@@ -20,7 +20,7 @@ class ProductGetReportSaveSd extends Command
      *
      * @var string
      */
-    protected $description = 'Save SD product performance Daily reports';
+    protected $description = 'ADS: Save SD Product Performance Report [US/CA]';
 
     /**
      * Execute the console command.

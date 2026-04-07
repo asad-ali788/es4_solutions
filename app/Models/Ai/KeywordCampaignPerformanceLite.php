@@ -25,13 +25,6 @@ class KeywordCampaignPerformanceLite extends Model
     use HasFactory, SoftDeletes;
 
     /**
-     * The connection name for the model.
-     *
-     * @var string|null
-     */
-    protected $connection = 'ai_sqlite';
-
-    /**
      * The table associated with the model.
      *
      * @var string
@@ -48,6 +41,7 @@ class KeywordCampaignPerformanceLite extends Model
         'campaign_name',
         'campaign_id',
         'asin',
+        'product_name',
         'country',
         'campaign_type',
         'campaign_state',
@@ -97,6 +91,7 @@ class KeywordCampaignPerformanceLite extends Model
         'impressions' => 'integer',
         'product_rating' => 'integer',
         'product_review_count' => 'integer',
+        'product_name' => 'string',
         'report_date' => 'date',
         'notes' => 'json',
         'created_at' => 'datetime',
@@ -153,7 +148,15 @@ class KeywordCampaignPerformanceLite extends Model
      */
     public function scopeByAsin($query, string $asin)
     {
-        return $query->where('asin', $asin);
+        return $query->where('asin', 'like', "%{$asin}%");
+    }
+
+    /**
+     * Filter by product name (partial match)
+     */
+    public function scopeSearchProductName($query, string $productName)
+    {
+        return $query->where('product_name', 'like', "%{$productName}%");
     }
 
     /**

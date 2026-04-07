@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 class TargetsSdRequestReportSave extends Command
 {
     protected $signature = 'app:targets-sd-request-report-save';
-    protected $description = 'Save SD Targeting Daily Report';
+    protected $description = 'ADS: Save SD Targeting Performance Report [US/CA]';
 
     public function handle()
     {

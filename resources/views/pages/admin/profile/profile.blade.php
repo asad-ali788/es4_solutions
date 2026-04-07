@@ -16,16 +16,15 @@
         </div>
     </div>
     <!-- end page title -->
-
-    <div class = "row">
-        <div class = "col-xl-4">
-            <div class = "card overflow-hidden">
-                <div class = "bg-primary-subtle">
-                    <div class = "row">
-                        <div class = "col-7">
-                            <div class = "text-primary p-3">
-                                <h5 class = "text-primary">Welcome Back !</h5>
-                                <p>It will seem like simplified</p>
+    <div class="row">
+        <div class="col-xl-4">
+            <div class="card overflow-hidden">
+                <div class="bg-primary-subtle">
+                    <div class="row">
+                        <div class="col-7">
+                            <div class="text-primary p-3">
+                                <h5 class="text-primary">Welcome Back!</h5>
+                                <p>Manage your profile details</p>
                             </div>
                         </div>
                         <div class="col-5 align-self-end">
@@ -38,25 +37,24 @@
                         <div class="col-sm-4">
                             <div class="avatar-md profile-user-wid mb-4">
                                 <img src="{{ $user->profile ? asset('storage/' . $user->profile) : $user->profile_photo_url }}"
-                                    alt="Profile Image" class="rounded-circle"
-                                    style="width: 60px; height: 60px; object-fit: cover;">
-                                <form action="{{ route('admin.profile.destroy', $user->id) }}" method="POST"
-                                    onsubmit="return confirm('Are you sure you want to delete your Profile?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-light position-relative p-0 ml-6 rounded-circle">
-                                        <span class="avatar-title bg-transparent text-reset" title="Delete Profile Image"
-                                            data-bs-toggle="tooltip">
-                                            <i class="bx bx-trash text-danger p-1"></i>
-                                        </span>
-                                    </button>
-                                </form>
+                                    alt="" class="img-thumbnail rounded-circle"
+                                    style="width: 72px; height: 72px; object-fit: cover;">
+                                <div class="position-absolute" style="bottom: 5px; right: -5px;">
+                                    <form action="{{ route('admin.profile.destroy', $user->id) }}" method="POST"
+                                        onsubmit="return confirm('Are you sure you want to delete your profile picture?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger btn-sm rounded-circle p-0" style="width: 24px; height: 24px;">
+                                            <i class="bx bx-trash font-size-12"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-12">
-                            <div>
-                                <h5 class="font-size-15">{{ $user->name ?? 'N/A' }}</h5>
-                                {{-- <p class="text-muted mb-0">{{ $user->getRoleNames()->first() ?? 'role' }}</p> --}}
+                        <div class="col-sm-8">
+                            <div class="pt-4">
+                                <h5 class="font-size-15 mb-1">{{ $user->name ?? 'N/A' }}</h5>
+                                <p class="text-muted mb-0 font-size-13">{{ $user->getRoleNames()->first() ?? 'Administrator' }}</p>
                             </div>
                         </div>
                     </div>
@@ -66,27 +64,25 @@
 
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title mb-4">Personal Information</h4>
-
-                    {{-- <p class="text-muted mb-4">Hi I'm Cynthia Price,has been the industry's standard dummy text To an English person, it will seem like simplified English, as a skeptical Cambridge.</p> --}}
+                    <h4 class="card-title mb-4">Account Information</h4>
                     <div class="table-responsive">
-                        <table class="table table-nowrap mb-0">
+                        <table class="table table-nowrap mb-0 font-size-14">
                             <tbody>
                                 <tr>
-                                    <th scope="row">Full Name :</th>
-                                    <td>{{ $user->name ?? 'N/A' }}</td>
+                                    <th scope="row" class="ps-0 border-top-0 w-50">Full Name :</th>
+                                    <td class="text-muted border-top-0">{{ $user->name ?? 'N/A' }}</td>
                                 </tr>
                                 <tr>
-                                    <th scope="row">Mobile :</th>
-                                    <td>{{ $user->mobile ?? 'N/A' }}</td>
+                                    <th scope="row" class="ps-0 w-50">Mobile :</th>
+                                    <td class="text-muted">{{ $user->mobile ?? '—' }}</td>
                                 </tr>
                                 <tr>
-                                    <th scope="row">E-mail :</th>
-                                    <td>{{ $user->email ?? 'N/A' }}</td>
+                                    <th scope="row" class="ps-0 w-50">E-mail :</th>
+                                    <td class="text-muted">{{ $user->email ?? 'N/A' }}</td>
                                 </tr>
                                 <tr>
-                                    <th scope="row">Role :</th>
-                                    <td>{{ $user->getRoleNames()->first() ?? 'role' }}</td>
+                                    <th scope="row" class="ps-0 border-bottom-0 w-50">Role :</th>
+                                    <td class="text-muted border-bottom-0">{{ $user->getRoleNames()->first() ?? 'Administrator' }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -97,142 +93,115 @@
         </div>
 
         <div class="col-xl-8">
-            <div class="card">
-                <form action="{{ route('admin.profile.store') }}" method="POST" id="profileForm"
-                    enctype="multipart/form-data">
+            <div class="card mb-4">
+                <form action="{{ route('admin.profile.store') }}" method="POST" id="profileForm" enctype="multipart/form-data">
                     @csrf
                     <div class="card-body">
-                        <h4 class="card-title">Personal Info</h4>
+                        <h4 class="card-title mb-4">Personal Information</h4>
+                        
                         <input type="hidden" name="formAction" value="update">
                         <input type="hidden" name="user_id" value="{{ $user->id }}">
 
-                        <!-- Name -->
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input id="name" name="name" type="text"
-                                class="form-control @error('name') is-invalid @enderror" placeholder="Enter your name"
-                                value="{{ old('name', $user->name) }}" required>
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <!-- Profile Image -->
-                        <div class="mt-2">
-                            <label for="profile_image" class="form-label">Profile Image</label>
-                            <input class="form-control @error('profile_image') is-invalid @enderror" type="file"
-                                id="profile_image" name="profile_image">
-                            @error('profile_image')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-
-                            @if ($user->profile_image)
-                                <img src="{{ asset('storage/' . $user->profile_image) }}" alt="Profile Image"
-                                    class="mt-2" width="80">
-                            @endif
-                        </div>
-
-                        <!-- Email -->
-                        <div class="row mt-3">
+                        <div class="row mb-3">
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="email" class="form-label">Email</label>
-                                    <input type="email" class="form-control @error('email') is-invalid @enderror"
-                                        id="email" name="email" placeholder="Enter your email"
-                                        value="{{ old('email', $user->email) }}" required>
-                                    @error('email')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
+                                <label for="name" class="form-label">Full Name</label>
+                                <input id="name" name="name" type="text"
+                                    class="form-control @error('name') is-invalid @enderror" placeholder="Enter your full name"
+                                    value="{{ old('name', $user->name) }}" required>
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
-                            <!-- Mobile -->
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="mobile" class="form-label">Mobile</label>
-                                    <input type="text" class="form-control @error('mobile') is-invalid @enderror"
-                                        id="mobile" name="mobile" placeholder="Enter your mobile"
-                                        value="{{ old('mobile', $user->mobile) }}">
-                                    @error('mobile')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
+                            <div class="col-md-6 mt-3 mt-md-0">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control @error('email') is-invalid @enderror"
+                                    id="email" name="email" placeholder="Enter your email"
+                                    value="{{ old('email', $user->email) }}" required>
+                                @error('email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
 
-                        <!-- Submit -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="mobile" class="form-label">Mobile Number</label>
+                                <input type="text" class="form-control @error('mobile') is-invalid @enderror"
+                                    id="mobile" name="mobile" placeholder="Enter your mobile number"
+                                    value="{{ old('mobile', $user->mobile) }}">
+                                @error('mobile')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6 mt-3 mt-md-0">
+                                <label for="profile_image" class="form-label">Profile Image</label>
+                                <input class="form-control @error('profile_image') is-invalid @enderror" type="file"
+                                    id="profile_image" name="profile_image">
+                                @error('profile_image')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
                         <div>
                             <button type="submit"
-                                class="btn btn-success waves-effect waves-light btn-rounded w-md" data-loading-text="Updating...">Update Profile</button>
+                                class="btn btn-primary w-md" data-loading-text="Updating...">Update Profile</button>
                         </div>
                     </div>
                 </form>
-
-                <!-- end card body -->
             </div>
-            <div class="card">
+
+            <div class="card shadow-none border">
                 <form action="{{ route('admin.updatePassword') }}" method="POST" id="ChangePasswordForm">
                     @csrf
-
                     <div class="card-body">
-                        <h4 class="card-title">Change Password</h4>
+                        <h4 class="card-title mb-4">Change Password</h4>
 
-                        {{-- Row 1: Current password + warning --}}
-                        <div class="row g-3 align-items-end">
-                            <div class="col-12 col-lg-6">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
                                 <label for="current-password" class="form-label">Current Password</label>
                                 <input id="current-password" name="current_password" type="password"
                                     class="form-control @error('current_password') is-invalid @enderror"
-                                    placeholder="Enter Current Password" required>
-
+                                    placeholder="Current password" required>
                                 @error('current_password')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
-                            <div class="col-12 col-lg-6">
-                                <div class="border rounded-2 p-3 bg-light">
-                                    <div class="fw-semibold mb-1 small">Password must contain:</div>
-                                    <ul class="mb-0 ps-3 small text-muted">
-                                        <li>Minimum 8 characters</li>
-                                        <li>One special character (!@#$%^&*)</li>
-                                    </ul>
+                            <div class="col-md-6 mt-3 mt-md-0">
+                                <div class="bg-light p-2 rounded border-start border-3 border-warning small text-muted">
+                                    <span class="text-dark fw-medium">Requirements:</span> Min 8 characters with at least one special character.
                                 </div>
-
                             </div>
                         </div>
 
-                        {{-- Row 2: New + Confirm --}}
-                        <div class="row g-3 mt-1">
-                            <div class="col-12 col-md-6">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
                                 <label for="new-password" class="form-label">New Password</label>
                                 <input id="new-password" name="password" type="password"
                                     class="form-control @error('password') is-invalid @enderror"
-                                    placeholder="Enter New Password" required>
-
+                                    placeholder="New password" required>
                                 @error('password')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
-                            <div class="col-12 col-md-6">
+                            <div class="col-md-6 mt-3 mt-md-0">
                                 <label for="password_confirmation" class="form-label">Confirm Password</label>
                                 <input id="password_confirmation" name="password_confirmation" type="password"
-                                    class="form-control" placeholder="Confirm New Password" required>
+                                    class="form-control" placeholder="Confirm password" required>
                             </div>
                         </div>
 
-                        {{-- Button --}}
-                        <div class="mt-3">
-                            <button type="submit" class="btn btn-success waves-effect waves-light btn-rounded w-md" data-loading-false>
-                                Update Password
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary px-4" data-loading-false>
+                                Update Security
                             </button>
                         </div>
                     </div>
                 </form>
-
-
-                <!-- end card body -->
             </div>
         </div>
 
@@ -274,17 +243,17 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title mb-4">Login History</h4>
+                    
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle nowrap w-100">
-                            <thead class="table">
+                        <table class="table table-hover align-middle nowrap w-100 mb-0">
+                            <thead class="table-light">
                                 <tr>
-                                    {{-- <th>User</th> --}}
-                                    <th>IP Address</th>
+                                    <th class="rounded-start">IP Address</th>
                                     <th>Status</th>
                                     <th>Browser</th>
                                     <th>Platform</th>
                                     <th>Login Time</th>
-                                    <th>Logout Time</th>
+                                    <th class="rounded-end">Logout Time</th>
                                 </tr>
                             </thead>
                             <tbody>

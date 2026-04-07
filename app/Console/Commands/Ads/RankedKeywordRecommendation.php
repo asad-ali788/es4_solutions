@@ -23,7 +23,7 @@ class RankedKeywordRecommendation extends Command
      *
      * @var string
      */
-    protected $description = 'Amz Ads Fetch ranked keyword Performance';
+    protected $description = 'ADS: Fetch and Rank Keyword Performance Data';
 
     /**
      * Execute the console command.

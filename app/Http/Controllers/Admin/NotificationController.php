@@ -19,8 +19,8 @@ class NotificationController extends Controller
         $this->authorize(NotificationEnum::Notification);
 
         $user   = Auth::user();
-        $status = $request->input('status');
-        $search = $request->input('search');
+        $status = $request->get('status');
+        $search = $request->get('search');
 
         // Base notification query scoped to role
         $baseQuery = Notification::query();
@@ -37,13 +37,13 @@ class NotificationController extends Controller
         if ($id) {
             $notification_details = $baseQuery->withTrashed()->with(['handlerUser', 'details'])->findOrFail($id);
             $users                = User::all();
-            $detailSearch         = $request->input('detail_search');
+            $detailSearch         = $request->get('detail_search');
             $detailsQuery         = $notification_details->details();
 
             if ($detailSearch) {
                 $detailsQuery->where('sku', 'like', "%{$detailSearch}%");
             }
-            $details_table = $detailsQuery->paginate($request->input('per_page', 15), ['*'], 'detail_page')->fragment('notification_details');
+            $details_table = $detailsQuery->paginate($request->get('per_page', 15), ['*'], 'detail_page')->fragment('notification_details');
         } else {
             // Filter by read/unread status
             if ($status === 'read') {
@@ -69,7 +69,7 @@ class NotificationController extends Controller
                 });
             }
 
-            $notification = $baseQuery->orderByDesc('created_date')->paginate($request->input('per_page', 15))->fragment('notification')->appends($request->query());
+            $notification = $baseQuery->orderByDesc('created_date')->paginate($request->get('per_page', 15))->fragment('notification')->appends($request->query());
         }
 
         // Unread Count scoped by role

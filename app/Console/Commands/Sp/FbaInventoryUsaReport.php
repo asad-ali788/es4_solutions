@@ -20,7 +20,7 @@ class FbaInventoryUsaReport extends Command
      *
      * @var string
      */
-    protected $description = 'Generate FBA Inventory Report	';
+    protected $description = 'SP: Request FBA USA Inventory Levels Report';
 
     /**
      * Execute the console command.

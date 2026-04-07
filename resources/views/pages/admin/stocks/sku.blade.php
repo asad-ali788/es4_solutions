@@ -62,16 +62,18 @@
                                 <tr>
                                     <th>#</th>
                                     <th>SKU</th>
+                                    <th>ASIN</th>
+                                    <th>Product Name</th>
                                     <th>
                                         <div>AFN</div>
                                         <div class="timestamp">Updated at:
                                             {{ \Carbon\Carbon::parse($lastUpdated['afn'])->format('M-d H:i') }}</div>
                                     </th>
-                                    <th>
+                                    <!-- <th>
                                         <div>FBA</div>
                                         <div class="timestamp">Updated at:
                                             {{ \Carbon\Carbon::parse($lastUpdated['fba'])->format('M-d H:i') }}</div>
-                                    </th>
+                                    </th> -->
                                     <th>
                                         <div>Inbound</div>
                                         <div class="timestamp">Updated at:
@@ -97,8 +99,10 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $stock->sku }}</td>
+                                        <td>{{ $stock->asin ?? '—' }}</td>
+                                        <td>{{ $stock->product_name ?? '—' }}</td>
                                         <td>{{ $stock->afn_quantity }}</td>
-                                        <td>{{ $stock->fba_totalstock }}</td>
+                                        <!-- <td>{{ $stock->fba_totalstock }}</td> -->
                                         <td>{{ $stock->inbound_qty }}</td>
                                         @foreach ($warehouses as $wh)
                                             <td>{{ $stock->{'wh_' . $wh->id . '_stock'} }}</td>

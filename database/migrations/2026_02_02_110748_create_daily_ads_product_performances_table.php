@@ -11,10 +11,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('daily_ads_product_performances')) {
-            return;
-        }
-
         Schema::create('daily_ads_product_performances', function (Blueprint $table) {
             $table->id();
             $table->string('sku');

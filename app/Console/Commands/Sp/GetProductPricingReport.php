@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 class GetProductPricingReport extends Command
 {
     protected $signature = 'app:get-product-pricing-report';
-    protected $description = 'Fetch product pricing Report';
+    protected $description = 'SP: Dispatch Product Pricing Jobs per ASIN Chunk (All Marketplaces)';
 
     // How many ASINs per queued job (1500 / 300 = 5 jobs per marketplace)
     private const DISPATCH_CHUNK_SIZE = 300;

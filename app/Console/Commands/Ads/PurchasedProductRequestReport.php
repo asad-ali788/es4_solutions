@@ -10,24 +10,33 @@ use Illuminate\Support\Facades\Log;
 
 class PurchasedProductRequestReport extends Command
 {
-    protected $signature = 'app:purchased-product-request-report';
-    protected $description = 'Generate SB Purchased Product Daily Report';
+    protected $signature = 'app:purchased-product-request-report {targetDate?}';
+    protected $description = 'ADS: Request SB Purchased Product Report [US/CA]';
 
     public function handle(AmazonAdsService $clients)
     {
         $marketTz = config('timezone.market');
-        $date = Carbon::now($marketTz)->subDay();
+        $targetDate = $this->argument('targetDate');
 
-        $this->requestReportForCountry($clients, config('amazon_ads.profiles.CA'), $date, 'CA');
-        $this->requestReportForCountry($clients, config('amazon_ads.profiles.US'), $date, 'US');
+        if ($targetDate) {
+            $date = Carbon::parse($targetDate);
+            $isUpdate = true;
+        } else {
+            $date = Carbon::now($marketTz)->subDay();
+            $isUpdate = false;
+        }
+
+        $this->requestReportForCountry($clients, config('amazon_ads.profiles.CA'), $date, 'CA', $isUpdate);
+        $this->requestReportForCountry($clients, config('amazon_ads.profiles.US'), $date, 'US', $isUpdate);
 
         $this->info("✅ Purchased Product reports requested for US and CA.");
     }
 
-    private function requestReportForCountry(AmazonAdsService $clients, string $profileId, Carbon $date, string $country): void
+    private function requestReportForCountry(AmazonAdsService $clients, string $profileId, Carbon $date, string $country, bool $isUpdate = false): void
     {
+        $reportType = $isUpdate ? 'sbPurchasedProduct_update' : 'sbPurchasedProduct';
         $data = [
-            "name"   => "sbPurchasedProduct-{$country}-{$date->toDateString()}",
+            "name"   => "{$reportType}-{$country}-{$date->toDateString()}",
             "startDate" => $date->toDateString(),
             "endDate"   => $date->toDateString(),
             "configuration" => [
@@ -70,7 +79,7 @@ class PurchasedProductRequestReport extends Command
 
             AmzAdsReportLog::create([
                 'country'       => $country,
-                'report_type'   => $res['configuration']['reportTypeId'] ?? 'sbPurchasedProduct',
+                'report_type'   => $reportType,
                 'report_id'     => $res['reportId'] ?? null,
                 'report_status' => 'IN_PROGRESS',
                 'r_iteration'   => 0,

@@ -24,7 +24,7 @@ class AmzKeywordUpdates extends Command
      *
      * @var string
      */
-    protected $description = 'Updates the Keyword & SB Bid and Status';
+    protected $description = 'ADS: Apply Pending Keyword Bid and Status Updates';
 
     /**
      * Execute the console command.

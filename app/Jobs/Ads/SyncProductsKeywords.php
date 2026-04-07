@@ -41,7 +41,7 @@ class SyncProductsKeywords implements ShouldQueue
         $chunk = [];
 
         // Tune this based on your DB:
-        $batchSize = 4000;
+        $batchSize = 5000;
 
         Log::channel('ads')->info("🚀 Syncing Sponsored Products Keywords for {$this->country}");
 

@@ -20,7 +20,7 @@ class WeeklySalesReport extends Command
      *
      * @var string
      */
-    protected $description = 'Generate Weekly sales report';
+    protected $description = 'SP: Request Weekly Order Sales Report (All Marketplaces)';
 
     /**
      * Execute the console command.

@@ -106,11 +106,11 @@ class CampaignAiTestController
     {
         try {
             // Get parameters from request (with defaults)
-            $asin = request()->input('asin', 'B07K6YKZBK');
-            $campaignType = request()->input('type'); // SP, SB, SD
-            $country = request()->input('country'); // US, UK, etc
-            $keywords = request()->input('keywords'); // search term
-            $date = request()->input('date'); // YYYY-MM-DD
+            $asin = request()->get('asin', 'B07K6YKZBK');
+            $campaignType = request()->get('type'); // SP, SB, SD
+            $country = request()->get('country'); // US, UK, etc
+            $keywords = request()->get('keywords'); // search term
+            $date = request()->get('date'); // YYYY-MM-DD
 
             // Validate ASIN
             if (!$asin) {
@@ -219,15 +219,15 @@ class CampaignAiTestController
     {
         try {
             // Get parameters from request
-            $asin = request()->input('asin', 'B07K6YKZBK');
-            $grouping = request()->input('grouping', 'performance'); // performance|campaign|keyword
-            $minSpend = (float) request()->input('min_spend', 5.0);
-            $maxAcos = (float) request()->input('max_acos', 50.0);
-            $minClicks = (int) request()->input('min_clicks', 0);
+            $asin = request()->get('asin', 'B07K6YKZBK');
+            $grouping = request()->get('grouping', 'performance'); // performance|campaign|keyword
+            $minSpend = (float) request()->get('min_spend', 5.0);
+            $maxAcos = (float) request()->get('max_acos', 50.0);
+            $minClicks = (int) request()->get('min_clicks', 0);
             $includeMetrics = request()->boolean('include_metrics', true);
             $includeTrends = request()->boolean('include_trends', true);
             $includeRecommendations = request()->boolean('include_recommendations', true);
-            $limitKeywords = (int) request()->input('limit_keywords', 15);
+            $limitKeywords = (int) request()->get('limit_keywords', 15);
 
             // Validate ASIN
             if (!$asin) {

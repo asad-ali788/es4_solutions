@@ -16,7 +16,7 @@ class ListAdGroups extends Command
     /**
      * The console command description.
      */
-    protected $description = 'Get SP Ad Groups Daily Report';
+    protected $description = 'ADS: Sync SP Ad Groups [US/CA] from Amazon Ads API';
 
     /**
      * Execute the console command.

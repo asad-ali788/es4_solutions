@@ -2,7 +2,7 @@
     @php
         $storageKey = $storageKey ?? 'dashboard:welcome-weather-flip-card';
     @endphp
-    <div class="card w-100 flip-card p-0 position-relative" wire:ignore.self x-data="flipWeatherCard({
+    <div class="card w-100 flip-card p-0 position-relative shadow-sm" wire:ignore.self x-data="flipWeatherCard({
         intervalMs: 5000,
         storageKey: @js($storageKey),
         defaultLocationKey: @js($locationKey ?? 'us_ca'),
@@ -17,13 +17,13 @@
                     <div class="flip-face flip-front">
                         <div class="flip-face-content">
                             <div class="d-flex justify-content-end gap-2 mb-2">
-                                <button type="button" class="btn btn-sm"
-                                    :class="locked ? 'btn-warning' : 'btn-outline-secondary'" @click="toggleLock()"
+                                <button type="button" class="btn btn-sm shadow-sm"
+                                    :class="locked ? 'btn-warning' : 'btn-light backdrop-blur border-white-50'" @click="toggleLock()"
                                     :title="locked ? 'Locked: auto-flip disabled' : 'Lock: stop auto-flip'">
                                     <i class="mdi" :class="locked ? 'mdi-lock' : 'mdi-lock-open-variant'"></i>
                                 </button>
 
-                                <button type="button" class="btn btn-sm btn-outline-secondary" @click="toggle()"
+                                <button type="button" class="btn btn-sm btn-light backdrop-blur border-white-50 shadow-sm" @click="toggle()"
                                     :disabled="locked" :title="locked ? 'Unlock to flip' : 'Flip'">
                                     <i class="mdi mdi-swap-vertical"></i>
                                 </button>
@@ -31,18 +31,34 @@
 
                             <div class="row g-3 align-items-center">
                                 <div class="col-8 col-lg-9 mt-0">
-                                    <h5 class="text-primary mb-1">Welcome Back ! 🎉</h5>
-                                    <p class="mb-2 text-muted">Here’s your daily overview</p>
+                                    <h4 class="text-primary fw-bold mb-1">Welcome Back! 🎉</h4>
+                                    <p class="mb-3 text-muted opacity-75">Here’s your daily overview</p>
 
                                     <div class="text-muted">
-                                        <p class="mb-1">
-                                            <i class="mdi mdi-circle-medium align-middle text-primary me-1"></i>
-                                            Track your campaign performance
-                                        </p>
-                                        <p class="mb-0">
-                                            <i class="mdi mdi-circle-medium align-middle text-primary me-1"></i>
-                                            Boost results with AI suggestions
-                                        </p>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="flex-shrink-0 me-2">
+                                                <div class="avatar-xs">
+                                                    <span class="avatar-title rounded-circle bg-primary-subtle text-primary">
+                                                        <i class="mdi mdi-trending-up"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <p class="mb-0 fs-13">Track your campaign performance</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-shrink-0 me-2">
+                                                <div class="avatar-xs">
+                                                    <span class="avatar-title rounded-circle bg-success-subtle text-success">
+                                                        <i class="mdi mdi-auto-fix"></i>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <p class="mb-0 fs-13">Boost results with AI suggestions</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -59,7 +75,7 @@
                         <div class="flip-face-content">
                             <div class="d-flex align-items-center justify-content-between gap-2">
                                 <div class="d-flex align-items-center flex-wrap gap-2">
-                                    <h6 class="mb-0">Next 5 days weather</h6>
+                                    <h6 class="mb-0">Weather Forecast</h6>
 
                                     {{-- Dropdown --}}
                                     <div style="min-width: 155px; max-width: 210px;" wire:ignore>
@@ -90,18 +106,18 @@
                                 </div>
 
                                 <div class="d-flex gap-2 flex-shrink-0">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                                    <button type="button" class="btn btn-sm btn-light backdrop-blur border-white-50 shadow-sm"
                                         wire:click.stop="refreshForecast" title="Refresh">
                                         <i class="mdi mdi-refresh"></i>
                                     </button>
 
-                                    <button type="button" class="btn btn-sm"
-                                        :class="locked ? 'btn-warning' : 'btn-outline-secondary'" @click="toggleLock()"
+                                    <button type="button" class="btn btn-sm shadow-sm"
+                                        :class="locked ? 'btn-warning' : 'btn-light backdrop-blur border-white-50'" @click="toggleLock()"
                                         :title="locked ? 'Locked: auto-flip disabled' : 'Lock: stop auto-flip'">
                                         <i class="mdi" :class="locked ? 'mdi-lock' : 'mdi-lock-open-variant'"></i>
                                     </button>
 
-                                    <button type="button" class="btn btn-sm btn-outline-secondary" @click="toggle()"
+                                    <button type="button" class="btn btn-sm btn-light backdrop-blur border-white-50 shadow-sm" @click="toggle()"
                                         :disabled="locked" :title="locked ? 'Unlock to flip' : 'Flip'">
                                         <i class="mdi mdi-swap-vertical"></i>
                                     </button>

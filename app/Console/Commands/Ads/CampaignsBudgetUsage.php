@@ -20,7 +20,7 @@ class CampaignsBudgetUsage extends Command
      *
      * @var string
      */
-    protected $description = 'Campaign Budget Usage for all';
+    protected $description = 'ADS: Track and Log Campaign Budget Usage (All Marketplaces)';
 
     /**
      * Execute the console command.

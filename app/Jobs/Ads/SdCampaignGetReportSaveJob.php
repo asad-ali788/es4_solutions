@@ -7,6 +7,8 @@ use App\Models\AmzAdsCampaignPerformanceReportSd;
 use App\Models\TempAmzCampaignSDPerformanceReport;
 use App\Services\Ads\CampaignPerformanceSnapshotService;
 use App\Services\Api\AmazonAdsService;
+use App\Jobs\Ads\CampaignRecommendationJob;
+use App\Console\Commands\Ai\SyncCampaignPerformanceLite;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
@@ -21,18 +23,24 @@ class SdCampaignGetReportSaveJob implements ShouldQueue
 
     public string $country;
     public bool $isTodayReport;
+    public ?string $reportType;
 
-    public function __construct(string $country, bool $isTodayReport = false)
+    public function __construct(string $country, bool $isTodayReport = false, ?string $reportType = null)
     {
         $this->country = $country;
         $this->isTodayReport = $isTodayReport;
+        $this->reportType = $reportType;
     }
 
     public function handle(
         AmazonAdsService $client,
         CampaignPerformanceSnapshotService $snapshotService
     ) {
-        $reportType = $this->isTodayReport ? 'sdCampaigns_daily' : 'sdCampaigns';
+        if ($this->reportType) {
+            $reportType = $this->reportType;
+        } else {
+            $reportType = $this->isTodayReport ? 'sdCampaigns_daily' : 'sdCampaigns';
+        }
 
         $reportLog = AmzAdsReportLog::where('country', $this->country)
             ->where('report_type', $reportType)
@@ -113,12 +121,27 @@ class SdCampaignGetReportSaveJob implements ShouldQueue
                     }
                 } else {
                     foreach (array_chunk($records, 1000) as $chunk) {
-                        AmzAdsCampaignPerformanceReportSd::insert($chunk);
+                        AmzAdsCampaignPerformanceReportSd::upsert(
+                            $chunk,
+                            ['campaign_id', 'c_date', 'country'],
+                            ['campaign_status', 'campaign_budget_amount', 'campaign_budget_currency_code', 'impressions', 'clicks', 'cost', 'sales', 'purchases', 'units_sold', 'updated_at']
+                        );
                     }
                 }
 
                 $reportLog->update(['report_status' => 'COMPLETED']);
                 Log::channel('ads')->info("[CampaignSdGetReportSave][{$this->country}] Report inserted and marked COMPLETED.");
+
+                // 🚀 Refresh recommendations if this was an update fetch
+                if (($this->reportType === 'sdCampaigns_update') && !empty($records)) {
+                    $targetDate = $records[0]['c_date'] ?? null;
+                    if ($targetDate) {
+                        CampaignRecommendationJob::dispatch($targetDate);
+                        SyncCampaignPerformanceLite::dispatch($targetDate);
+                        Log::channel('ads')->info("🔄 Recommendation refresh (SD) dispatched for date: {$targetDate}");
+                    }
+                }
+
                 if ($this->isTodayReport) {
                     $snapshotService->captureDeltaForType('SD');
                 }

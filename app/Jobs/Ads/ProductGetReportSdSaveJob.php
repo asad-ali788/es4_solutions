@@ -20,16 +20,22 @@ class ProductGetReportSdSaveJob implements ShouldQueue
 
     public string $country;
     public bool $isTodayReport;
+    public ?string $reportType;
 
-    public function __construct(string $country, bool $isTodayReport = false)
+    public function __construct(string $country, bool $isTodayReport = false, ?string $reportType = null)
     {
         $this->country = $country;
         $this->isTodayReport = $isTodayReport;
+        $this->reportType = $reportType;
     }
 
     public function handle(AmazonAdsService $client)
     {
-        $reportType = $this->isTodayReport ? 'sdAdvertisedProduct_daily' : 'sdAdvertisedProduct';
+        if ($this->reportType) {
+            $reportType = $this->reportType;
+        } else {
+            $reportType = $this->isTodayReport ? 'sdAdvertisedProduct_daily' : 'sdAdvertisedProduct';
+        }
 
         $reportLog = AmzAdsReportLog::where('country', $this->country)
             ->where('report_type', $reportType)
@@ -102,7 +108,7 @@ class ProductGetReportSdSaveJob implements ShouldQueue
                                 'ad_group_id' => $record['ad_group_id'],
                                 'ad_id'       => $record['ad_id'],
                                 'sku'         => $record['sku'],
-                                'date'      => $record['date'],
+                                'date'        => $record['date'],
                                 'country'     => $record['country'],
                             ],
                             $record
@@ -110,7 +116,11 @@ class ProductGetReportSdSaveJob implements ShouldQueue
                     }
                 } else {
                     foreach (array_chunk($records, 1000) as $chunk) {
-                        AmzAdsProductPerformanceReportSd::insert($chunk);
+                        AmzAdsProductPerformanceReportSd::upsert(
+                            $chunk,
+                            ['campaign_id', 'ad_group_id', 'ad_id', 'sku', 'date', 'country'],
+                            ['clicks', 'impressions', 'cost', 'sales', 'purchases', 'units_sold', 'asin', 'updated_at']
+                        );
                     }
                 }
 

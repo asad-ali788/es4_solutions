@@ -20,7 +20,7 @@ class CampaignRecommendationsWeekly extends Command
      *
      * @var string
      */
-    protected $description = 'Amz Ads Campaign Performance Daily Report';
+    protected $description = 'ADS: Generate Campaign Performance Recommendations (SP/SB/SD)';
 
     /**
      * Execute the console command.->onQueue('long-running');

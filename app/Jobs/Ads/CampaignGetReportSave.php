@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Ads;
 
+use App\Console\Commands\Ai\SyncCampaignPerformanceLite;
 use App\Models\AmzAdsCampaignPerformanceReport;
 use App\Models\AmzAdsReportLog;
 use App\Models\TempAmzCampaignPerformanceReport;
@@ -22,18 +23,22 @@ class CampaignGetReportSave implements ShouldQueue
 
     public string $country;
     public bool $isTodayReport;
+    public ?string $reportType;
 
-    public function __construct(string $country, bool $isTodayReport = false)
+    public function __construct(string $country, bool $isTodayReport = false, ?string $reportType = null)
     {
         $this->country = $country;
         $this->isTodayReport = $isTodayReport;
+        $this->reportType = $reportType;
     }
 
-    public function handle(AmazonAdsService $client,
+    public function handle(
+        AmazonAdsService $client,
         CampaignPerformanceSnapshotService $snapshotService
-    )
-    {
-        if ($this->isTodayReport) {
+    ) {
+        if ($this->reportType) {
+            $reportType = $this->reportType;
+        } elseif ($this->isTodayReport) {
             $reportType = 'spCampaigns_daily';
         } else {
             $reportType = 'spCampaigns';
@@ -48,7 +53,7 @@ class CampaignGetReportSave implements ShouldQueue
         Log::channel('ads')->info("📥 Processing {$this->country} Amz Ads Campaign Performance Report");
 
         if (!$reportLog) {
-            Log::channel('ads')->info('CampaignGetReportSave No Campaign report in progress.');
+            Log::channel('ads')->info("CampaignGetReportSave No Campaign report in progress for type: $reportType");
             return;
         }
 
@@ -85,31 +90,31 @@ class CampaignGetReportSave implements ShouldQueue
                 $records = [];
                 foreach ($reportRows as $item) {
                     $records[] = [
-                        'campaign_id'  => $item['campaignId'] ?? null,
-                        'ad_group_id'  => $item['adGroupId'] ?? null,
-                        'cost'         => $item['cost'] ?? null,
-                        'sales1d'      => $item['sales1d'] ?? null,
-                        'sales7d'      => $item['sales7d'] ?? null,
-                        'purchases1d'  => $item['purchases1d'] ?? null,
-                        'purchases7d'  => $item['purchases7d'] ?? null,
-                        'clicks'       => $item['clicks'] ?? null,
+                        'campaign_id' => $item['campaignId'] ?? null,
+                        'ad_group_id' => $item['adGroupId'] ?? null,
+                        'cost' => $item['cost'] ?? null,
+                        'sales1d' => $item['sales1d'] ?? null,
+                        'sales7d' => $item['sales7d'] ?? null,
+                        'purchases1d' => $item['purchases1d'] ?? null,
+                        'purchases7d' => $item['purchases7d'] ?? null,
+                        'clicks' => $item['clicks'] ?? null,
                         'costPerClick' => $item['costPerClick'] ?? null,
-                        'c_budget'     => $item['campaignBudgetAmount'] ?? null,
-                        'c_currency'   => $item['campaignBudgetCurrencyCode'] ?? null,
-                        'c_status'     => $item['campaignStatus'] ?? null,
-                        'c_date'       => isset($item['date']) ? Carbon::parse($item['date']) : null,
-                        'country'      => $this->country,
+                        'c_budget' => $item['campaignBudgetAmount'] ?? null,
+                        'c_currency' => $item['campaignBudgetCurrencyCode'] ?? null,
+                        'c_status' => $item['campaignStatus'] ?? null,
+                        'c_date' => isset($item['date']) ? Carbon::parse($item['date']) : null,
+                        'country' => $this->country,
                         'budget_gap' => (
                             isset($item['cost'], $item['campaignBudgetAmount']) &&
                             $item['cost'] >= (0.9 * $item['campaignBudgetAmount'])
                         ) ? 1 : 0,
-                        'added'        => now(),
-                        'created_at'   => now(),
-                        'updated_at'   => now(),
+                        'added' => now(),
+                        'created_at' => now(),
+                        'updated_at' => now(),
                     ];
                 }
 
-                if ($this->isTodayReport) {
+                if ($reportType === 'spCampaigns_daily') {
                     foreach ($records as $record) {
                         $tempRecord = $record;
                         unset($tempRecord['budget_gap']); // drop the field not in table
@@ -117,15 +122,21 @@ class CampaignGetReportSave implements ShouldQueue
                             [
                                 'campaign_id' => $record['campaign_id'],
                                 'ad_group_id' => $record['ad_group_id'],
-                                'c_date'      => $record['c_date'],
-                                'country'     => $record['country'],
+                                'c_date' => $record['c_date'],
+                                'country' => $record['country'],
                             ],
                             $record
                         );
                     }
                 } else {
+                    // Use upsert for BOTH 'spCampaigns' and 'spCampaigns_update' for safety.
+                    // Since we have a unique index, a plain insert would fail on duplicates.
                     foreach (array_chunk($records, 1000) as $chunk) {
-                        AmzAdsCampaignPerformanceReport::insert($chunk);
+                        AmzAdsCampaignPerformanceReport::upsert(
+                            $chunk,
+                            ['campaign_id', 'ad_group_id', 'c_date', 'country'],
+                            ['cost', 'sales1d', 'sales7d', 'purchases1d', 'purchases7d', 'clicks', 'costPerClick', 'c_budget', 'c_currency', 'c_status', 'budget_gap', 'added', 'updated_at']
+                        );
                     }
                 }
 
@@ -133,10 +144,17 @@ class CampaignGetReportSave implements ShouldQueue
                 Cache::forget('sales_report_today');
                 Cache::forget('sales_report_yesterday');
                 Log::channel('ads')->info('CampaignGetReportSave Report inserted and marked as COMPLETED.');
-                /**
-                 * ✅ SAFELY APPENDED: snapshot capture for SP (today report only)
-                 * Does not change your existing logic/flow; it runs after save+completed.
-                 */
+
+                // 🚀 If it's an update report, refresh the recommendations for that date
+                if ($this->reportType === 'spCampaigns_update' && !empty($records)) {
+                    $targetDate = $records[0]['c_date'] ?? null;
+                    if ($targetDate) {
+                        CampaignRecommendationJob::dispatch($targetDate);
+                        SyncCampaignPerformanceLite::dispatch($targetDate);
+                        Log::channel('ads')->info("🔄 Recommendation refresh (SP) dispatched for date: {$targetDate}");
+                    }
+                }
+
                 if ($this->isTodayReport) {
                     $snapshotService->captureDeltaForType('SP');
                 }

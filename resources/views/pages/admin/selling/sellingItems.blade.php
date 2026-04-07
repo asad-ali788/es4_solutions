@@ -198,7 +198,7 @@
                                     <div class="form-group mb-3">
                                         <label for="new_price" class="form-label mb-2">Set Amazon Price</label>
                                         <div class="input-group">
-                                            <input type="text" class="form-control" id="new_price"
+                                            <input type="text" class="form-control" id="new_price" disabled
                                                 placeholder="Enter Amazon Price" maxlength="4"
                                                 oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1').replace(/^(\d+)(\.\d{0,2}).*$/, '$1$2')">
                                             <div class="ms-2">

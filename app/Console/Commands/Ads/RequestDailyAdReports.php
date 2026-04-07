@@ -12,7 +12,7 @@ use App\Models\AmzAdsReportLog;
 class RequestDailyAdReports extends Command
 {
     protected $signature = 'app:request-daily-reports';
-    protected $description = 'Request daily Amazon Ads reports (5 types)';
+    protected $description = 'ADS: Request All Daily Ad Reports [US/CA] (SP/SB/SD/KW/Targets)';
 
     public function handle()
     {

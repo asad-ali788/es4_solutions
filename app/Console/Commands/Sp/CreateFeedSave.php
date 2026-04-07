@@ -23,7 +23,7 @@ class CreateFeedSave extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'SP: Process and Sync Price-Update Feed Results';
 
     public function __construct(
         protected SellerConnector $connector

@@ -242,12 +242,12 @@ return [
     |--------------------------------------------------------------------------
     | Log Viewer prefixes all the cache keys created with this value. If for
     | some reason you would like to change this prefix, you can do so here.
-    | The format of Log Viewer cache keys is:
+    | The format of Log Viewer cache keys is:     'cache_key_prefix' => 'lv',
     | {prefix}:{version}:{rest-of-the-key}
     |
     */
 
-    'cache_key_prefix' => 'lv',
+    'cache_key_prefix' => 'lvg',
 
     /*
     |--------------------------------------------------------------------------

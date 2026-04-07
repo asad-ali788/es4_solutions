@@ -25,7 +25,7 @@ class AmzCampaignUpdates extends Command
      *
      * @var string
      */
-    protected $description = 'Updates the Campaign & SB Budget and Status';
+    protected $description = 'ADS: Apply Pending Campaign Budget and Status Updates';
 
     /**
      * Execute the console command.

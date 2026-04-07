@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Password;
+use Mirror\Facades\Mirror;
 
 class UserController extends Controller
 {
@@ -35,7 +36,7 @@ class UserController extends Controller
             });
         }
 
-        $users = $query->paginate($request->input('per_page', 25));
+        $users = $query->paginate($request->get('per_page', 25));
         return view('pages.admin.user.users.index', compact('users'));
     }
 
@@ -171,5 +172,26 @@ class UserController extends Controller
         $user->save();
 
         return redirect()->back()->with('success', 'User status updated successfully.');
+    }
+
+    public function impersonate(User $user)
+    {
+        abort_unless(auth()->user()?->canImpersonate(), 403);
+        abort_if(auth()->id() === $user->id, 422, 'You cannot impersonate your own account.');
+
+        Mirror::start($user);
+
+        return redirect()->route('admin.dashboard');
+    }
+
+    public function leave()
+    {
+        if (! Mirror::isImpersonating()) {
+            return redirect()->route('admin.users.index');
+        }
+
+        Mirror::stop();
+
+        return redirect()->route('admin.users.index');
     }
 }

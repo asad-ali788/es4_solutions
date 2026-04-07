@@ -13,7 +13,7 @@ use Saloon\Exceptions\Request\Statuses\ForbiddenException;
 class ListSponsoredBrandsTargetingClauses extends Command
 {
     protected $signature = 'app:list-sponsored-brands-targeting-clauses';
-    protected $description = 'Fetch Sponsored Brands Targeting Clauses from Amazon Ads API';
+    protected $description = 'ADS: Sync SB Targeting Clauses [US/CA] from Amazon Ads API';
 
     public function handle()
     {

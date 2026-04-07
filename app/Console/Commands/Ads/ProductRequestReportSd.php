@@ -9,17 +9,25 @@ use Illuminate\Console\Command;
 
 class ProductRequestReportSd extends Command
 {
-    protected $signature = 'app:product-request-report-sd';
-    protected $description = 'Generate SD Product Performance Daily Report';
+    protected $signature = 'app:product-request-report-sd {targetDate?}';
+    protected $description = 'ADS: Request SD Product Performance Report [US/CA]';
 
     public function handle(AmazonAdsService $client, AdsReportsService $reportService)
     {
         $marketTz = config('timezone.market');
-        $date     = Carbon::now($marketTz)->subDay()->toDateString();
+        $targetDate = $this->argument('targetDate');
+
+        if ($targetDate) {
+            $date = Carbon::parse($targetDate)->toDateString();
+            $reportLogType = "sdAdvertisedProduct_update";
+        } else {
+            $date = Carbon::now($marketTz)->subDay()->toDateString();
+            $reportLogType = "sdAdvertisedProduct";
+        }
 
         // common config for SD Product report
         $reportType   = "sdAdvertisedProduct";
-        $reportLogType = "sdAdvertisedProduct";
+        // $reportLogType is already defined above dynamically
         $groupBy      = ["advertiser"];
         $columns      = [
             "adGroupId",

@@ -20,7 +20,7 @@ class ListTargetsSd extends Command
      *
      * @var string
      */
-    protected $description = 'Get Targets Daily Report';
+    protected $description = 'ADS: Sync SD Targets [US/CA] from Amazon Ads API';
 
     /**
      * Execute the console command.

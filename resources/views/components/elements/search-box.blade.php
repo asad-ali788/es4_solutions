@@ -1,3 +1,5 @@
+@props(['name', 'placeholder', 'value' => null])
+
 {{-- Search --}}
 <div class="col-12 col-md-auto">
     <div class="search-box d-flex align-items-center position-relative bg-light px-2 py-2"
@@ -10,7 +12,7 @@
                id="search-{{ $name }}"
                class="form-control border-0 bg-light flex-grow-1"
                placeholder="{{ $placeholder }}"
-               value="{{ request($name) }}"
+               value="{{ $value ?? request($name) }}"
                oninput="toggleClearButton('{{ $name }}')">
 
         <button type="button"

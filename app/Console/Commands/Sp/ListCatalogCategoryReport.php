@@ -16,11 +16,11 @@ class ListCatalogCategoryReport extends Command
     protected $signature = 'app:list-catalog-category-report';
 
     /**
-     * The console command description.
+     * The console SP: Fetch Catalog Category Tree by ASIN from SP-API.
      *
      * @var string
      */
-    protected $description = 'Catalog category by ASIN';
+    protected $description = 'SP: Fetch Catalog Category Tree by ASIN from SP-API';
 
     /**
      * Execute the console command.

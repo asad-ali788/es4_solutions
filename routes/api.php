@@ -13,6 +13,8 @@ use App\Http\Controllers\Api\SpReportCronApi;
 use App\Services\Api\AmazonAdsService;
 use SellingPartnerApi\Seller\ListingsItemsV20210801\Dto\ListingsItemPatchRequest;
 use SellingPartnerApi\Seller\ListingsItemsV20210801\Dto\PatchOperation;
+use App\Models\TestCampaign;
+use App\Jobs\Ads\TestCampaignGetReportSave;
 
 // Route::prefix('spapi')->as('spapi.')->group(function () {
 
@@ -30,7 +32,7 @@ Route::controller(SpReportController::class)->group(function () {
 /**
  * 📊 Inventory Summary
  */
-    // Route::get('/getInventorySummaries', [InventoryController::class, 'getInventorySummaries'])->name('getInventorySummaries');
+    Route::get('/getInventorySummaries', [InventoryController::class, 'getInventorySummaries'])->name('getInventorySummaries');
 
 /**
  * 📚 Catalog Item & Category Routes
@@ -247,15 +249,6 @@ Route::get('/rankedKeywordAsin', function (Request $request) {
             'success' => true,
             'payload_sent' => $payload,
             'decoded_json' => $decoded,
-        ]);
-    }
-
-    // Already array
-    if (is_array($responseRaw)) {
-        return response()->json([
-            'success' => true,
-            'payload_sent' => $payload,
-            'decoded_json' => $responseRaw,
         ]);
     }
 
@@ -509,7 +502,7 @@ Route::get('/rankedKeyword', function (Request $request) {
 
 Route::get('budgetRules', function (Request $request, AmazonAdsService $amazonAdsService) {
 
-    $country = $request->input('country', 'US');
+    $country = $request->get('country', 'US');
 
     $profileId = match ($country) {
         'US' => config('amazon_ads.profiles.US'),
@@ -518,7 +511,7 @@ Route::get('budgetRules', function (Request $request, AmazonAdsService $amazonAd
     };
 
     $query = [
-        'pageSize' => (int) $request->input('pageSize', 30),
+        'pageSize' => (int) $request->get('pageSize', 30),
     ];
 
     $data = $amazonAdsService->getSPBudgetRulesForAdvertiser($profileId, $query);
@@ -556,5 +549,22 @@ Route::prefix('test')->group(function () {
         Route::get('/campaign-keywords/deep-analysis', 'testDeepAnalysis')
             ->name('test.deep-analysis');
     });
+});
+
+Route::post('/test-campaigns/generate-report', function (Request $request) {
+        $country = $request->input('country', 'US');
+        (new TestCampaignGetReportSave($country))->handle(app(AmazonAdsService::class));
+        return response()->json(['status' => 'generated', 'country' => $country]);
+    });
+Route::post('/test-campaigns/run-report', function (\Illuminate\Http\Request $request) {
+    $country = $request->input('country', 'US');
+    dispatch(new TestCampaignGetReportSave($country));
+    return response()->json(['status' => 'dispatched', 'country' => $country]);
+});
+
+Route::post('/test-campaigns/request-report', function (\Illuminate\Http\Request $request) {
+    $country = $request->input('country', 'US');
+    \Illuminate\Support\Facades\Artisan::call('app:test-campaign-request-report', ['--country' => $country]);
+    return response()->json(['status' => 'requested', 'country' => $country]);
 });
 

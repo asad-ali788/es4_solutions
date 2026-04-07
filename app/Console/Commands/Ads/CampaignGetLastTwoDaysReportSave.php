@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 class CampaignGetLastTwoDaysReportSave extends Command
 {
     protected $signature = 'app:campaign-get-last-two-days-report-save';
-    protected $description = 'Dispatch one job per country to fetch & save SP/SB/SD campaign reports for the last 2 days';
+    protected $description = 'ADS: Save SP/SB/SD Campaign Reports - Last 2 Days Correction [US/CA]';
 
     public function handle()
     {

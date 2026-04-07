@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::connection('ai_sqlite')->create('keyword_campaign_performance_lites', function (Blueprint $table) {
+        Schema::create('keyword_campaign_performance_lites', function (Blueprint $table) {
             // Primary identifiers
             $table->id();
             $table->string('keyword_text')->index();
@@ -64,10 +64,10 @@ return new class extends Migration
             $table->unique(['keyword_text', 'campaign_id', 'report_date', 'country'], 'unique_keyword_campaign_date');
             
             // Indexes for common queries
-            $table->index(['campaign_name', 'report_date']);
-            $table->index(['keyword_text', 'campaign_type']);
-            $table->index(['country', 'campaign_type', 'report_date']);
-            $table->index(['asin', 'report_date']);
+            $table->index(['campaign_name', 'report_date'], 'kcpl_campaign_date_idx');
+            $table->index(['keyword_text', 'campaign_type'], 'kcpl_keyword_type_idx');
+            $table->index(['country', 'campaign_type', 'report_date'], 'kcpl_country_type_date_idx');
+            $table->index(['asin', 'report_date'], 'kcpl_asin_date_idx');
         });
     }
 
@@ -76,6 +76,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::connection('ai_sqlite')->dropIfExists('keyword_campaign_performance_lites');
+        Schema::dropIfExists('keyword_campaign_performance_lites');
     }
 };

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 class PurchasedProductGetReportSave extends Command
 {
     protected $signature = 'app:purchased-product-get-report-save';
-    protected $description = 'Save SB Purchased Product Daily Report';
+    protected $description = 'ADS: Save SB Purchased Product Report [US/CA]';
 
     public function handle()
     {

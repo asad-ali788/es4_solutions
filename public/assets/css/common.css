@@ -161,6 +161,7 @@ li:hover i {
     background: linear-gradient(90deg, #00c6ff, #ff00ff, #45f17c, #ffbb00);
     background-size: 300% 300%;
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: bold;
     animation: gradientShift 5s ease infinite;
@@ -448,7 +449,7 @@ table th.wide-col {
         width: auto !important;
     }
 }
-/* ES4 Solutions Custom Toast */
+/* Itrend Custom Toast */
 .itr-toast {
     background: #fff;
     opacity: 0;
@@ -721,29 +722,28 @@ html[data-bs-theme="dark"] .acc-btn-theme {
 .flip-card {
     position: relative;
     overflow: hidden;
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     background: var(--bs-body-bg);
+    border-radius: 1rem !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
-/* subtle gradient overlay */
+/* modern mesh gradient overlay */
 .flip-card::before {
     content: "";
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: linear-gradient(
-        135deg,
-        rgba(3, 104, 255, 0.064),
-        rgba(7, 245, 174, 0.162)
-    );
-    opacity: 0.9;
+    background: radial-gradient(at 0% 0%, rgba(13, 110, 253, 0.15) 0, transparent 50%);
+    opacity: 1;
+    z-index: 0;
 }
 
 /* Perspective container */
 .flip-stage {
     position: relative;
     width: 100%;
-    min-height: 165px; /* compact height */
+    min-height: 175px; /* slightly more breathing room */
     perspective: 1200px;
     transform-style: preserve-3d;
 }
@@ -805,6 +805,8 @@ html[data-bs-theme="dark"] .acc-btn-theme {
     flex-wrap: nowrap;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    padding: 6px 4px 4px 4px; /* Added top padding to prevent clipping on hover */
+    margin-top: -6px; /* Offset padding to keep layout stable */
 }
 
 /* Scrollbar (Light) */
@@ -818,21 +820,29 @@ html[data-bs-theme="dark"] .acc-btn-theme {
 
 /* Each day card (Light glass) */
 .weather-day {
-    flex: 0 0 calc((100% - 2rem) / 5); /* 5 visible with gaps on wide screens */
-    min-width: 135px; /* scroll on small screens */
-    border-radius: 0.65rem;
-    padding: 0.5rem 0.55rem;
+    flex: 0 0 calc((100% - 2.5rem) / 5);
+    min-width: 140px;
+    border-radius: 12px;
+    padding: 0.75rem 0.6rem;
     text-align: center;
     scroll-snap-align: start;
+    transition: all 0.3s ease;
 
-    background: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    position: relative;
+    z-index: 1;
 }
+
 .weather-day:hover {
-    border-color: rgba(13, 110, 253, 0.63);
-    transition-duration: 0.5s, 1s;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(13, 110, 253, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    z-index: 2;
 }
 .weather-icon img {
     width: 34px;
@@ -850,9 +860,9 @@ html[data-bs-theme="dark"] .acc-btn-theme {
 
 /* Today highlight (Light) */
 .weather-day.is-today {
-    border-color: rgba(13, 110, 253, 0.63);
-    box-shadow: 0 10px 24px rgba(13, 110, 253, 0.12);
-    background: linear-gradient(135deg, #0062ff38, #60ffba3c);
+    border-color: rgba(13, 110, 253, 0.4);
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.1), rgba(32, 201, 151, 0.1));
+    box-shadow: 0 8px 24px rgba(13, 110, 253, 0.12);
 }
 
 /* Today badge (Light) */
@@ -895,19 +905,17 @@ html[data-bs-theme="dark"] .acc-btn-theme {
 }
 
 [data-bs-theme="dark"] .flip-card::before {
-    background: linear-gradient(
-        135deg,
-        rgba(13, 110, 253, 0.18),
-        rgba(32, 201, 151, 0.1)
-    );
-    opacity: 0.85;
+    background: radial-gradient(at 0% 0%, rgba(13, 110, 253, 0.25) 0, transparent 50%);
+    opacity: 1;
 }
 
 /* Weather cards in dark */
 [data-bs-theme="dark"] .weather-day {
-    background: rgba(20, 20, 24, 0.72);
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+    background: rgba(30, 35, 45, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
 }
 
 /* Dark scrollbar */
@@ -990,4 +998,154 @@ html[data-bs-theme="dark"] .acc-btn-theme {
 }
 .pointer {
     cursor: pointer !important;
+}
+
+/* Glassmorphism Utilities */
+.backdrop-blur {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+[data-bs-theme="dark"] .backdrop-blur {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.border-white-50 {
+    border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Rounded Table Headers Pill Shape */
+.table thead.table-light th {
+    border-bottom: none !important;
+}
+.table thead.table-light th:first-child {
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+}
+.table thead.table-light th:last-child {
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+.table {
+    border-collapse: separate !important;
+    border-spacing: 0 0;
+}
+.table tbody tr td {
+    border-bottom: 1px solid var(--bs-border-color);
+}
+[data-bs-theme="dark"] .table tbody tr td {
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Sidebar Menu Icon Animation */
+#vertical-menu-btn i {
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    display: inline-block;
+}
+
+body.vertical-collpsed #vertical-menu-btn i {
+    transform: rotate(180deg);
+}
+
+/* Curved joint between header and sidebar */
+@media (min-width: 992px) {
+    #page-topbar {
+        box-shadow: none !important; /* Remove Skote's default straight shadow */
+        border-bottom: none !important; /* Remove any default border on the container level */
+    }
+    
+    /* 1) Realistic shadow for the rest of the header */
+    #page-topbar::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 285px; /* 250px sidebar + 35px curve */
+        right: 0;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+        pointer-events: none;
+        z-index: -1;
+        transition: left 0.2s ease; /* Skote precise timing */
+    }
+
+    /* 2) The precise inward curve, securely locked to the sidebar itself */
+    .vertical-menu::after {
+        content: "";
+        position: absolute;
+        top: -1px; /* Align dynamically perfectly under the header */
+        right: -35px; /* Permanently lock 34px outside the sidebar */
+        width: 35px;
+        height: 35px;
+        /* Standard color with 1px overlap */
+        /* background: radial-gradient(circle at 100% 100%, transparent 35px, var(--bs-header-bg, #ffffff) 35px); */
+        filter: drop-shadow(3px 4px 6px rgba(0, 0, 0, 0.04)); 
+        pointer-events: none;
+        /* No transition required! It physically moves with the sidebar. */
+        z-index: 1000; 
+    }
+    
+    body.vertical-collpsed #page-topbar::before {
+        left: 105px; /* 70px + 35px */
+    }
+    
+    html[data-bs-theme="dark"] #page-topbar::before {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+    }
+    html[data-bs-theme="dark"] .vertical-menu::after {
+        background: radial-gradient(circle at 100% 100%, transparent 35px, var(--bs-header-bg, #1f242f) 35px);
+        filter: drop-shadow(3px 4px 6px rgba(0, 0, 0, 0.22));
+    }
+}
+
+/* Custom Concave Curve (Bottom Right of Sidebar) - Sized to match top curve & card borders */
+.curve {
+    height: 30px;
+    width: 30px;
+    overflow: hidden;
+    position: absolute;
+    bottom: 0px; 
+    right: -30px; 
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.concave {
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    box-shadow: -30px 30px 0 0 #2a3042;
+}
+
+html[data-bs-theme="dark"] .concave {
+    box-shadow: -30px 30px 0 0 var(--bs-header-bg, #2A3042);
+}
+
+/* Custom Concave Curve (Top Right of Navbar Brand Box) */
+.curve-top {
+    height: 30px;
+    width: 30px;
+    overflow: hidden;
+    position: absolute;
+    top: 0px; 
+    right: -30px; 
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.concave-top {
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+    position: absolute;
+    bottom: -30px;
+    right: -30px;
+    box-shadow: -30px -30px 0 0 #2a3042;
+}
+
+html[data-bs-theme="dark"] .concave-top {
+    box-shadow: -30px -30px 0 0 var(--bs-header-bg, #2A3042);
 }

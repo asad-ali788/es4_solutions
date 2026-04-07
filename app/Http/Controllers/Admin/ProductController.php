@@ -127,7 +127,7 @@ class ProductController extends Controller
                     'asins',
                     'asins.categorisation',
                 ])
-                ->paginate($request->input('per_page', 15));
+                ->paginate($request->get('per_page', 15));
             return view('pages.admin.product.index', compact('products', 'reportingUsers', 'targetUserId'));
         } catch (\Throwable $e) {
             Log::error('Product index error: ' . $e->getMessage(), [

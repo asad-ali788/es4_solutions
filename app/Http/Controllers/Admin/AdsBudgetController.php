@@ -35,7 +35,7 @@ class AdsBudgetController extends Controller
             ->orderByDesc('updated_at')
             ->orderByDesc('id');
 
-        $budgetUsages = $query->paginate((int) $request->input('per_page', 50));
+        $budgetUsages = $query->paginate((int) $request->get('per_page', 50));
         $this->attachProductNames($budgetUsages);
 
         return view('pages.admin.amzAds.budget.usage', compact('budgetUsages'));
@@ -72,7 +72,7 @@ class AdsBudgetController extends Controller
             ->orderByDesc('updated_at')
             ->orderByDesc('id');
 
-        $recommendations = $query->paginate((int) $request->input('per_page', 50));
+        $recommendations = $query->paginate((int) $request->get('per_page', 50));
         $this->attachProductNames($recommendations);
 
         return view('pages.admin.amzAds.budget.recommendations', compact('recommendations'));

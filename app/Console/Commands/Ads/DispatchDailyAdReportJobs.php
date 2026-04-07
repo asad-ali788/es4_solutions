@@ -22,7 +22,7 @@ use App\Jobs\Ads\TargetsSdGetReportSaveJob;
 class DispatchDailyAdReportJobs extends Command
 {
     protected $signature = 'app:dispatch-daily-report-jobs';
-    protected $description = 'Dispatch jobs to poll and save Amazon Ads reports';
+    protected $description = 'ADS: Dispatch Jobs to Poll and Save Pending Ad Reports [US/CA]';
 
     /**
      * How long we allow IN_PROGRESS without report_id before marking FAILED
@@ -121,10 +121,10 @@ class DispatchDailyAdReportJobs extends Command
                 | CASE 3: Valid → Dispatch job
                 |--------------------------------------------------------------------------
                 */
-                Bus::dispatch(new $jobClass(
+                $jobClass::dispatch(
                     $country,
                     $isTodayReport
-                ));
+                )->onQueue('long-running');
 
                 $this->info("Dispatched: {$reportType} for {$country}");
             }

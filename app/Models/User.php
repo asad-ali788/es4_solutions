@@ -68,4 +68,16 @@ class User extends Authenticatable implements AuthorizableContract
         return $this->belongsTo(User::class, 'reporting_to');
     }
 
+    public function canImpersonate(): bool
+    {
+        $allowedUserIds = array_map('intval', config('impersonation.allowed_user_ids', []));
+
+        return in_array((int) $this->id, $allowedUserIds, true);
+    }
+
+    public function canBeImpersonated(): bool
+    {
+        return true;
+    }
+
 }

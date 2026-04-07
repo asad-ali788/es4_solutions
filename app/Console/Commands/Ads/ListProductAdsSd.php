@@ -20,7 +20,7 @@ class ListProductAdsSd extends Command
      *
      * @var string
      */
-    protected $description = 'Get SD Products Daily Report.';
+    protected $description = 'ADS: Sync SD Product Ads [US/CA] from Amazon Ads API';
 
     /**
      * Execute the console command.

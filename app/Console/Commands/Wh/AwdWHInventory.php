@@ -2,131 +2,97 @@
 
 namespace App\Console\Commands\Wh;
 
+use App\Models\Product;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
-use SellingPartnerApi\Seller\SellerConnector;
+use Illuminate\Support\Facades\DB;
 use App\Models\Warehouse;
-use App\Models\Product;
+use App\Models\ProductAsins;
 use App\Models\ProductWhInventory;
 use Exception;
 
 class AwdWHInventory extends Command
 {
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
     protected $signature = 'app:awd-wh-inventory';
-    protected $description = 'AWD Warehouse Sync';
 
-    public function handle(SellerConnector $connector)
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'AWD Warehouse Sync from PowerBI';
+
+    /**
+     * Execute the console command.
+     */
+    public function handle()
     {
         try {
-            Log::info('🔄 Syncing AWD available stock…');
-
-            $granularityType = 'Marketplace';
-            $granularityId   = 'ATVPDKIKX0DER';
-            $marketplaceIds = ['ATVPDKIKX0DER'];
+            Log::info('🔄 Syncing AWD inventory from PowerBI…');
+            $this->info('🔄 Syncing AWD inventory from PowerBI…');
 
             $warehouse = Warehouse::firstOrCreate(
                 ['warehouse_name' => 'AWD'],
                 [
                     'location' => 'US',
-                    'uuid'     => Str::uuid(),
+                    'uuid' => (string) Str::uuid(),
                 ]
             );
 
-            $itemApi   = $connector->fbaInventoryV1();
-            $nextToken = null;
-            $total     = 0;
+            $rows = DB::connection('powerbi')->table('AWD')->get();
+            $total = 0;
 
-            do {
-                /** -------------------------------
-                 *  Retry wrapper for SP-API call
-                 *  ------------------------------- */
-                $attempt = 0;
-                $maxRetries = 5;
-                $delay = 2;
-
-                while (true) {
-                    try {
-                        $response = $itemApi->getInventorySummaries(
-                            $granularityType,
-                            $granularityId,
-                            $marketplaceIds,
-                            true,
-                            null,
-                            null,
-                            null,
-                            $nextToken
-                        );
-
-                        // success → break retry loop
-                        break;
-                    } catch (Exception $e) {
-
-                        // Check for 429 specifically
-                        if (str_contains($e->getMessage(), '429') && $attempt < $maxRetries) {
-                            $attempt++;
-
-                            Log::warning("⚠️ AWD rate limit hit (429). Retry {$attempt}/{$maxRetries} after {$delay}s");
-
-                            sleep($delay);
-                            $delay *= 2; // exponential backoff
-
-                            continue;
-                        }
-
-                        // Any other error OR retries exhausted
-                        throw $e;
-                    }
+            foreach ($rows as $row) {
+                $sku = trim((string) ($row->SKU ?? ''));
+                if (!$sku) {
+                    // Fallback to ASIN if SKU is missing
+                    $asin = trim((string) ($row->ASIN ?? ''));
+                    if (!$asin) continue;
+                    $pa = ProductAsins::where('asin1', $asin)->first();
+                    $product = $pa ? $pa->product : null;
+                } else {
+                    $product = Product::where(DB::raw('BINARY `sku`'), '=', $sku)->first();
                 }
 
-                /** -------------------------------
-                 *  Process response
-                 *  ------------------------------- */
-                $data      = $response->json();
-                $summaries = $data['payload']['inventorySummaries'] ?? [];
+                if (!$product)
+                    continue;
 
-                foreach ($summaries as $summary) {
-                    $sellerSku = $summary['sellerSku'] ?? null;
-                    if (!$sellerSku) continue;
+                $available = (int) ($row->{'Available in AWD (units)'} ?? 0);
+                $inbound = (int) ($row->{'Inbound to AWD (units)'} ?? 0);
 
-                    $product = Product::where('sku', $sellerSku)->first();
-                    if (!$product) continue;
-
-                    $inventoryDetails = $summary['inventoryDetails'] ?? [];
-
-                    $fulfillable   = $inventoryDetails['fulfillableQuantity'] ?? 0;
-                    $reserved      = $inventoryDetails['reservedQuantity']['totalReservedQuantity'] ?? 0;
-                    $unfulfillable = $inventoryDetails['futureSupplyQuantity']['futureSupplyBuyableQuantity'] ?? 0;
-
-                    if ($fulfillable == 0 && $reserved == 0 && $unfulfillable == 0) {
-                        continue;
-                    }
-
-                    ProductWhInventory::updateOrCreate(
-                        [
-                            'product_id'   => $product->id,
-                            'warehouse_id' => $warehouse->id,
-                        ],
-                        [
-                            'quantity'           => $fulfillable,
-                            'reserved_quantity'  => $reserved,
-                            'available_quantity' => $unfulfillable,
-                            'updated_at'         => now(),
-                        ]
-                    );
-
-                    $total++;
+                if ($available == 0 && $inbound == 0) {
+                    continue;
                 }
 
-                $nextToken = $data['pagination']['nextToken'] ?? null;
-            } while ($nextToken);
+                ProductWhInventory::updateOrCreate(
+                    [
+                        'product_id' => $product->id,
+                        'warehouse_id' => $warehouse->id,
+                    ],
+                    [
+                        'available_quantity' => $available,
+                        'quantity' => $inbound, // Inbound units saved as quantity for tracking
+                        'updated_at' => now(),
+                    ]
+                );
 
-            Log::info("✅ Synced {$total} inventory records for AWD.");
-            $this->info("✅ Synced {$total} inventory records for AWD.");
+                $total++;
+            }
+
+            Log::info("✅ Synced {$total} inventory records for AWD from PowerBI.");
+            $this->info("✅ Synced {$total} inventory records for AWD from PowerBI.");
+
         } catch (Exception $e) {
             Log::error('❌ AWD inventory sync failed', [
                 'error' => $e->getMessage()
             ]);
+            $this->error('❌ AWD inventory sync failed: ' . $e->getMessage());
         }
     }
 }

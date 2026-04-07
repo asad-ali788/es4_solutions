@@ -57,13 +57,32 @@ class CampaignRecommendationJob implements ShouldQueue
         'to_group',
     ];
 
+    /**
+     * @var Carbon|string|null 
+     */
+    public $targetDate;
+
+    /**
+     * @param Carbon|string|null $targetDate Target date for recommendations (defaults to subDay(2) for stable data)
+     */
+    public function __construct($targetDate = null)
+    {
+        $this->targetDate = $targetDate;
+    }
+
     public function handle()
     {
         $marketTz      = config('timezone.market') ?: config('app.timezone');
-        $dayStart      = Carbon::now($marketTz)->subDay()->startOfDay(); // yesterday
-        $day7Start     = $dayStart->copy()->subDays(6);   // last 7 days including yesterday
-        $day14Start    = $dayStart->copy()->subDays(13);  // last 14 days including yesterday
-        $day30Start    = $dayStart->copy()->subDays(29);  // last 30 days including yesterday
+        
+        if ($this->targetDate) {
+            $dayStart = Carbon::parse($this->targetDate)->startOfDay();
+        } else {
+            $dayStart = Carbon::now($marketTz)->subDay()->startOfDay();
+        }
+
+        $day7Start     = $dayStart->copy()->subDays(6);   // last 7 days including the target date
+        $day14Start    = $dayStart->copy()->subDays(13);  // last 14 days including the target date
+        $day30Start    = $dayStart->copy()->subDays(29);  // last 30 days including the target date
         $yesterdayDate = $dayStart->toDateString();
 
         $rules = CampaignBudgetRecommendationRule::where('is_active', 1)

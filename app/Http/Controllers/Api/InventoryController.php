@@ -19,7 +19,7 @@ class InventoryController extends Controller
             $sellerSku       = null;
             $details         = true;
             $startDateTime   = null;
-            $sellerSkus      = [];//'AutoCSS-Large-Vcut', 'EcoSteeringDesk', 'ECOSUNSHADE190T'
+            $sellerSkus      = ['Eco_Med_LD'];//'AutoCSS-Large-Vcut', 'EcoSteeringDesk', 'ECOSUNSHADE190T'
             $itemApi         = $connector->fbaInventoryV1();
             $response        = $itemApi->getInventorySummaries(
                 $granularityType,
@@ -32,7 +32,7 @@ class InventoryController extends Controller
             );
             $data            = $response->json();
             $summaries       = $data['payload']['inventorySummaries'] ?? [];
-            // return response()->json($data);
+            return response()->json($data);
 
             if (empty($summaries)) {
                 return;

@@ -258,7 +258,7 @@ class AmzAdsController extends Controller
             $query->where('country', strtoupper($request->country));
         }
         // Update filter
-        if ($request->input('updateFilter') === 'pending') {
+        if ($request->get('updateFilter') === 'pending') {
             $pendingIds = AmzCampaignUpdates::where('campaign_type', $campaignType)
                 ->where('status', 'pending')
                 ->distinct()
@@ -321,7 +321,7 @@ class AmzAdsController extends Controller
     {
         $this->authorize(AmzAdsEnum::AmazonAdsDataCampaignCreate);
         return view('pages.admin.amzAds.data.campaign.form', [
-            'campaignType' => strtoupper($request->input('type', 'SP')),
+            'campaignType' => strtoupper($request->get('type', 'SP')),
         ]);
     }
 
@@ -449,7 +449,7 @@ class AmzAdsController extends Controller
             $query->where('country', strtoupper($request->country));
         }
         // Update filter
-        if ($request->input('updateFilter') === 'pending') {
+        if ($request->get('updateFilter') === 'pending') {
             $pendingIds = ModelsAmzKeywordUpdate::where('keyword_type', $keywordType)
                 ->where('status', 'pending')
                 ->distinct()
@@ -511,7 +511,7 @@ class AmzAdsController extends Controller
         if ($request->filled('country') && $request->country !== 'all') {
             $query->where('country', $request->country);
         }
-        $asins = $query->paginate($request->input('per_page', 10));
+        $asins = $query->paginate($request->get('per_page', 10));
 
         $asins->getCollection()->transform(function ($asinRow) {
             $campaigns = AmzCampaigns::whereIn('campaign_id', function ($q) use ($asinRow) {
@@ -530,8 +530,8 @@ class AmzAdsController extends Controller
     }
     public function allKeywordsAsin(Request $request, $asin)
     {
-        $perPage = (int) $request->input('per_page', 10);
-        $match   = $request->input('match', 'all');        // all | match | not_match | reco_not_existing
+        $perPage = (int) $request->get('per_page', 10);
+        $match   = $request->get('match', 'all');        // all | match | not_match | reco_not_existing
         $table   = true;
         // 1) ASIN manual enabled campaigns
         $campaignIdsSub = DB::table('amz_campaigns as c')
@@ -678,7 +678,7 @@ class AmzAdsController extends Controller
         if ($request->filled('country') && $request->country !== 'all') {
             $query->where('country', $request->country);
         }
-        $asins = $query->paginate($request->input('per_page', 10));
+        $asins = $query->paginate($request->get('per_page', 10));
 
         $asins->getCollection()->transform(function ($asinRow) {
             $campaigns = AmzCampaignsSb::whereIn('campaign_id', function ($q) use ($asinRow) {
@@ -708,7 +708,7 @@ class AmzAdsController extends Controller
             $query = $this->targetSearch($request, $query);
 
             // Only enabled targets
-            $targets = $query->where('state', 'ENABLED')->paginate($request->input('per_page', 50));
+            $targets = $query->where('state', 'ENABLED')->paginate($request->get('per_page', 50));
 
             return view('pages.admin.amzAds.data.target', [
                 'targets'    => $targets,

@@ -11,7 +11,6 @@ use App\Models\FbaInventoryUsa;
 use App\Models\InboundShipmentDetailsSp;
 use Illuminate\Support\Facades\DB;
 use App\Models\Product;
-use App\Models\ProductAsins;
 use App\Models\ProductWhInventory;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
@@ -45,11 +44,18 @@ class StocksController extends Controller
 
         // --- Base Product Query ---
         $stocksQuery = Product::query()
+            ->leftJoin('product_asins', 'products.id', '=', 'product_asins.product_id')
+            ->leftJoin('product_categorisations as pc', function($join) {
+                $join->on('pc.child_asin', '=', 'product_asins.asin1')
+                     ->whereNull('pc.deleted_at');
+            })
             ->leftJoinSub($afnSub, 'afn', fn($join) => $join->on('products.sku', '=', 'afn.seller_sku'))
             ->leftJoinSub($fbaSub, 'fba', fn($join) => $join->on('products.sku', '=', 'fba.sku'))
             ->leftJoinSub($inboundSub, 'inbound', fn($join) => $join->on('products.sku', '=', 'inbound.sku'))
             ->select([
                 'products.sku',
+                'product_asins.asin1 as asin',
+                'pc.child_short_name as product_name',
                 DB::raw('COALESCE(afn.afn_quantity, 0) as afn_quantity'),
                 DB::raw('COALESCE(fba.fba_totalstock, 0) as fba_totalstock'),
                 DB::raw('COALESCE(inbound.inbound_qty, 0) as inbound_qty'),
@@ -83,10 +89,15 @@ class StocksController extends Controller
         }
 
         if ($request->filled('search')) {
-            $stocksQuery->where('products.sku', 'like', '%' . $request->search . '%');
+            $search = $request->search;
+            $stocksQuery->where(function($q) use ($search) {
+                $q->where('products.sku', 'like', '%' . $search . '%')
+                  ->orWhere('product_asins.asin1', 'like', '%' . $search . '%')
+                  ->orWhere('pc.child_short_name', 'like', '%' . $search . '%');
+            });
         }
 
-        $stocks = $stocksQuery->paginate($request->input('per_page', 25));
+        $stocks = $stocksQuery->paginate($request->get('per_page', 25));
 
         // --- Global last updated timestamps for other tables ---
         $lastUpdated = [
@@ -163,6 +174,10 @@ class StocksController extends Controller
         // --- Main query ---
         $query = DB::table('product_asins as pa')
             ->join('products as p', 'pa.product_id', '=', 'p.id')
+            ->leftJoin('product_categorisations as pc', function($join) {
+                $join->on('pc.child_asin', '=', 'pa.asin1')
+                     ->whereNull('pc.deleted_at');
+            })
             ->leftJoinSub($afnSub, 'afn', fn($join) => $join->on('afn.seller_sku', '=', 'p.sku'))
             ->leftJoinSub($fbaSub, 'fba', fn($join) => $join->on('fba.sku', '=', 'p.sku'))
             ->leftJoinSub($inboundAsinSub, 'inbound', fn($join) => $join->on('inbound.asin1', '=', 'pa.asin1'));
@@ -179,6 +194,7 @@ class StocksController extends Controller
         // --- Select aggregated columns ---
         $selects = [
             'pa.asin1',
+            DB::raw('MAX(pc.child_short_name) as product_name'),
             DB::raw('SUM(COALESCE(afn.afn_quantity,0)) as afn_quantity'),
             DB::raw('SUM(COALESCE(fba.fba_total_stock,0)) as fba_total_stock'),
             DB::raw('MAX(COALESCE(inbound.inbound_qty,0)) as inbound_qty')
@@ -193,12 +209,28 @@ class StocksController extends Controller
 
         // --- ASIN search ---
         if (!empty($asinSearch)) {
-            $query->where('pa.asin1', 'like', "%{$asinSearch}%");
+            $query->where(function($q) use ($asinSearch) {
+                $q->where('pa.asin1', 'like', "%{$asinSearch}%")
+                  ->orWhere('pc.child_short_name', 'like', "%{$asinSearch}%");
+            });
         }
 
-        $stocks = $query->paginate($request->input('per_page', 25));
+        $stocks = $query->paginate($request->get('per_page', 25));
 
-        return view('pages.admin.stocks.asin', compact('stocks', 'warehouses', 'asinSearch'));
+        // --- Global last updated timestamps for other tables ---
+        $warehouseLastUpdated = [];
+        foreach ($warehouses as $wh) {
+            $warehouseLastUpdated[$wh->id] = ProductWhInventory::where('warehouse_id', $wh->id)->max('updated_at');
+        }
+
+        $lastUpdated = [
+            'afn'        => AfnInventoryData::max('updated_at'),
+            'fba'        => FbaInventoryUsa::max('updated_at'),
+            'inbound'    => InboundShipmentDetailsSp::max('updated_at'),
+            'warehouses' => $warehouseLastUpdated
+        ];
+
+        return view('pages.admin.stocks.asin', compact('stocks', 'warehouses', 'asinSearch', 'lastUpdated'));
     }
 
     public function exportAsin(Request $request)

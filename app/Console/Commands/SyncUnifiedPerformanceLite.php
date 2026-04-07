@@ -7,6 +7,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use PDOException;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 
 /**
  * Sync unified keyword + campaign performance data to SQLite lite table
@@ -14,13 +19,26 @@ use PDOException;
  * Combines keyword recommendations with campaign data for unified querying
  * Groups by campaign_name with aggregated metrics (single day only)
  */
-class SyncUnifiedPerformanceLite extends Command
+class SyncUnifiedPerformanceLite extends Command implements ShouldQueue
 {
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public $targetDate = null;
+
+    public function __construct($targetDate = null)
+    {
+        parent::__construct();
+        if ($targetDate instanceof Carbon) {
+            $this->targetDate = $targetDate->toDateString();
+        } elseif (is_string($targetDate)) {
+            $this->targetDate = $targetDate;
+        }
+    }
     protected $signature = 'app:sync-unified-performance-lite 
                             {--date= : Specific date to sync (YYYY-MM-DD)}
                             {--from= : Start date for range sync (YYYY-MM-DD)}
                             {--to= : End date for range sync (YYYY-MM-DD)}';
-    protected $description = 'Sync keyword + campaign performance to unified SQLite lite table - supports single date or date range';
+    protected $description = 'Sync keyword + campaign performance to unified table.';
 
     public function handle(): void
     {
@@ -31,17 +49,34 @@ class SyncUnifiedPerformanceLite extends Command
             // Determine dates to sync
             $datesToSync = [];
             
-            if ($this->option('date')) {
-                // Single date mode
-                $date = $this->option('date');
+            $dateOption = null;
+            $fromOption = null;
+            $toOption = null;
+
+            if (isset($this->input)) {
+                $dateOption = $this->option('date');
+                $fromOption = $this->option('from');
+                $toOption = $this->option('to');
+            }
+
+            if ($this->targetDate) {
+                // Job dispatched mode
+                $date = $this->targetDate;
                 $this->validateDateFormat($date);
                 $datesToSync[] = $date;
-                $this->info("📅 Single date mode: syncing {$date}");
+                $this->logMessage("📅 Job mode: syncing {$date}");
                 
-            } elseif ($this->option('from') && $this->option('to')) {
+            } elseif ($dateOption) {
+                // Single date mode
+                $date = $dateOption;
+                $this->validateDateFormat($date);
+                $datesToSync[] = $date;
+                $this->logMessage("📅 Single date mode: syncing {$date}");
+                
+            } elseif ($fromOption && $toOption) {
                 // Date range mode
-                $fromDate = $this->option('from');
-                $toDate = $this->option('to');
+                $fromDate = $fromOption;
+                $toDate = $toOption;
                 
                 $this->validateDateFormat($fromDate);
                 $this->validateDateFormat($toDate);
@@ -50,26 +85,26 @@ class SyncUnifiedPerformanceLite extends Command
                 $to = Carbon::createFromFormat('Y-m-d', $toDate);
                 
                 if ($from->isAfter($to)) {
-                    $this->error("From date cannot be after To date");
+                    $this->logError("From date cannot be after To date");
                     return;
                 }
                 
-                $this->info("📅 Date range mode: syncing {$fromDate} to {$toDate}");
+                $this->logMessage("📅 Date range mode: syncing {$fromDate} to {$toDate}");
                 
                 while ($from->lte($to)) {
                     $datesToSync[] = $from->toDateString();
                     $from->addDay();
                 }
                 
-            } elseif ($this->option('from') || $this->option('to')) {
-                $this->error("Both --from and --to options are required for range sync");
+            } elseif ($fromOption || $toOption) {
+                $this->logError("Both --from and --to options are required for range sync");
                 return;
                 
             } else {
                 // Default: sync yesterday
                 $date = $now->copy()->subDay()->toDateString();
                 $datesToSync[] = $date;
-                $this->info("📅 Default mode: syncing yesterday ({$date})");
+                $this->logMessage("📅 Default mode: syncing yesterday ({$date})");
             }
             
             // Process each date
@@ -82,8 +117,7 @@ class SyncUnifiedPerformanceLite extends Command
             }
             
             $totalTime = number_format(microtime(true) - $totalStartTime, 2);
-            $this->newLine();
-            $this->info("✅ Batch complete: {$totalSynced} total records synced in {$totalTime}s");
+            $this->logMessage("\n✅ Batch complete: {$totalSynced} total records synced in {$totalTime}s");
             
             Log::channel('ai')->info("SyncUnifiedPerformanceLite: Batch sync complete", [
                 'dates_processed' => count($datesToSync),
@@ -92,7 +126,7 @@ class SyncUnifiedPerformanceLite extends Command
             ]);
             
         } catch (\Exception $e) {
-            $this->error("Error: {$e->getMessage()}");
+            $this->logError("Error: {$e->getMessage()}");
             Log::channel('ai')->error("SyncUnifiedPerformanceLite failed: {$e->getMessage()}");
         }
     }
@@ -105,7 +139,11 @@ class SyncUnifiedPerformanceLite extends Command
         try {
             Carbon::createFromFormat('Y-m-d', $date);
         } catch (\Exception $e) {
-            throw new \Exception("Invalid date format: {$date}. Use YYYY-MM-DD");
+            if (isset($this->input)) {
+                throw new \Exception("Invalid date format: {$date}. Use YYYY-MM-DD");
+            } else {
+                $this->logError("Invalid date format: {$date}. Use YYYY-MM-DD");
+            }
         }
     }
 
@@ -118,7 +156,7 @@ class SyncUnifiedPerformanceLite extends Command
             $marketTz = config('timezone.market') ?? 'America/Los_Angeles';
             $now = Carbon::now($marketTz);
             
-            $this->info("🔄 Syncing unified performance for: {$date}");
+            $this->logMessage("🔄 Syncing unified performance for: {$date}");
             $startTime = microtime(true);
 
             // Fetch keywords with campaign grouping - union all campaign types
@@ -172,7 +210,7 @@ class SyncUnifiedPerformanceLite extends Command
                 ->get();
 
             if ($keywords->isEmpty()) {
-                $this->warn("⚠️  No keywords found for {$date}");
+                $this->logWarning("⚠️  No keywords found for {$date}");
                 return ['count' => 0, 'time' => 0];
             }
 
@@ -235,7 +273,7 @@ class SyncUnifiedPerformanceLite extends Command
             }
 
             if (empty($rowsToInsert)) {
-                $this->warn("⚠️  No valid rows to insert for {$date}");
+                $this->logWarning("⚠️  No valid rows to insert for {$date}");
                 return ['count' => 0, 'time' => 0];
             }
 
@@ -244,7 +282,7 @@ class SyncUnifiedPerformanceLite extends Command
             $chunks = array_chunk($rowsToInsert, $chunkSize);
             $totalRecords = count($rowsToInsert);
 
-            DB::connection('ai_sqlite')->transaction(function () use ($chunks, $totalRecords) {
+            DB::transaction(function () use ($chunks, $totalRecords) {
                 $processedCount = 0;
                 $totalChunks = count($chunks);
                 
@@ -254,7 +292,7 @@ class SyncUnifiedPerformanceLite extends Command
                     
                     if (($chunkIndex + 1) % 20 === 0 || $chunkIndex === $totalChunks - 1) {
                         $percent = round(($processedCount / $totalRecords) * 100);
-                        $this->info("   Progress: {$percent}% ({$processedCount}/{$totalRecords})");
+                        $this->logMessage("   Progress: {$percent}% ({$processedCount}/{$totalRecords})");
                     }
                     
                     gc_collect_cycles();
@@ -264,8 +302,8 @@ class SyncUnifiedPerformanceLite extends Command
             $executionTime = number_format(microtime(true) - $startTime, 2);
             $recordsPerSec = $totalRecords > 0 ? number_format($totalRecords / floatval($executionTime), 0) : 0;
             
-            $this->info("✅ Successfully synced {$totalRecords} keyword-campaign(s) for {$date}");
-            $this->info("   ⚡ Execution time: {$executionTime}s | Speed: {$recordsPerSec} records/sec");
+            $this->logMessage("✅ Successfully synced {$totalRecords} keyword-campaign(s) for {$date}");
+            $this->logMessage("   ⚡ Execution time: {$executionTime}s | Speed: {$recordsPerSec} records/sec");
             
             Log::channel('ai')->info("SyncUnifiedPerformanceLite: Synced {$totalRecords} records for {$date}", [
                 'date' => $date,
@@ -277,46 +315,79 @@ class SyncUnifiedPerformanceLite extends Command
             return ['count' => $totalRecords, 'time' => $executionTime];
 
         } catch (PDOException $e) {
-            $this->error("   ⚠️  Database error for {$date}: {$e->getMessage()}");
+            $this->logError("   ⚠️  Database error for {$date}: {$e->getMessage()}");
             Log::channel('ai')->error("SyncUnifiedPerformanceLite DB failed for {$date}: {$e->getMessage()}");
             return ['count' => 0, 'time' => 0];
             
         } catch (\Exception $e) {
-            $this->error("   ⚠️  Error syncing {$date}: {$e->getMessage()}");
+            $this->logError("   ⚠️  Error syncing {$date}: {$e->getMessage()}");
             Log::channel('ai')->error("SyncUnifiedPerformanceLite failed for {$date}: {$e->getMessage()}");
             return ['count' => 0, 'time' => 0];
         }
     }
 
     /**
-     * Batch insert or replace records using SQLite's INSERT OR REPLACE
+     * Batch upsert records using the table's unique key.
      */
     private function batchInsertOrReplace(array $rows): void
     {
-        if (empty($rows)) return;
+        if (empty($rows)) {
+            return;
+        }
 
-        $columns = array_keys(reset($rows));
-        $columnList = implode(', ', array_map(function ($col) {
-            return "\"{$col}\"";
-        }, $columns));
-        
-        $placeholders = implode(', ', array_map(function ($col) {
-            return '?';
-        }, $columns));
+        DB::table('keyword_campaign_performance_lites')->upsert(
+            $rows,
+            ['keyword_text', 'campaign_id', 'report_date', 'country'],
+            [
+                'campaign_name',
+                'campaign_state',
+                'asin',
+                'product_name',
+                'campaign_type',
+                'daily_budget',
+                'estimated_monthly_budget',
+                'total_spend',
+                'total_sales',
+                'acos',
+                'purchases',
+                'clicks',
+                'impressions',
+                'cpc',
+                'ctr',
+                'roas',
+                'conversion_rate',
+                'keyword_bid',
+                'keyword_state',
+                'notes',
+                'updated_at',
+            ]
+        );
+    }
 
-        $sql = "INSERT OR REPLACE INTO keyword_campaign_performance_lites ({$columnList}) VALUES ({$placeholders})";
+    protected function logMessage($message)
+    {
+        if (isset($this->output)) {
+            $this->line($message);
+        } else {
+            Log::channel('ai')->info("SyncUnifiedPerformanceLite: {$message}");
+        }
+    }
 
-        $db = DB::connection('ai_sqlite');
-        $pdo = $db->getPdo();
+    protected function logError($message)
+    {
+        if (isset($this->output)) {
+            $this->error($message);
+        } else {
+            Log::channel('ai')->error("SyncUnifiedPerformanceLite: {$message}");
+        }
+    }
 
-        foreach ($rows as $row) {
-            $values = array_values($row);
-            try {
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute($values);
-            } catch (\Exception $e) {
-                throw new \RuntimeException("Failed to insert row: {$e->getMessage()}");
-            }
+    protected function logWarning($message)
+    {
+        if (isset($this->output)) {
+            $this->warn($message);
+        } else {
+            Log::channel('ai')->warning("SyncUnifiedPerformanceLite: {$message}");
         }
     }
 }

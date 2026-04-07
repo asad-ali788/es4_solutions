@@ -20,7 +20,7 @@ class CampaignBudgetRecommendation extends Command
      *
      * @var string
      */
-    protected $description = 'Campaign Budget Recommendation jobs dispatched';
+    protected $description = 'ADS: Dispatch Campaign Budget Recommendation Jobs';
 
     /**
      * Execute the console command.
@@ -30,7 +30,7 @@ class CampaignBudgetRecommendation extends Command
         CampaignBudgetRecommendationJob::dispatchSync('US');
         CampaignBudgetRecommendationJob::dispatchSync('CA');
 
-        $this->info('Campaign Budget Recommendation jobs dispatched.');
+        $this->info('ADS: Dispatch Campaign Budget Recommendation Jobs.');
         Log::channel('ads')->info('CampaignBudgetRecommendationJob dispatched.');
     }
 }

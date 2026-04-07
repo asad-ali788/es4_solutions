@@ -6,7 +6,7 @@
     </div>
 
     {{-- Actual card after loading --}}
-    <div wire:loading.remove wire:target="loadHourlyCharts" class="card w-100 mb-0">
+    <div wire:loading.remove wire:target="loadHourlyCharts" class="card shadow-sm w-100 mb-0">
         <div class="card-body pb-0">
             <div class="d-flex align-items-center">
                 <div class="avatar-xs me-2">

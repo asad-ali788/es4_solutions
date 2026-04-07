@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\DB;
 
 class KeywordRecommendations extends Command
 {
-    protected $signature = 'app:keyword-recommendations';
-    protected $description = 'Amz Ads Keyword Performance Daily Report';
+    protected $signature = 'app:keyword-recommendations {date?}';
+    protected $description = 'ADS: Generate SP Keyword Performance Recommendations';
 
     public function handle()
     {
@@ -41,7 +41,17 @@ class KeywordRecommendations extends Command
     private function processRecommendations($baseQuery, string $campaignType): void
     {
         $marketTz  = config('timezone.market');
-        $dayStart  = Carbon::now($marketTz)->startOfDay()->subDay();
+        
+        $targetDate = $this->argument('date');
+        if ($targetDate) {
+            $dayStart = Carbon::parse($targetDate)->startOfDay();
+        } else {
+            // 🚀 Default to subDay(2) (2 days ago) for stable data.
+            // Records for 2nd day ago are updated at 2 AM every day, ensuring
+            // this job (running daily) uses fully accurate data.
+            $dayStart = Carbon::now($marketTz)->subDay()->startOfDay();
+        }
+
         $yesterday = $dayStart->toDateString();
         $start7d   = $dayStart->copy()->subDays(6)->toDateString();
         $start14d  = $dayStart->copy()->subDays(13)->toDateString();

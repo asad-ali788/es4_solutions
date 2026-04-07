@@ -12,7 +12,7 @@ class ListProductsKeywordSb extends Command
     protected $signature = 'app:list-products-keyword-sb';
 
 
-    protected $description = 'Sync SB Keywords.';
+    protected $description = 'ADS: Sync SB Keywords [US/CA] from Amazon Ads API';
 
     public function handle()
     {

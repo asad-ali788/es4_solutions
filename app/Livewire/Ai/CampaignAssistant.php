@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Laravel\Ai\Streaming\Events\StreamEnd;
+use Laravel\Ai\Streaming\Events\TextDelta;
+use Laravel\Ai\Streaming\Events\ToolCall;
 use Livewire\Component;
 use Livewire\Attributes\Url;
 
@@ -35,7 +37,7 @@ class CampaignAssistant extends Component
      */
     public array $messages = [];
 
-    public string $selectedModelKey = 'gpt-5';
+    public string $selectedModelKey = 'gpt-oss:120b-cloud';
 
     // Filter options
     public string $campaignType = 'all';
@@ -45,8 +47,10 @@ class CampaignAssistant extends Component
      * @var array<string, array{provider:string, model:string, timeout:int}>
      */
     public array $modelOptions = [
-        'qwen3.5:cloud' => ['provider' => 'ollama', 'model' => 'qwen3.5:cloud', 'timeout' => 330],
-        'gpt-5'         => ['provider' => 'openai', 'model' => 'gpt-5', 'timeout' => 330],
+        'qwen3.5:cloud'     => ['provider' => 'ollama', 'model' => 'qwen3.5:cloud', 'timeout' => 500, 'accuracy' => 'low'],
+        'gpt-oss:20b-cloud' => ['provider' => 'ollama', 'model' => 'gpt-oss:20b-cloud', 'timeout' => 500, 'accuracy' => 'high'],
+        'gpt-oss:120b-cloud' => ['provider' => 'ollama', 'model' => 'gpt-oss:120b-cloud', 'timeout' => 500, 'accuracy' => 'high'],  
+        'gpt-5'             => ['provider' => 'openai', 'model' => 'gpt-5', 'timeout' => 500, 'accuracy' => 'high'],
     ];
 
     /**
@@ -75,7 +79,7 @@ class CampaignAssistant extends Component
 
         // Check URL parameter for view mode
         if (request()->has('ai')) {
-            $mode = request()->input('ai');
+            $mode = request()->get('ai');
             if (in_array($mode, ['popup', 'fullscreen'], true)) {
                 $this->viewMode = $mode;
             }
@@ -190,141 +194,196 @@ class CampaignAssistant extends Component
 
         $startedAt = Carbon::now();
 
-        try {
-            $agent = CampaignKeywordAgent::make()
-                ->setAsinContext($this->asin)
-                ->setFilters($this->campaignType, $this->country);
+        // Retry loop for robustness
+        for ($attempt = 1; $attempt <= 3; $attempt++) {
+            try {
+                $this->streamProgress('phase', $attempt > 1 ? "Retrying analysis ($attempt/3)" : 'Analyzing your question');
 
-            $agent = $this->conversationId
-                ? $agent->continue($this->conversationId, as: $user)
-                : $agent->forUser($user);
+                $agent = CampaignKeywordAgent::make()
+                    ->setAsinContext($this->asin)
+                    ->setFilters($this->campaignType, $this->country);
 
-            $stream = $agent->stream(
-                $this->question,
-                provider: $runtime['provider'],
-                model: $runtime['model'],
-                timeout: $runtime['timeout'],
-            );
+                $agent = $this->conversationId
+                    ? $agent->continue($this->conversationId, as: $user)
+                    : $agent->forUser($user);
 
-            $streamEndReason = null;
-
-            foreach ($stream as $event) {
-                if ($event instanceof StreamEnd) {
-                    $streamEndReason = $event->reason;
-                }
-
-                $chunk = $this->extractDelta($event);
-                if ($chunk !== '') {
-                    $this->stream(to: 'answer', content: $chunk);
-                    $this->answer .= $chunk;
-                }
-            }
-
-            if ($streamEndReason === 'length') {
-                $continuationPrompt = 'Continue exactly from where you stopped. Do not repeat previous content. Return only the remaining part.';
-
-                $continuation = $agent->stream(
-                    $continuationPrompt,
+                $stream = $agent->stream(
+                    $this->question,
                     provider: $runtime['provider'],
                     model: $runtime['model'],
                     timeout: $runtime['timeout'],
                 );
 
-                foreach ($continuation as $event) {
-                    if ($event instanceof StreamEnd && $event->reason === 'length') {
-                        $this->error = 'Response is very long and was truncated again. Please ask "continue" to fetch the next part.';
+                $toolsToDetect = [
+                    'UnifiedPerformanceQuery' => 'Querying Unified performance data',
+                    'CampaignPerformanceLiteQuery' => 'Querying Campaign performance data',
+                    'CampaignKeywordRecommendationsQuery' => 'Finding Recommended Keywords for products',
+                    'WarehouseStockDetails' => 'Checking inventory',
+                    'SpSearchTermSummaryTool' => 'Finding Search Term Summary',
+                    'BrandAnalyticLiteQuery' => 'Querying Brand Analytics data',
+                    'KeywordRankReportLiteQuery' => 'Tracking keyword ranks',
+                ];
+                $startedGenerating = false;
+                $streamEndReason = null;
+
+                foreach ($stream as $event) {
+                    if ($event instanceof StreamEnd) {
+                        $streamEndReason = $event->reason;
                     }
 
+                    // Structured Tool Call Detection
+                    if ($event instanceof ToolCall) {
+                        $toolName = $event->toolCall->name;
+                        $label = $toolsToDetect[$toolName] ?? "Executing $toolName";
+                        $this->streamProgress('tool', $label);
+                        continue; // Tool calls don't have text delta
+                    }
+
+                    // Extract text content
                     $chunk = $this->extractDelta($event);
-                    if ($chunk !== '') {
-                        $this->stream(to: 'answer', content: $chunk);
-                        $this->answer .= $chunk;
+                    if ($chunk === '') {
+                        continue;
+                    }
+
+                    if (!$startedGenerating) {
+                        $startedGenerating = true;
+                        $this->streamProgress('phase', 'Generating response');
+                    }
+
+                    $this->stream(to: 'answer', content: $chunk);
+                    $this->answer .= $chunk;
+                }
+
+                // Handle truncated responses
+                if ($streamEndReason === 'length') {
+                    $this->streamProgress('phase', 'Continuing response');
+                    $continuation = $agent->stream(
+                        'Continue exactly from where you stopped. Do not repeat previous content. Return only the remaining part.',
+                        provider: $runtime['provider'],
+                        model: $runtime['model'],
+                        timeout: $runtime['timeout'],
+                    );
+                    foreach ($continuation as $event) {
+                        $chunk = $this->extractDelta($event);
+                        if ($chunk !== '') {
+                            $this->stream(to: 'answer', content: $chunk);
+                            $this->answer .= $chunk;
+                        }
                     }
                 }
-            }
 
-            // If new chat, find or create conversation with ASIN metadata
-            if (!$this->conversationId) {
-                $candidate = DB::table('agent_conversations')
-                    ->where('user_id', (int) $user->id)
-                    ->where('updated_at', '>=', $startedAt)
-                    ->orderByDesc('updated_at')
-                    ->first(['id', 'title']);
+                if (trim($this->answer) === '') {
+                    throw new \Exception('AI returned an empty response.');
+                }
 
-                if ($candidate) {
-                    // Update metadata to mark this as campaign assistant for this ASIN
-                    DB::table('agent_conversations')
-                        ->where('id', $candidate->id)
-                        ->update([
+                $this->streamProgress('done', 'Done');
+
+                // If new chat, cache the ID and update metadata
+                if (!$this->conversationId) {
+                    $candidate = DB::table('agent_conversations')
+                        ->where('user_id', (int) $user->id)
+                        ->where('updated_at', '>=', $startedAt)
+                        ->orderByDesc('updated_at')
+                        ->first(['id', 'title']);
+
+                    if ($candidate) {
+                        DB::table('agent_conversations')->where('id', $candidate->id)->update([
                             'metadata' => json_encode([
                                 'asin' => $this->asin,
                                 'type' => 'campaign_assistant',
                             ]),
                         ]);
+                        $this->conversationId = (string) $candidate->id;
+                        $this->conversationTitle = (string) ($candidate->title ?: 'Campaign AI');
+                        Cache::forget("campaign_ai_conv:{$user->id}:{$this->asin}");
+                    }
+                } else {
+                    $title = DB::table('agent_conversations')->where('id', $this->conversationId)->value('title');
+                    if ($title) $this->conversationTitle = (string) $title;
+                }
 
-                    $this->conversationId = (string) $candidate->id;
-                    $this->conversationTitle = (string) ($candidate->title ?: 'Campaign AI');
+                $this->loadMessages();
+                $this->answer = '';
+                $this->question = '';
+                $this->isStreaming = false;
+                $this->dispatch('campaign-assistant-scroll-bottom');
+
+                return; // Success!
+            } catch (\Throwable $e) {
+                Log::error("Campaign AI attempt $attempt failed", ['msg' => $e->getMessage()]);
+                
+                if ($attempt === 3) {
+                    $this->isStreaming = false;
+                    $errorMessage = $e->getMessage();
                     
-                    // Clear cache since we have a new conversation
-                    Cache::forget("campaign_ai_conv:{$user->id}:{$this->asin}");
+                    if (stripos($errorMessage, 'timeout') !== false || stripos($errorMessage, 'timed out') !== false) {
+                        $this->error = '⏱️ Request timed out. The AI took too long to respond.';
+                    } elseif (stripos($errorMessage, 'connection') !== false) {
+                        $this->error = '🌐 Connection failed. Please check your internet.';
+                    } elseif (stripos($errorMessage, 'rate') !== false) {
+                        $this->error = '⚙️ Rate limit reached. Please wait a moment.';
+                    } else {
+                        $this->error = config('app.debug') ? $e::class . ': ' . $errorMessage : '❌ AI failed to respond.';
+                    }
+                    throw $e;
                 }
-            } else {
-                // Refresh title in case it was updated
-                $title = DB::table('agent_conversations')
-                    ->where('id', $this->conversationId)
-                    ->value('title');
-
-                if ($title) {
-                    $this->conversationTitle = (string) $title;
-                }
-            }
-
-            $this->loadMessages();
-            $this->answer = '';
-            $this->isStreaming = false;
-            $this->question = '';
-
-            $this->dispatch('campaign-assistant-scroll-bottom');
-        } catch (\Throwable $e) {
-            $this->isStreaming = false;
-
-            Log::error('Campaign AI streaming failed', [
-                'conversation_id' => $this->conversationId,
-                'user_id'         => Auth::id(),
-                'asin'            => $this->asin,
-                'provider'        => $runtime['provider'] ?? null,
-                'model'           => $runtime['model'] ?? null,
-                'message'         => $e->getMessage(),
-            ]);
-
-            // Provide user-friendly error messages
-            $errorMessage = $e->getMessage();
-            if (stripos($errorMessage, 'timeout') !== false || 
-                stripos($errorMessage, 'timed out') !== false) {
-                $this->error = '⏱️ Request timed out. The AI took too long to respond. Please try again or select a faster model.';
-            } elseif (stripos($errorMessage, 'connection') !== false) {
-                $this->error = '🌐 Connection failed. Please check your internet and try again.';
-            } elseif (stripos($errorMessage, 'rate') !== false) {
-                $this->error = '⚙️ Rate limit reached. Please wait a moment and try again.';
-            } else {
-                $this->error = config('app.debug')
-                    ? $e::class . ': ' . $errorMessage
-                    : '❌ AI failed to respond. Please try again.';
+                usleep(500000); // 0.5s pause before retry
             }
         }
     }
 
     /**
-     * Simple delta extraction from streaming event
+     * Send progress updates to the UI via wire:stream
+     */
+    private function streamProgress(string $type, string $label): void
+    {
+        $this->stream(to: 'progress', content: json_encode([
+            'type'  => $type,
+            'label' => $label,
+        ], JSON_UNESCAPED_UNICODE), replace: true);
+    }
+
+    /**
+     * Advanced delta extraction from streaming event
      */
     private function extractDelta(mixed $event): string
     {
+        if ($event instanceof TextDelta) {
+            return $event->delta;
+        }
+
         if (is_array($event)) {
-            return (string) ($event['text'] ?? $event['delta'] ?? '');
+            $value = $event['text']
+                ?? $event['delta']
+                ?? $event['content']
+                ?? null;
+
+            return is_string($value) ? $value : '';
         }
+
         if (is_object($event)) {
-            return (string) ($event->text ?? $event->delta ?? '');
+            $value = $event->text
+                ?? $event->delta
+                ?? $event->content
+                ?? null;
+
+            if (is_string($value) && $value !== '') {
+                return $value;
+            }
+
+            if (method_exists($event, 'toArray')) {
+                $array = $event->toArray();
+                if (is_array($array)) {
+                    $arrayValue = $array['text']
+                        ?? $array['delta']
+                        ?? $array['content']
+                        ?? null;
+
+                    return is_string($arrayValue) ? $arrayValue : '';
+                }
+            }
         }
+
         return '';
     }
 
@@ -341,7 +400,7 @@ class CampaignAssistant extends Component
             ->where('conversation_id', $this->conversationId)
             ->orderByDesc('id')
             ->limit(self::MAX_MESSAGES)
-            ->get(['role', 'content'])
+            ->get(['role', 'content', 'tool_results'])
             ->reverse()
             ->values();
 
@@ -349,12 +408,40 @@ class CampaignAssistant extends Component
             $role = (string) $r->role;
             $formatted = $formatter->formatMessage($role, (string) $r->content);
 
+            // Extract trace_id from tool_results if present
+            $traceId = null;
+            if ($role === 'assistant' && !empty($r->tool_results)) {
+                try {
+                    $results = json_decode($r->tool_results, true);
+                    if (is_array($results)) {
+                        foreach ($results as $res) {
+                            if (isset($res['result']) && is_string($res['result'])) {
+                                $inner = json_decode($res['result'], true);
+                                if (isset($inner['meta']['trace_id'])) {
+                                    $traceId = $inner['meta']['trace_id'];
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } catch (\Exception $e) {
+                    Log::warning("Failed to parse tool_results for campaign assistant: " . $e->getMessage());
+                }
+            }
+
             return [
                 'role'    => $role,
                 'content' => $formatted['content'],
                 'is_html' => $formatted['is_html'],
+                'trace_id' => $traceId,
             ];
-        })->all();
+        })->filter(function (array $message) {
+            if (($message['role'] ?? '') === 'assistant' && trim((string) ($message['content'] ?? '')) === '') {
+                return false;
+            }
+
+            return true;
+        })->values()->all();
     }
 
     public function newChat(): void
