@@ -32,7 +32,7 @@
 
 {{-- data-topbar="dark" --}}
 
-<body data-sidebar="dark" class="relative">
+<body class="relative">
     <!-- Loading Spinner -->
     @include('components.loading')
 

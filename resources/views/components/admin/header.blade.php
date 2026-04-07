@@ -18,21 +18,21 @@
                 </div>
                 <a href="{{ route('admin.dashboard') }}" class="logo logo-dark">
                     <span class="logo-sm">
-                        <img src="{{ asset('assets/images/logo-sm.png') }}" alt="itrend" height="70" width="100"
+                        <img src="{{ asset('assets/images/es4-logo.png') }}" alt="itrend" height="70" width="100"
                             style="margin-left: -14px;">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ asset('assets/images/logo-light.png') }}" alt="itrend" height="80" width="130">
+                        <img src="{{ asset('assets/images/es4-logo.png') }}" alt="itrend" height="80" width="130">
                     </span>
                 </a>
 
                 <a href="{{ route('admin.dashboard') }}" class="logo logo-light">
                     <span class="logo-sm">
-                        <img src="{{ asset('assets/images/logo-sm.png') }}" alt="itrend" height="70" width="110"
+                        <img src="{{ asset('assets/images/es4-logo.png') }}" alt="itrend" height="70" width="110"
                             style="margin-left: -14px;">
                     </span>
                     <span class="logo-lg">
-                        <img src="{{ asset('assets/images/logo-light.png') }}" alt="itrend" height="75" width="130">
+                        <img src="{{ asset('assets/images/es4-logo.png') }}" alt="itrend" height="75" width="130">
                     </span>
                 </a>
             </div>

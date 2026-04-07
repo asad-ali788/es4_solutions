@@ -1149,3 +1149,87 @@ html[data-bs-theme="dark"] .concave {
 html[data-bs-theme="dark"] .concave-top {
     box-shadow: -30px -30px 0 0 var(--bs-header-bg, #2A3042);
 }
+
+/* =========================================================
+   LIGHT SIDEBAR REFINEMENTS
+   ========================================================= */
+
+/* Sidebar Background & Footer in Light Mode */
+body:not([data-sidebar="dark"]) .vertical-menu {
+    background: #ffffff !important;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.03);
+}
+
+body:not([data-sidebar="dark"]) .sidebar-footer {
+    background-color: #fcfcfd !important;
+    border-top: 1px solid #f1f1f1;
+}
+
+body:not([data-sidebar="dark"]) .sidebar-footer small {
+    color: #a6b0cf !important;
+}
+
+/* Sidebar Menu Item Active/Hover State (Light Mode) */
+body:not([data-sidebar="dark"]) #sidebar-menu ul li a {
+    color: #545a6d;
+    transition: all 0.3s ease;
+}
+
+body:not([data-sidebar="dark"]) #sidebar-menu ul li a:hover {
+    color: #3b82f6;
+    background-color: rgba(59, 130, 246, 0.04);
+}
+
+body:not([data-sidebar="dark"]) #sidebar-menu ul li a i {
+    color: #545a6d;
+    transition: color 0.3s ease;
+}
+
+body:not([data-sidebar="dark"]) #sidebar-menu ul li.mm-active > a {
+    color: #2563eb !important;
+    background-color: #eff6ff !important; /* Soft premium blue background */
+    font-weight: 600;
+}
+
+body:not([data-sidebar="dark"]) #sidebar-menu ul li.mm-active > a i {
+    color: #2563eb !important;
+}
+
+/* Concave Corner Refinement for Light Mode */
+body:not([data-sidebar="dark"]) .curve .concave {
+    background-color: #ffffff !important;
+}
+
+body:not([data-sidebar="dark"]) .curve {
+    background-color: transparent !important;
+}
+
+/* Ensure sub-menu inherits light theme properly */
+body:not([data-sidebar="dark"]) .sub-menu {
+    background-color: #fafbfc !important;
+}
+
+body:not([data-sidebar="dark"]) .sub-menu li a {
+    color: #74788d !important;
+}
+
+body:not([data-sidebar="dark"]) .sub-menu li.mm-active > a {
+    color: #2563eb !important;
+}
+
+/* Animation for the active highlight */
+@keyframes slideInActive {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+
+body:not([data-sidebar="dark"]) #sidebar-menu ul li.mm-active > a::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #2563eb;
+    animation: slideInActive 0.3s ease-out;
+}
