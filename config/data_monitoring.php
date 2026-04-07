@@ -3,6 +3,6 @@
 return [
     'timezone' => 'Asia/Kolkata',
     'recipients' => [
-        'akshay.p@itrendsolution.com',
+        'sr.dev.akshay@gmail.com',
     ],
 ];

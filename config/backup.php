@@ -212,13 +212,12 @@ return [
         'notifiable' => \Spatie\Backup\Notifications\Notifiable::class,
 
         'mail' => [
-            'to' => ['akshay.p@itrendsolution.com',
-                'santhosh.g@itrendsolution.com'
+            'to' => ['sr.dev.akshay@gmail.com',
         ],
 
             'from' => [
-                'address' => env('MAIL_FROM_ADDRESS', 'itrendsolution300@gmail.com'),
-                'name' => env('MAIL_FROM_NAME', 'ITrend Solution'),
+                'address' => env('MAIL_FROM_ADDRESS', 'sr.dev.akshay@gmail.com'),
+                'name' => env('MAIL_FROM_NAME', 'ES4 Solutions'),
             ],
         ],
 

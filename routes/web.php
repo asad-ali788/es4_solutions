@@ -239,10 +239,11 @@ Route::prefix('admin')->as('admin.')->middleware('auth')->group(function () {
     Route::get('/dashboard-cache-clear', [DashboardController::class, 'clearCache'])->name('dashboard.clearCache');
     Route::get('/dashboard-monthToDateDailyView', [DashboardController::class, 'monthToDateDailyView'])->name('dashboard.monthToDateDailyView');
     Route::get('/dashboard-flushMtdDailyCache', [DashboardController::class, 'flushMtdDailyCache'])->name('dashboard.flushMtdDailyCache');
+    Route::get('/run-demo-data', [DashboardController::class, 'runDemoData'])->name('runDemoData');
 
     Route::get('/dashboard/hourly-sales/products', HourlyProductSalesPage::class)
         ->name('dashboard.hourly-sales.products');
-    Route::get('/dashboard/detailed-todays-sales-summery', [DashboardController::class,'detailedTodaysSalesSummery'])
+    Route::get('/dashboard/detailed-todays-sales-summery', [DashboardController::class, 'detailedTodaysSalesSummery'])
         ->name('dashboard.detailed-todays-sales-summery');
     Route::get('/dashboard/snapshot-todays-sales-summery', [DashboardController::class, 'snapshotTodaysSalesSummery'])
         ->name('dashboard.snapshot-todays-sales-summery');
@@ -363,7 +364,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::prefix('purchaseOrder')->as('purchaseOrder.')->controller(PurchaseOrderController::class)->group(function () {
-        Route::get('{id}/items',  'items')->name('items');
+        Route::get('{id}/items', 'items')->name('items');
         Route::get('{id}/items/create', 'itemCreate')->name('itemCreate');
         Route::post('items', 'itemStore')->name('itemStore');
         Route::get('items/{id}/edit', 'itemEdit')->name('itemEdit');
@@ -372,7 +373,8 @@ Route::prefix('admin')->as('admin.')->middleware('auth')->group(function () {
         Route::post('/updatePurchaseOrderItems/{id}', 'updatePurchaseOrderItems')->name('updatePurchaseOrderItems');
     });
     Route::get('/allPurchaseOrderList', [PurchaseOrderController::class, 'allPurchaseOrders'])->name('purchaseOrder.allPurchaseOrders');
-    Route::get('/allPurchaseOrderList/delayed/{sku}', [PurchaseOrderController::class, 'delayedLists'])->name('purchaseOrder.delayedLists');;
+    Route::get('/allPurchaseOrderList/delayed/{sku}', [PurchaseOrderController::class, 'delayedLists'])->name('purchaseOrder.delayedLists');
+    ;
 
     /*
     |--------------------------------------------------------------------------
@@ -605,7 +607,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth')->group(function () {
             });
         });
     });
-    
+
     /*
     |--------------------------------------------------------------------------
     | Assigning Asins in User Module
@@ -644,7 +646,7 @@ Route::prefix('admin')->as('admin.')->middleware('auth')->group(function () {
         Route::get('/export', 'export')->name('export');
     });
 
-    
+
     /*
     |--------------------------------------------------------------------------
     | Ai chatbot route
@@ -659,20 +661,20 @@ Route::prefix('admin')->as('admin.')->middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::resources([
-        'products'          => ProductController::class,
-        'sourcing'          => SourcingController::class,
-        'users'             => UserController::class,
-        'profile'           => ProfileController::class,
-        'selling'           => SellingController::class,
-        'warehouse'         => WarehouseController::class,
-        'shipments'         => ShipmentController::class,
-        'purchaseOrder'     => PurchaseOrderController::class,
-        'currencies'        => CurrencyController::class,
-        'orderforecast'     => OrderForecastController::class,
+        'products' => ProductController::class,
+        'sourcing' => SourcingController::class,
+        'users' => UserController::class,
+        'profile' => ProfileController::class,
+        'selling' => SellingController::class,
+        'warehouse' => WarehouseController::class,
+        'shipments' => ShipmentController::class,
+        'purchaseOrder' => PurchaseOrderController::class,
+        'currencies' => CurrencyController::class,
+        'orderforecast' => OrderForecastController::class,
         'orderforecastasin' => OrderForecastAsinController::class,
-        'data'              => DataController::class,
-        'asin-selling'      => SellingAsinController::class,
-        'assignAsin'        => AssignAsinController::class,
+        'data' => DataController::class,
+        'asin-selling' => SellingAsinController::class,
+        'assignAsin' => AssignAsinController::class,
         // 'forecastperformance'       => OrderForecastPerformanceController::class,
     ]);
 });
@@ -680,12 +682,12 @@ Route::prefix('admin')->as('admin.')->middleware('auth')->group(function () {
 
 Route::prefix('dev')->as('dev.')->middleware('auth')->group(function () {
     // Developer routes
-    Route::as('jobs.')->controller(JobMonitorController::class)->group(function () {
+    Route:: as('jobs.')->controller(JobMonitorController::class)->group(function () {
         Route::get('jobs', 'index')->name('index');
         Route::get('failed', 'failed')->name('failed');
     });
     // DB backup routes
-    Route::as('backups.')->controller(DatabaseBackUpController::class)->group(function () {
+    Route:: as('backups.')->controller(DatabaseBackUpController::class)->group(function () {
         Route::get('database-backups', 'index')->name('index');
         Route::get('database-backups/download/{file}', 'download')->name('download');
     });

@@ -14,6 +14,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use App\Services\Demo\DashboardDemoDataGenerator;
 
 class DashboardController extends Controller
 {
@@ -632,5 +633,40 @@ class DashboardController extends Controller
 
 
         return view('pages.admin.dashboard.snapshot-todays-sales-summery', compact('rows', 'marketTz'));
+    }
+
+    /**
+     * Generate demo data for the dashboard manually.
+     */
+    public function runDemoData(DashboardDemoDataGenerator $generator)
+    {
+        try {
+            set_time_limit(300); // 5 mins max
+
+            $marketTz = config('timezone.market', 'America/Los_Angeles');
+            $endDate = Carbon::now($marketTz)->startOfDay();
+            $days = 35;
+            $startDate = $endDate->copy()->subDays($days - 1);
+            $cleanup = true; // Cleanup old demo data in range by default for "manual" run
+
+            $result = $generator->generate($startDate, $endDate, $cleanup);
+            
+            // Clear dashboard cache to show new data
+            $this->clearCache();
+
+            return redirect()->route('admin.dashboard')->with('success', sprintf(
+                'Demo data generated: %s to %s. (Stats: Products %d, Campaigns %d, Keywords %d)',
+                $result['from'],
+                $result['to'],
+                $result['products'],
+                $result['campaigns'],
+                $result['keywords']
+            ));
+        } catch (\Throwable $e) {
+            Log::error('Demo Data Generation Failed: ' . $e->getMessage(), [
+                'exception' => $e
+            ]);
+            return back()->with('error', 'Failed to generate demo data: ' . $e->getMessage());
+        }
     }
 }

@@ -164,11 +164,11 @@
                         <span class="fw-medium">My Profile</span>
                     </a>
 
-                    <a class="dropdown-item d-flex align-items-center py-2 px-3 rounded-2 hover-card"
+                    <!-- <a class="dropdown-item d-flex align-items-center py-2 px-3 rounded-2 hover-card"
                         href="https://itrendsolutions.sharepoint.com/sites/ITrendInternalDocs" target="_blank">
                         <i class="mdi mdi-folder-information-outline fs-5 me-3 text-info"></i>
                         <span class="fw-medium">Project Documentation</span>
-                    </a>
+                    </a> -->
 
                     <div class="dropdown-divider my-2"></div>
 

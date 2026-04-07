@@ -36,6 +36,10 @@
                                         <a class="dropdown-item" href="{{ route('admin.dashboard.clearCache') }}">Reset
                                             Cache</a>
                                     </li>
+                                     <li>
+                                        <a class="dropdown-item" href="{{ route('admin.runDemoData') }}">
+                                            Run demo data</a>
+                                    </li>
                                 </ul>
                             </div>
                         </div>

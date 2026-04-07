@@ -11,7 +11,7 @@
                     </div>
                     <div>
                         <div class="ai-cap-header-label">INTELLIGENCE CENTER</div>
-                        <h5 class="ai-cap-header-title mb-0">iTrend AI Assistant</h5>
+                        <h5 class="ai-cap-header-title mb-0">ES4 AI Assistant</h5>
                     </div>
                 </div>
                 <div class="d-flex align-items-center gap-3">
@@ -77,7 +77,7 @@
                                         </div>
                                         <div>
                                             <h2 class="ai-cap-hero-title">Welcome to <span
-                                                    class="ai-cap-gradient-text">iTrend AI</span></h2>
+                                                    class="ai-cap-gradient-text">ES4 AI</span></h2>
                                             <p class="ai-cap-hero-sub">Your intelligent Amazon analytics co-pilot — ask
                                                 questions in plain English and get data-driven answers instantly.</p>
                                         </div>
@@ -91,7 +91,7 @@
                                         <div>
                                             <p class="ai-cap-notice-title">This assistant is in <strong>BETA</strong>
                                             </p>
-                                            <p class="ai-cap-notice-body">iTrend AI is highly capable, but artificial
+                                            <p class="ai-cap-notice-body">ES4 AI is highly capable, but artificial
                                                 intelligence can still make mistakes or return incomplete data. Always
                                                 verify critical decisions before acting on AI-generated results.</p>
                                         </div>
@@ -197,7 +197,8 @@
                                                         <i class="bx {{ $t['icon'] }}"></i>
                                                     </div>
                                                     <div class="ai-cap-tool-cat" style="color: {{ $t['color'] }};">
-                                                        {{ $t['cat'] }}</div>
+                                                        {{ $t['cat'] }}
+                                                    </div>
                                                     <div class="ai-cap-tool-title">{{ $t['title'] }}</div>
                                                     <div class="ai-cap-tool-desc">{{ $t['desc'] }}</div>
                                                 </div>
@@ -301,7 +302,8 @@
                                                     <div>
                                                         <div class="ai-cap-tip-title">Chain Questions</div>
                                                         <div class="ai-cap-tip-body">Follow up on previous results:
-                                                            <em>"Now, for the first item in that list…"</em></div>
+                                                            <em>"Now, for the first item in that list…"</em>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -345,8 +347,15 @@
                                             <div class="ai-cap-error-icon"><i class='bx bx-table'></i></div>
                                             <div class="flex-grow-1">
                                                 <div class="ai-cap-error-title">Unknown Column in Query</div>
-                                                <div class="ai-cap-error-body">The AI generated a SQL query referencing a column that doesn't exist in the table (e.g., <code>Unknown column 'revenue' in field list</code>). This happens when the AI guesses column names instead of using exact schema names.</div>
-                                                <div class="ai-cap-error-fix"><i class='bx bx-right-arrow-alt me-1'></i><strong>Fix:</strong> Retry with more specific wording, or tell the AI the exact field — e.g., <em>"use the column ordered_units"</em>.</div>
+                                                <div class="ai-cap-error-body">The AI generated a SQL query referencing
+                                                    a column that doesn't exist in the table (e.g.,
+                                                    <code>Unknown column 'revenue' in field list</code>). This happens
+                                                    when the AI guesses column names instead of using exact schema
+                                                    names.</div>
+                                                <div class="ai-cap-error-fix"><i
+                                                        class='bx bx-right-arrow-alt me-1'></i><strong>Fix:</strong>
+                                                    Retry with more specific wording, or tell the AI the exact field —
+                                                    e.g., <em>"use the column ordered_units"</em>.</div>
                                             </div>
                                         </div>
 
@@ -355,8 +364,15 @@
                                             <div class="ai-cap-error-icon"><i class='bx bx-ghost'></i></div>
                                             <div class="flex-grow-1">
                                                 <div class="ai-cap-error-title">Blank Response from AI</div>
-                                                <div class="ai-cap-error-body">Sometimes the AI processes your question but returns nothing — the chat shows a spinning indicator and then stops with no output. This is triggered internally as <em>"AI returned an empty response"</em> and the system automatically retries up to 3 times.</div>
-                                                <div class="ai-cap-error-fix"><i class='bx bx-right-arrow-alt me-1'></i><strong>Fix:</strong> Click <strong>Retry</strong> on the failed message, or rephrase and resend your question.</div>
+                                                <div class="ai-cap-error-body">Sometimes the AI processes your question
+                                                    but returns nothing — the chat shows a spinning indicator and then
+                                                    stops with no output. This is triggered internally as <em>"AI
+                                                        returned an empty response"</em> and the system automatically
+                                                    retries up to 3 times.</div>
+                                                <div class="ai-cap-error-fix"><i
+                                                        class='bx bx-right-arrow-alt me-1'></i><strong>Fix:</strong>
+                                                    Click <strong>Retry</strong> on the failed message, or rephrase and
+                                                    resend your question.</div>
                                             </div>
                                         </div>
 
@@ -364,9 +380,17 @@
                                         <div class="ai-cap-error-card ai-cap-error-card--red">
                                             <div class="ai-cap-error-icon"><i class='bx bx-spreadsheet'></i></div>
                                             <div class="flex-grow-1">
-                                                <div class="ai-cap-error-title">Excel Download Fails — Invalid Export SQL</div>
-                                                <div class="ai-cap-error-body">The Download Excel button uses a separate, broader SQL query generated by the AI specifically for exports. If that export SQL contains an error (wrong column, wrong table), the download will fail even if the chat preview worked fine.</div>
-                                                <div class="ai-cap-error-fix"><i class='bx bx-right-arrow-alt me-1'></i><strong>Fix:</strong> Re-ask your question and explicitly say <em>"export the full dataset to Excel"</em> so the AI regenerates a clean export query.</div>
+                                                <div class="ai-cap-error-title">Excel Download Fails — Invalid Export
+                                                    SQL</div>
+                                                <div class="ai-cap-error-body">The Download Excel button uses a
+                                                    separate, broader SQL query generated by the AI specifically for
+                                                    exports. If that export SQL contains an error (wrong column, wrong
+                                                    table), the download will fail even if the chat preview worked fine.
+                                                </div>
+                                                <div class="ai-cap-error-fix"><i
+                                                        class='bx bx-right-arrow-alt me-1'></i><strong>Fix:</strong>
+                                                    Re-ask your question and explicitly say <em>"export the full dataset
+                                                        to Excel"</em> so the AI regenerates a clean export query.</div>
                                             </div>
                                         </div>
 
@@ -374,9 +398,17 @@
                                         <div class="ai-cap-error-card ai-cap-error-card--amber">
                                             <div class="ai-cap-error-icon"><i class='bx bx-code-block'></i></div>
                                             <div class="flex-grow-1">
-                                                <div class="ai-cap-error-title">SQL Is Required — Tool Received No Query</div>
-                                                <div class="ai-cap-error-body">Every AI data tool requires a valid SQL SELECT query. If the AI calls a tool without generating one (usually when it misunderstands your request), the system throws <em>"SQL is required"</em> and the tool fails silently. You will typically see no result at all.</div>
-                                                <div class="ai-cap-error-fix"><i class='bx bx-right-arrow-alt me-1'></i><strong>Fix:</strong> Rephrase your question to be more data-specific, e.g., <em>"Show me the top 10 ASINs by sales for last month"</em>.</div>
+                                                <div class="ai-cap-error-title">SQL Is Required — Tool Received No Query
+                                                </div>
+                                                <div class="ai-cap-error-body">Every AI data tool requires a valid SQL
+                                                    SELECT query. If the AI calls a tool without generating one (usually
+                                                    when it misunderstands your request), the system throws <em>"SQL is
+                                                        required"</em> and the tool fails silently. You will typically
+                                                    see no result at all.</div>
+                                                <div class="ai-cap-error-fix"><i
+                                                        class='bx bx-right-arrow-alt me-1'></i><strong>Fix:</strong>
+                                                    Rephrase your question to be more data-specific, e.g., <em>"Show me
+                                                        the top 10 ASINs by sales for last month"</em>.</div>
                                             </div>
                                         </div>
 
@@ -384,9 +416,17 @@
                                         <div class="ai-cap-error-card ai-cap-error-card--blue">
                                             <div class="ai-cap-error-icon"><i class='bx bx-lock-alt'></i></div>
                                             <div class="flex-grow-1">
-                                                <div class="ai-cap-error-title">Query References a Disallowed Table</div>
-                                                <div class="ai-cap-error-body">Each AI tool is restricted to its own set of permitted tables. If the AI generates a query that joins or references a table outside the tool's allowed scope (e.g., querying a campaign table inside a warehouse tool), a security check blocks it with <em>"Query references disallowed table or alias"</em>.</div>
-                                                <div class="ai-cap-error-fix"><i class='bx bx-right-arrow-alt me-1'></i><strong>Fix:</strong> Keep your questions scoped to one domain — campaigns, inventory, or keywords — rather than mixing them.</div>
+                                                <div class="ai-cap-error-title">Query References a Disallowed Table
+                                                </div>
+                                                <div class="ai-cap-error-body">Each AI tool is restricted to its own set
+                                                    of permitted tables. If the AI generates a query that joins or
+                                                    references a table outside the tool's allowed scope (e.g., querying
+                                                    a campaign table inside a warehouse tool), a security check blocks
+                                                    it with <em>"Query references disallowed table or alias"</em>.</div>
+                                                <div class="ai-cap-error-fix"><i
+                                                        class='bx bx-right-arrow-alt me-1'></i><strong>Fix:</strong>
+                                                    Keep your questions scoped to one domain — campaigns, inventory, or
+                                                    keywords — rather than mixing them.</div>
                                             </div>
                                         </div>
 
@@ -394,9 +434,17 @@
                                         <div class="ai-cap-error-card ai-cap-error-card--amber">
                                             <div class="ai-cap-error-icon"><i class='bx bx-wifi-off'></i></div>
                                             <div class="flex-grow-1">
-                                                <div class="ai-cap-error-title">AI Connection Interrupted / Timeout</div>
-                                                <div class="ai-cap-error-body">The AI model runs on a remote server. If the connection drops mid-stream (network hiccup, server overload, or a model taking too long), the streaming stops. The system automatically retries up to 3 times, then shows the last error as a failure.</div>
-                                                <div class="ai-cap-error-fix"><i class='bx bx-right-arrow-alt me-1'></i><strong>Fix:</strong> Click <strong>Retry</strong>. If it keeps failing, try switching to a lighter model (e.g., GPT-OSS 20B) from the model selector.</div>
+                                                <div class="ai-cap-error-title">AI Connection Interrupted / Timeout
+                                                </div>
+                                                <div class="ai-cap-error-body">The AI model runs on a remote server. If
+                                                    the connection drops mid-stream (network hiccup, server overload, or
+                                                    a model taking too long), the streaming stops. The system
+                                                    automatically retries up to 3 times, then shows the last error as a
+                                                    failure.</div>
+                                                <div class="ai-cap-error-fix"><i
+                                                        class='bx bx-right-arrow-alt me-1'></i><strong>Fix:</strong>
+                                                    Click <strong>Retry</strong>. If it keeps failing, try switching to
+                                                    a lighter model (e.g., GPT-OSS 20B) from the model selector.</div>
                                             </div>
                                         </div>
 
@@ -404,9 +452,19 @@
                                         <div class="ai-cap-error-card ai-cap-error-card--blue">
                                             <div class="ai-cap-error-icon"><i class='bx bx-history'></i></div>
                                             <div class="flex-grow-1">
-                                                <div class="ai-cap-error-title">Conversation Too Long — Context Reset</div>
-                                                <div class="ai-cap-error-body">Each AI conversation has a maximum context budget (message count and total characters). When a conversation exceeds this limit, the system automatically clears the thread and starts a fresh one — you may notice a message like <em>"Context too large, starting a fresh thread"</em> in the status bar.</div>
-                                                <div class="ai-cap-error-fix"><i class='bx bx-right-arrow-alt me-1'></i><strong>Fix:</strong> This is automatic and expected. Use the <strong>New Chat</strong> button on the left sidebar to start fresh yourself when responses feel slow.</div>
+                                                <div class="ai-cap-error-title">Conversation Too Long — Context Reset
+                                                </div>
+                                                <div class="ai-cap-error-body">Each AI conversation has a maximum
+                                                    context budget (message count and total characters). When a
+                                                    conversation exceeds this limit, the system automatically clears the
+                                                    thread and starts a fresh one — you may notice a message like
+                                                    <em>"Context too large, starting a fresh thread"</em> in the status
+                                                    bar.</div>
+                                                <div class="ai-cap-error-fix"><i
+                                                        class='bx bx-right-arrow-alt me-1'></i><strong>Fix:</strong>
+                                                    This is automatic and expected. Use the <strong>New Chat</strong>
+                                                    button on the left sidebar to start fresh yourself when responses
+                                                    feel slow.</div>
                                             </div>
                                         </div>
 
@@ -1173,90 +1231,260 @@
     /* ─── Dark mode support — comprehensive ───────────────── */
 
     /* Layout shells */
-    html[data-bs-theme="dark"] .ai-cap-content      { background: #0f172a; }
-    html[data-bs-theme="dark"] .ai-cap-main         { background: #0f172a; }
+    html[data-bs-theme="dark"] .ai-cap-content {
+        background: #0f172a;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-main {
+        background: #0f172a;
+    }
 
     /* Sidebar */
-    html[data-bs-theme="dark"] .ai-cap-sidebar      { background: #0c1428; border-color: rgba(255,255,255,0.07); }
-    html[data-bs-theme="dark"] .ai-cap-sidebar-label { color: #475569; }
-    html[data-bs-theme="dark"] .ai-cap-nav .nav-link { color: #94a3b8; }
-    html[data-bs-theme="dark"] .ai-cap-nav .nav-link:hover { background: rgba(148,163,184,0.08); color: #cbd5e1; }
-    html[data-bs-theme="dark"] .ai-cap-nav .nav-link.active { background: #1e293b; color: #93c5fd; box-shadow: none; border-color: rgba(147,197,253,0.15); }
+    html[data-bs-theme="dark"] .ai-cap-sidebar {
+        background: #0c1428;
+        border-color: rgba(255, 255, 255, 0.07);
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-sidebar-label {
+        color: #475569;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-nav .nav-link {
+        color: #94a3b8;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-nav .nav-link:hover {
+        background: rgba(148, 163, 184, 0.08);
+        color: #cbd5e1;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-nav .nav-link.active {
+        background: #1e293b;
+        color: #93c5fd;
+        box-shadow: none;
+        border-color: rgba(147, 197, 253, 0.15);
+    }
 
     /* Footer */
-    html[data-bs-theme="dark"] .ai-cap-footer       { background: #0c1428; border-color: rgba(255,255,255,0.07); }
-    html[data-bs-theme="dark"] .ai-cap-footer-note  { color: #475569; }
+    html[data-bs-theme="dark"] .ai-cap-footer {
+        background: #0c1428;
+        border-color: rgba(255, 255, 255, 0.07);
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-footer-note {
+        color: #475569;
+    }
 
     /* Typography */
-    html[data-bs-theme="dark"] .ai-cap-page-title   { color: #f1f5f9; }
-    html[data-bs-theme="dark"] .ai-cap-page-sub     { color: #64748b; }
-    html[data-bs-theme="dark"] .ai-cap-section-heading { color: #94a3b8; }
+    html[data-bs-theme="dark"] .ai-cap-page-title {
+        color: #f1f5f9;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-page-sub {
+        color: #64748b;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-section-heading {
+        color: #94a3b8;
+    }
 
     /* Intro hero */
-    html[data-bs-theme="dark"] .ai-cap-intro-hero   { background: linear-gradient(135deg, #1a2235, #0f172a); border-color: rgba(99,102,241,0.15); }
-    html[data-bs-theme="dark"] .ai-cap-hero-title   { color: #f1f5f9; }
-    html[data-bs-theme="dark"] .ai-cap-hero-sub     { color: #94a3b8; }
+    html[data-bs-theme="dark"] .ai-cap-intro-hero {
+        background: linear-gradient(135deg, #1a2235, #0f172a);
+        border-color: rgba(99, 102, 241, 0.15);
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-hero-title {
+        color: #f1f5f9;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-hero-sub {
+        color: #94a3b8;
+    }
 
     /* Beta notice */
-    html[data-bs-theme="dark"] .ai-cap-notice--amber { background: #1c1506; border-color: rgba(245,158,11,0.2); }
-    html[data-bs-theme="dark"] .ai-cap-notice-icon  { background: rgba(245,158,11,0.15); }
-    html[data-bs-theme="dark"] .ai-cap-notice-title { color: #fde68a; }
-    html[data-bs-theme="dark"] .ai-cap-notice-body  { color: #d4a820; }
+    html[data-bs-theme="dark"] .ai-cap-notice--amber {
+        background: #1c1506;
+        border-color: rgba(245, 158, 11, 0.2);
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-notice-icon {
+        background: rgba(245, 158, 11, 0.15);
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-notice-title {
+        color: #fde68a;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-notice-body {
+        color: #d4a820;
+    }
 
     /* Info cards (Why mistakes happen) */
-    html[data-bs-theme="dark"] .ai-cap-info-card    { background: #1e293b; border-color: rgba(255,255,255,0.07); }
-    html[data-bs-theme="dark"] .ai-cap-info-title   { color: #e2e8f0; }
-    html[data-bs-theme="dark"] .ai-cap-info-body    { color: #64748b; }
+    html[data-bs-theme="dark"] .ai-cap-info-card {
+        background: #1e293b;
+        border-color: rgba(255, 255, 255, 0.07);
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-info-title {
+        color: #e2e8f0;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-info-body {
+        color: #64748b;
+    }
 
     /* Model badges */
-    html[data-bs-theme="dark"] .ai-cap-model-badge  { background: rgba(37,99,235,0.15); border-color: rgba(37,99,235,0.25); color: #93c5fd; }
+    html[data-bs-theme="dark"] .ai-cap-model-badge {
+        background: rgba(37, 99, 235, 0.15);
+        border-color: rgba(37, 99, 235, 0.25);
+        color: #93c5fd;
+    }
 
     /* Roadmap strip */
-    html[data-bs-theme="dark"] .ai-cap-roadmap-strip { background: #0d1f12; border-color: rgba(34,197,94,0.2); color: #86efac; }
+    html[data-bs-theme="dark"] .ai-cap-roadmap-strip {
+        background: #0d1f12;
+        border-color: rgba(34, 197, 94, 0.2);
+        color: #86efac;
+    }
 
     /* Tool cards */
-    html[data-bs-theme="dark"] .ai-cap-tool-card    { background: #1e293b; border-color: rgba(255,255,255,0.07); }
-    html[data-bs-theme="dark"] .ai-cap-tool-card:hover { border-color: rgba(99,102,241,0.3); box-shadow: 0 4px 16px rgba(99,102,241,0.1); }
-    html[data-bs-theme="dark"] .ai-cap-tool-title   { color: #f1f5f9; }
-    html[data-bs-theme="dark"] .ai-cap-tool-desc    { color: #64748b; }
+    html[data-bs-theme="dark"] .ai-cap-tool-card {
+        background: #1e293b;
+        border-color: rgba(255, 255, 255, 0.07);
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-tool-card:hover {
+        border-color: rgba(99, 102, 241, 0.3);
+        box-shadow: 0 4px 16px rgba(99, 102, 241, 0.1);
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-tool-title {
+        color: #f1f5f9;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-tool-desc {
+        color: #64748b;
+    }
 
     /* Count pill */
-    html[data-bs-theme="dark"] .ai-cap-count-pill   { background: rgba(37,99,235,0.15); border-color: rgba(37,99,235,0.25); color: #93c5fd; }
+    html[data-bs-theme="dark"] .ai-cap-count-pill {
+        background: rgba(37, 99, 235, 0.15);
+        border-color: rgba(37, 99, 235, 0.25);
+        color: #93c5fd;
+    }
 
     /* Prompt cards — bad */
-    html[data-bs-theme="dark"] .ai-cap-prompt-card--bad  { background: #1a0a0a; border-color: rgba(239,68,68,0.2); }
-    html[data-bs-theme="dark"] .ai-cap-prompt-card--bad .ai-cap-prompt-text  { color: #fca5a5; }
-    html[data-bs-theme="dark"] .ai-cap-prompt-badge--bad  { background: rgba(239,68,68,0.15); color: #fca5a5; }
+    html[data-bs-theme="dark"] .ai-cap-prompt-card--bad {
+        background: #1a0a0a;
+        border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-prompt-card--bad .ai-cap-prompt-text {
+        color: #fca5a5;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-prompt-badge--bad {
+        background: rgba(239, 68, 68, 0.15);
+        color: #fca5a5;
+    }
 
     /* Prompt cards — good */
-    html[data-bs-theme="dark"] .ai-cap-prompt-card--good { background: #0a1a0e; border-color: rgba(34,197,94,0.2); }
-    html[data-bs-theme="dark"] .ai-cap-prompt-card--good .ai-cap-prompt-text  { color: #86efac; }
-    html[data-bs-theme="dark"] .ai-cap-prompt-badge--good { background: rgba(34,197,94,0.15); color: #86efac; }
+    html[data-bs-theme="dark"] .ai-cap-prompt-card--good {
+        background: #0a1a0e;
+        border-color: rgba(34, 197, 94, 0.2);
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-prompt-card--good .ai-cap-prompt-text {
+        color: #86efac;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-prompt-badge--good {
+        background: rgba(34, 197, 94, 0.15);
+        color: #86efac;
+    }
 
     /* Demo prompts */
-    html[data-bs-theme="dark"] .ai-cap-demo-prompt        { background: #1e293b; border-color: rgba(255,255,255,0.07); }
-    html[data-bs-theme="dark"] .ai-cap-demo-prompt:hover  { background: #263448; border-color: rgba(99,102,241,0.2); }
-    html[data-bs-theme="dark"] .ai-cap-demo-text          { color: #94a3b8; }
+    html[data-bs-theme="dark"] .ai-cap-demo-prompt {
+        background: #1e293b;
+        border-color: rgba(255, 255, 255, 0.07);
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-demo-prompt:hover {
+        background: #263448;
+        border-color: rgba(99, 102, 241, 0.2);
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-demo-text {
+        color: #94a3b8;
+    }
 
     /* Pro Tips box — already dark slate, needs subtle adjustment */
-    html[data-bs-theme="dark"] .ai-cap-tips-box           { background: #0f172a; border: 1px solid rgba(255,255,255,0.06); }
-    html[data-bs-theme="dark"] .ai-cap-tip-item           { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.06); }
+    html[data-bs-theme="dark"] .ai-cap-tips-box {
+        background: #0f172a;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-tip-item {
+        background: rgba(255, 255, 255, 0.03);
+        border-color: rgba(255, 255, 255, 0.06);
+    }
 
     /* Error cards */
-    html[data-bs-theme="dark"] .ai-cap-error-card--red    { background: #1a0a0a; border-color: rgba(239,68,68,0.2); }
-    html[data-bs-theme="dark"] .ai-cap-error-card--amber  { background: #1c1506; border-color: rgba(245,158,11,0.2); }
-    html[data-bs-theme="dark"] .ai-cap-error-card--blue   { background: #07111f; border-color: rgba(59,130,246,0.2); }
+    html[data-bs-theme="dark"] .ai-cap-error-card--red {
+        background: #1a0a0a;
+        border-color: rgba(239, 68, 68, 0.2);
+    }
 
-    html[data-bs-theme="dark"] .ai-cap-error-card--red   .ai-cap-error-icon { background: rgba(239,68,68,0.15);  color: #fca5a5; }
-    html[data-bs-theme="dark"] .ai-cap-error-card--amber .ai-cap-error-icon { background: rgba(245,158,11,0.15); color: #fde68a; }
-    html[data-bs-theme="dark"] .ai-cap-error-card--blue  .ai-cap-error-icon { background: rgba(59,130,246,0.15); color: #93c5fd; }
+    html[data-bs-theme="dark"] .ai-cap-error-card--amber {
+        background: #1c1506;
+        border-color: rgba(245, 158, 11, 0.2);
+    }
 
-    html[data-bs-theme="dark"] .ai-cap-error-title        { color: #e2e8f0; }
-    html[data-bs-theme="dark"] .ai-cap-error-body         { color: #64748b; }
-    html[data-bs-theme="dark"] .ai-cap-error-body code    { background: rgba(255,255,255,0.08); color: #a5b4fc; }
-    html[data-bs-theme="dark"] .ai-cap-error-body em      { color: #94a3b8; }
-    html[data-bs-theme="dark"] .ai-cap-error-fix          { color: #94a3b8; }
-    html[data-bs-theme="dark"] .ai-cap-error-fix strong   { color: #cbd5e1; }
+    html[data-bs-theme="dark"] .ai-cap-error-card--blue {
+        background: #07111f;
+        border-color: rgba(59, 130, 246, 0.2);
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-error-card--red .ai-cap-error-icon {
+        background: rgba(239, 68, 68, 0.15);
+        color: #fca5a5;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-error-card--amber .ai-cap-error-icon {
+        background: rgba(245, 158, 11, 0.15);
+        color: #fde68a;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-error-card--blue .ai-cap-error-icon {
+        background: rgba(59, 130, 246, 0.15);
+        color: #93c5fd;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-error-title {
+        color: #e2e8f0;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-error-body {
+        color: #64748b;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-error-body code {
+        background: rgba(255, 255, 255, 0.08);
+        color: #a5b4fc;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-error-body em {
+        color: #94a3b8;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-error-fix {
+        color: #94a3b8;
+    }
+
+    html[data-bs-theme="dark"] .ai-cap-error-fix strong {
+        color: #cbd5e1;
+    }
 
     /* ─── Responsive ──────────────────────────────────────── */
     @media (max-width: 991.98px) {
