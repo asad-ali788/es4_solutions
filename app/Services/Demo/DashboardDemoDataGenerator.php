@@ -149,6 +149,18 @@ class DashboardDemoDataGenerator
                 ]);
             }
 
+            DB::table('product_asins')->updateOrInsert(
+                [
+                    'product_id' => $productId,
+                    'asin1'      => $asin,
+                ],
+                [
+                    'catalog_item_status' => 1,
+                    'updated_at'          => now(),
+                    'created_at'          => now(),
+                ]
+            );
+
             $listingsByCountry = [];
 
             foreach (self::COUNTRIES as $country) {

@@ -509,7 +509,7 @@ Route::get('/rankedKeyword', function (Request $request) {
 
 Route::get('budgetRules', function (Request $request, AmazonAdsService $amazonAdsService) {
 
-    $country = $request->get('country', 'US');
+    $country = $request->input('country', 'US');
 
     $profileId = match ($country) {
         'US' => config('amazon_ads.profiles.US'),
@@ -518,7 +518,7 @@ Route::get('budgetRules', function (Request $request, AmazonAdsService $amazonAd
     };
 
     $query = [
-        'pageSize' => (int) $request->get('pageSize', 30),
+        'pageSize' => (int) $request->input('pageSize', 30),
     ];
 
     $data = $amazonAdsService->getSPBudgetRulesForAdvertiser($profileId, $query);

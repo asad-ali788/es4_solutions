@@ -34,7 +34,7 @@ class AmzAdsCampaignSchedulerController extends Controller
             }
             // Filter only Enabled campaigns
             $query->where('campaign_status', 'Enabled');
-            $campaigns = $query->paginate($request->get('per_page', 50));
+            $campaigns = $query->paginate($request->input('per_page', 50));
             return view('pages.admin.amzAds.campaignSchedule.activeCampaigns', compact('campaigns'));
         } catch (\Throwable $e) {
             Log::error('Error in underSchedule(): ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);

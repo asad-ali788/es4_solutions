@@ -106,7 +106,7 @@ Schedule::command(HourlyProductSalesReport::class)->hourlyAt(32);
 Schedule::command(HourlyProductSalesReportSave::class)->hourlyAt(37);
 
 // Demo-only data generation for dashboard/selling/ads overview.
-Schedule::command(GenerateDashboardDemoData::class, ['--days' => 45, '--cleanup' => true])->dailyAt('04:10');
+Schedule::command(GenerateDashboardDemoData::class, ['--days' => 45, '--cleanup' => true])->everySixHours();
 /**
  * 📊 Daily Sales Report (lightweight)
  * Run after 12:30 PM IST so it completes before 1 PM.
@@ -215,15 +215,15 @@ Schedule::command(CampaignKeywordRecommendation::class)->dailyAt('15:00');
 // Missing data alert for key daily datasets (IST: 4:00 PM and 5:00 PM)
 Schedule::command(CheckDailyDataAvailability::class)->twiceDailyAt(16, 17, 0)->timezone('Asia/Kolkata');
 
-Schedule::command(CampaignsBudgetUsage::class)->twiceDaily(3, 13, 10);
-Schedule::command(CampaignKeywordRecommendation::class)->twiceDaily(3, 13, 15);
+Schedule::command(CampaignsBudgetUsage::class)->twiceDailyAt(3, 13, 10);
+Schedule::command(CampaignKeywordRecommendation::class)->twiceDailyAt(3, 13, 15);
 
 /**
  * 🎯 Ads
  */
 
 Schedule::command(AmzCampaignUpdates::class)->everyTenMinutes();
-Schedule::command(AmzKeywordUpdates::class)->everyTenMinutes(10);
+Schedule::command(AmzKeywordUpdates::class)->everyTenMinutes();
 
 Schedule::command(ListCampaigns::class)->cron('30 2,5,8,13,15,19 * * *')->withoutOverlapping();
 Schedule::command(ListCampaignsSd::class)->cron('35 2,5,8,13,15,19 * * *')->withoutOverlapping();
@@ -236,7 +236,7 @@ Schedule::command(ListProductAdsSd::class)->twiceDaily(10, 22);
 Schedule::command(ListProductsKeywords::class)->cron('45 2,5,8,13,15,19 * * *')->withoutOverlapping();
 Schedule::command(ListProductsKeywordSb::class)->cron('50 2,5,8,13,15,19 * * *')->withoutOverlapping();
 
-Schedule::command(ListAdGroups::class)->twiceDaily(1, 13, 32);
+Schedule::command(ListAdGroups::class)->twiceDailyAt(1, 13, 32);
 Schedule::command(ListAdGroupsSd::class)->twiceDaily(11, 23);
 Schedule::command(ListTargetsSd::class)->twiceDaily(12, 0);
 

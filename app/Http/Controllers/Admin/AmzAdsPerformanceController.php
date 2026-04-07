@@ -40,7 +40,7 @@ class AmzAdsPerformanceController extends Controller
             ->orderByDesc('report_week')
             ->pluck('report_week');
 
-        $selectedWeek = $request->get('week', $weeks->first());
+        $selectedWeek = $request->input('week', $weeks->first());
 
         $query = AsinRecommendation::query()
             ->leftJoin('product_categorisations as pc', function ($join) {
@@ -74,7 +74,7 @@ class AmzAdsPerformanceController extends Controller
         }
 
         $asins = $query->orderBy('asin_recommendations.country')
-            ->paginate($request->get('per_page', 25))
+            ->paginate($request->input('per_page', 25))
             ->appends($request->all());
 
         return view('pages.admin.amzAds.performance.asins', compact('asins', 'weeks', 'selectedWeek'));
@@ -88,7 +88,7 @@ class AmzAdsPerformanceController extends Controller
         try {
             $query = $this->getFilteredCampaignsQuery($request);
             $campaigns = $query->orderBy('enabled_campaigns_count', 'desc')
-                ->paginate($request->get('per_page', 25));
+                ->paginate($request->input('per_page', 25));
 
             // Merge asins for all campaigns (flattened, unique)
             $merged = $this->mergeCampaignAsins($campaigns->getCollection());
@@ -342,7 +342,7 @@ class AmzAdsPerformanceController extends Controller
         $this->authorize(AmzAdsEnum::AmazonAdsKeywordPerformance);
         try {
             $query   = $this->getFilteredKeywordsQuery($request);
-            $perPage = (int) $request->get('per_page', 25);
+            $perPage = (int) $request->input('per_page', 25);
             $keywords = $query
                 ->orderByDesc('amz_keyword_recommendations.total_sales')
                 ->paginate($perPage)
@@ -726,7 +726,7 @@ class AmzAdsPerformanceController extends Controller
             ->orderByDesc('amz_target_recommendations.total_sales');
 
         // Paginate with query params preserved
-        $targets = $query->paginate($request->get('per_page', 25));
+        $targets = $query->paginate($request->input('per_page', 25));
 
         return view('pages.admin.amzAds.performance.targets', compact('targets', 'selectedDate'));
     }
@@ -744,8 +744,8 @@ class AmzAdsPerformanceController extends Controller
 
     public function productAsins(Request $request)
     {
-        $query   = $request->get('q', '');
-        $page    = max((int) $request->get('page', 1), 1);
+        $query   = $request->input('q', '');
+        $page    = max((int) $request->input('page', 1), 1);
         $perPage = 20;
         $asinsQuery = ProductAsins::query()
             ->select('asin1 as text')

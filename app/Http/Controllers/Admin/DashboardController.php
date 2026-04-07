@@ -263,7 +263,7 @@ class DashboardController extends Controller
             $marketTz = config('timezone.market');
 
             $selectedMonth = $request->input('month', now($marketTz)->format('Y-m'));
-            $perPage = (int) $request->get('per_page', 25);
+            $perPage = (int) $request->input('per_page', 25);
 
             $monthStart = Carbon::createFromFormat('Y-m', $selectedMonth, $marketTz)
                 ->startOfMonth();

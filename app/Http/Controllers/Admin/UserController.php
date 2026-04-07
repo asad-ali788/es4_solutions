@@ -35,7 +35,7 @@ class UserController extends Controller
             });
         }
 
-        $users = $query->paginate($request->get('per_page', 25));
+        $users = $query->paginate($request->input('per_page', 25));
         return view('pages.admin.user.users.index', compact('users'));
     }
 

@@ -33,7 +33,7 @@ class WarehouseController extends Controller
                 });
             }
 
-            $warehouses = $query->latest()->paginate($request->get('per_page', 10));
+            $warehouses = $query->latest()->paginate($request->input('per_page', 10));
             $perPage = 25;
 
             foreach ($warehouses as $warehouse) {
@@ -124,7 +124,7 @@ class WarehouseController extends Controller
                         ->orWhere('fnsku', 'like', "%{$search}%");
                 });
             })
-            ->paginate($request->get('per_page', 10))
+            ->paginate($request->input('per_page', 10))
             ->appends(['search' => $search]);
 
         return view('pages.admin.warehouse.quantities', compact('warehouse', 'inventories'));
@@ -296,7 +296,7 @@ class WarehouseController extends Controller
         $stocksQuery->havingRaw("({$totalStockExpr}) > 0");
 
         // --- Paginate ---
-        $stocks = $stocksQuery->paginate($request->get('per_page', 25));
+        $stocks = $stocksQuery->paginate($request->input('per_page', 25));
 
         return view('pages.admin.warehouse.all_inventory_list', [
             'stocks'      => $stocks,

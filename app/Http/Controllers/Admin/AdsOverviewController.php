@@ -23,7 +23,7 @@ class AdsOverviewController extends Controller
         $asin           = $request->input('asin', null);
         $productName    = $request->input('product', null);
         $allowedPeriods = ['1d', '7d', '14d', '30d'];
-        $period         = $request->get('period', '1d');
+        $period         = $request->input('period', '1d');
 
         if (!in_array($period, $allowedPeriods, true)) {
             $period = '1d';
@@ -84,7 +84,7 @@ class AdsOverviewController extends Controller
         $query = $this->getFilteredCampaignsQuery($request);
 
         $campaigns = $query->orderBy('enabled_campaigns_count', 'desc')
-            ->paginate($request->get('per_page', 25));
+            ->paginate($request->input('per_page', 25));
 
         $campaigns->getCollection()->transform(function ($campaign) {
             return $campaign;
@@ -145,7 +145,7 @@ class AdsOverviewController extends Controller
             $productName = $request->input('product', null);
 
             $allowedPeriods = ['1d', '7d', '14d', '30d'];
-            $period = $request->get('period', '1d');
+            $period = $request->input('period', '1d');
 
             if (!in_array($period, $allowedPeriods, true)) {
                 $period = '1d';
@@ -159,7 +159,7 @@ class AdsOverviewController extends Controller
             };
 
             $maxDate       = Carbon::now($marketTz)->subDay()->toDateString();
-            $requestedDate = $request->get('date', $maxDate);
+            $requestedDate = $request->input('date', $maxDate);
 
             if ($requestedDate > $maxDate) {
                 $requestedDate = $maxDate;
@@ -221,7 +221,7 @@ class AdsOverviewController extends Controller
 
             $query = $this->getFilteredKeywordsQuery($request);
 
-            $keywords = $query->orderByDesc('total_spend')->paginate($request->get('per_page', 25));
+            $keywords = $query->orderByDesc('total_spend')->paginate($request->input('per_page', 25));
 
             $merged = $this->mergeKeywordAsins($keywords->getCollection());
             $keywords->setCollection($merged);

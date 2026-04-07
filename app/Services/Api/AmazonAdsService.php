@@ -15,15 +15,15 @@ class AmazonAdsService
     public function __construct()
     {
         $config = [
-            'clientId'     => config('amazon_ads.client_id'),
+            'clientId' => config('amazon_ads.client_id'),
             'clientSecret' => config('amazon_ads.client_secret'),
             'refreshToken' => config('amazon_ads.refresh_token'),
-            'region'       => config('amazon_ads.region'),
+            'region' => config('amazon_ads.region'),
             'appUserAgent' => config('amazon_ads.user_agent'),
-            'sandbox'      => config('amazon_ads.sandbox', false),
-            'accessToken'  => null,
-            'isUseProxy'   => false,
-            'saveFile'     => false,
+            'sandbox' => config('amazon_ads.sandbox', false),
+            'accessToken' => null,
+            'isUseProxy' => false,
+            'saveFile' => false,
             'headerAccept' => ''
         ];
 
@@ -41,8 +41,8 @@ class AmazonAdsService
         try {
             $rawProfiles = $this->client->listProfiles();
 
-            $response    = $rawProfiles['response'] ?? [];
-            $profiles    = is_array($response) ? $response : json_decode($response, true);
+            $response = $rawProfiles['response'] ?? [];
+            $profiles = is_array($response) ? $response : json_decode($response, true);
             if (!is_array($profiles)) {
                 Log::error("Invalid profile response for country: $countryCode", [
                     'raw_response' => $response,
@@ -61,7 +61,7 @@ class AmazonAdsService
         } catch (\Throwable $e) {
             Log::error("❌ Exception while fetching profile for $countryCode", [
                 'message' => $e->getMessage(),
-                'trace'   => $e->getTraceAsString(),
+                'trace' => $e->getTraceAsString(),
             ]);
             return null;
         }
@@ -72,9 +72,9 @@ class AmazonAdsService
         // Use fallback if no profileId provided
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.spcampaign.v3+json';
-        $this->client->headerAccept      = 'application/vnd.spcampaign.v3+json';
+        $this->client->headerAccept = 'application/vnd.spcampaign.v3+json';
         return $this->client->listSponsoredProductsCampaigns($filter);
     }
 
@@ -83,9 +83,9 @@ class AmazonAdsService
         // Use fallback if no profileId provided
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.spCampaign.v3+json';
-        $this->client->headerAccept      = 'application/vnd.spCampaign.v3+json';
+        $this->client->headerAccept = 'application/vnd.spCampaign.v3+json';
         return $this->client->createSponsoredProductsCampaigns($filter);
     }
 
@@ -95,9 +95,9 @@ class AmazonAdsService
         // Use fallback if no profileId provided
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.spCampaign.v3+json';
-        $this->client->headerAccept      = 'application/vnd.spCampaign.v3+json';
+        $this->client->headerAccept = 'application/vnd.spCampaign.v3+json';
         return $this->client->updateSponsoredProductsCampaigns($filter);
     }
 
@@ -106,9 +106,9 @@ class AmazonAdsService
         // Use fallback if no profileId provided
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.sbcampaignresource.v4+json';
-        $this->client->headerAccept      = 'application/vnd.sbcampaignresource.v4+json';
+        $this->client->headerAccept = 'application/vnd.sbcampaignresource.v4+json';
         return $this->client->listSponsoredBrandsCampaigns($filter);
     }
 
@@ -117,9 +117,9 @@ class AmazonAdsService
         // Use fallback if no profileId provided
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.sbcampaignresource.v4+json';
-        $this->client->headerAccept      = 'application/vnd.sbcampaignresource.v4+json';
+        $this->client->headerAccept = 'application/vnd.sbcampaignresource.v4+json';
         return $this->client->updateSponsoredBrandsCampaigns($filter);
     }
 
@@ -128,9 +128,9 @@ class AmazonAdsService
         // Use fallback if no profileId provided
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.spadGroup.v3+json';
-        $this->client->headerAccept      = 'application/vnd.spadGroup.v3+json';
+        $this->client->headerAccept = 'application/vnd.spadGroup.v3+json';
 
         return $this->client->listSponsoredProductsAdGroups($params);
     }
@@ -140,9 +140,9 @@ class AmazonAdsService
         // Use fallback if no profileId provided
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.spkeyword.v3+json';
-        $this->client->headerAccept      = 'application/vnd.spkeyword.v3+json';
+        $this->client->headerAccept = 'application/vnd.spkeyword.v3+json';
 
         return $this->client->listSponsoredProductsKeywords($filter);
     }
@@ -152,9 +152,9 @@ class AmazonAdsService
         // Use fallback if no profileId provided
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.spKeyword.v3+json';
-        $this->client->headerAccept      = 'application/vnd.spkeyword.v3+json';
+        $this->client->headerAccept = 'application/vnd.spkeyword.v3+json';
 
         return $this->client->createSponsoredProductsKeywords($filter);
     }
@@ -164,9 +164,9 @@ class AmazonAdsService
         // Use fallback if no profileId provided
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.spKeyword.v3+json';
-        $this->client->headerAccept      = 'application/vnd.spkeyword.v3+json';
+        $this->client->headerAccept = 'application/vnd.spkeyword.v3+json';
 
         return $this->client->updateSponsoredProductsKeywords($filter);
     }
@@ -176,9 +176,9 @@ class AmazonAdsService
         // Use fallback if no profileId provided
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.spKeyword.v3+json';
-        $this->client->headerAccept      = 'application/vnd.spkeyword.v3+json';
+        $this->client->headerAccept = 'application/vnd.spkeyword.v3+json';
 
         return $this->client->deleteSponsoredProductsKeywords($filter);
     }
@@ -197,7 +197,7 @@ class AmazonAdsService
 
     public function listSBKeywords(array $filter = [], ?string $profileId = null): array
     {
-        $this->client->profileId         = $profileId ?? config('amazon_ads.profiles.US');
+        $this->client->profileId = $profileId ?? config('amazon_ads.profiles.US');
         $this->client->headerContentType = 'application/vnd.sbkeywordresource.v3.2+json';
 
         return $this->client->listSponsoredBrandKeywords($filter);
@@ -208,9 +208,9 @@ class AmazonAdsService
         // Use fallback if no profileId provided
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.spProductAd.v3+json';
-        $this->client->headerAccept      = 'application/vnd.spProductAd.v3+json';
+        $this->client->headerAccept = 'application/vnd.spProductAd.v3+json';
 
         return $this->client->listSponsoredProductsProductAds($filter);
     }
@@ -220,9 +220,9 @@ class AmazonAdsService
         // Use fallback if no profileId provided
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.sbadresource.v4+json';
-        $this->client->headerAccept      = 'application/vnd.sbadresource.v4+json';
+        $this->client->headerAccept = 'application/vnd.sbadresource.v4+json';
 
         return $this->client->listSponsoredBrandsAds($filter);
     }
@@ -232,9 +232,9 @@ class AmazonAdsService
         // Use fallback if no profileId provided
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.createasyncreportrequest.v3+json';
-        $this->client->headerAccept      = 'application/vnd.createasyncreportrequest.v3+json';
+        $this->client->headerAccept = 'application/vnd.createasyncreportrequest.v3+json';
 
         return $this->client->requestOfflineReport($filter);
     }
@@ -244,36 +244,36 @@ class AmazonAdsService
         // Use fallback if no profileId provided
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.getasyncreportresponse.v3+json';
-        $this->client->headerAccept      = 'application/vnd.getasyncreportresponse.v3+json';
+        $this->client->headerAccept = 'application/vnd.getasyncreportresponse.v3+json';
 
         return $this->client->getOfflineReport($reportId);
     }
 
     public function deleteReport($reportId = null)
     {
-        $this->client->profileId         = config('amazon_ads.profiles.US');
+        $this->client->profileId = config('amazon_ads.profiles.US');
         $this->client->headerContentType = 'application/vnd.deleteasyncreportresponse.v3+json';
-        $this->client->headerAccept      = 'application/vnd.deleteasyncreportresponse.v3+json';
+        $this->client->headerAccept = 'application/vnd.deleteasyncreportresponse.v3+json';
 
         return $this->client->deleteOfflineReport($reportId);
     }
 
     public function getRankedKeywordRecommendation($reportId = null)
     {
-        $this->client->profileId         = config('amazon_ads.profiles.US');
+        $this->client->profileId = config('amazon_ads.profiles.US');
         $this->client->headerContentType = 'application/vnd.spkeywordsrecommendation.v4+json';
-        $this->client->headerAccept      = 'application/vnd.spkeywordsrecommendation.v4+json';
+        $this->client->headerAccept = 'application/vnd.spkeywordsrecommendation.v4+json';
 
         return $this->client->getRankedKeywordRecommendation($reportId);
     }
 
     public function listSponsoredProductsTargetingClauses(array $payload, string $profileId): array
     {
-        $this->client->profileId         = $profileId ?? config('amazon_ads.profiles.US');
+        $this->client->profileId = $profileId ?? config('amazon_ads.profiles.US');
         $this->client->headerContentType = 'application/vnd.spTargetingClause.v3+json';
-        $this->client->headerAccept      = 'application/vnd.spTargetingClause.v3+json';
+        $this->client->headerAccept = 'application/vnd.spTargetingClause.v3+json';
 
         return $this->client->listSponsoredProductsTargetingClauses($payload);
     }
@@ -291,9 +291,9 @@ class AmazonAdsService
     {
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/json';
-        $this->client->headerAccept      = 'application/json';
+        $this->client->headerAccept = 'application/json';
 
         return $this->client->listSponsoredDisplayCampaigns($filter);
     }
@@ -303,9 +303,9 @@ class AmazonAdsService
         // Use fallback if no profileId provided
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/json';
-        $this->client->headerAccept      = 'application/json';
+        $this->client->headerAccept = 'application/json';
         return $this->client->updateSponsoredDisplayCampaigns($filter);
     }
 
@@ -315,9 +315,9 @@ class AmazonAdsService
     {
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/json';
-        $this->client->headerAccept      = 'application/json';
+        $this->client->headerAccept = 'application/json';
 
         return $this->client->listSponsoredDisplayAdGroups($filter);
     }
@@ -326,9 +326,9 @@ class AmazonAdsService
     {
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/json';
-        $this->client->headerAccept      = 'application/json';
+        $this->client->headerAccept = 'application/json';
 
         return $this->client->listSponsoredDisplayProductAds($filter);
     }
@@ -337,9 +337,9 @@ class AmazonAdsService
     {
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/json';
-        $this->client->headerAccept      = 'application/json';
+        $this->client->headerAccept = 'application/json';
 
         return $this->client->listSponsoredDisplayTargets($filter);
     }
@@ -357,7 +357,7 @@ class AmazonAdsService
     {
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         return $this->client->download($location, $gunzip);
     }
 
@@ -365,9 +365,9 @@ class AmazonAdsService
     {
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.spthemebasedbidrecommendation.v4+json';
-        $this->client->headerAccept      = 'application/vnd.spthemebasedbidrecommendation.v4+json';
+        $this->client->headerAccept = 'application/vnd.spthemebasedbidrecommendation.v4+json';
 
         return $this->client->getThemeBasedBidRecommendationForAdGroupV1($filter);
     }
@@ -376,18 +376,18 @@ class AmazonAdsService
     {
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.spAdGroup.v3+json';
-        $this->client->headerAccept      = 'application/vnd.spAdGroup.v3+json';
+        $this->client->headerAccept = 'application/vnd.spAdGroup.v3+json';
         return $this->client->createSponsoredProductsAdGroups($filter);
     }
     public function updateSPAdGroups(array $filter = [], $profileId = null): array
     {
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.spAdGroup.v3+json';
-        $this->client->headerAccept      = 'application/vnd.spAdGroup.v3+json';
+        $this->client->headerAccept = 'application/vnd.spAdGroup.v3+json';
         return $this->client->updateSponsoredProductsAdGroups($filter);
     }
 
@@ -395,9 +395,9 @@ class AmazonAdsService
     {
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.spProductAd.v3+json';
-        $this->client->headerAccept      = 'application/vnd.spProductAd.v3+json';
+        $this->client->headerAccept = 'application/vnd.spProductAd.v3+json';
         return $this->client->createSponsoredProductsProductAds($filter);
     }
 
@@ -406,9 +406,9 @@ class AmazonAdsService
         // Use fallback if no profileId provided
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.spTargetingClause.v3+json';
-        $this->client->headerAccept      = 'application/vnd.spTargetingClause.v3+json';
+        $this->client->headerAccept = 'application/vnd.spTargetingClause.v3+json';
 
         return $this->client->createSponsoredProductsTargetingClauses($filter);
     }
@@ -418,9 +418,9 @@ class AmazonAdsService
         // Use fallback if no profileId provided
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.spcampaignbudgetusage.v1+json';
-        $this->client->headerAccept      = 'application/vnd.spcampaignbudgetusage.v1+json';
+        $this->client->headerAccept = 'application/vnd.spcampaignbudgetusage.v1+json';
 
         return $this->client->spCampaignsBudgetUsage($filter);
     }
@@ -429,9 +429,9 @@ class AmazonAdsService
         // Use fallback if no profileId provided
         $profileId = $profileId ?? config('amazon_ads.profiles.US');
 
-        $this->client->profileId         = $profileId;
+        $this->client->profileId = $profileId;
         $this->client->headerContentType = 'application/vnd.budgetrecommendation.v3+json';
-        $this->client->headerAccept      = 'application/vnd.budgetrecommendation.v3+json';
+        $this->client->headerAccept = 'application/vnd.budgetrecommendation.v3+json';
 
         return $this->client->getBudgetRecommendations($filter);
     }
@@ -479,9 +479,9 @@ class AmazonAdsService
             }
 
             return [
-                'success'  => true,
+                'success' => true,
                 'response' => $response,
-                'data'     => json_decode($response, true),
+                'data' => json_decode($response, true),
             ];
         } catch (\Throwable $e) {
             Log::error('Amazon DSP Stream API Error', [
@@ -489,9 +489,9 @@ class AmazonAdsService
             ]);
 
             return [
-                'success'  => false,
+                'success' => false,
                 'response' => null,
-                'data'     => null,
+                'data' => null,
             ];
         }
     }
@@ -500,9 +500,9 @@ class AmazonAdsService
     {
         $url = 'https://api.amazon.com/auth/o2/token';
         $params = [
-            'grant_type'    => 'refresh_token',
+            'grant_type' => 'refresh_token',
             'refresh_token' => config('amazon_ads.refresh_token'),
-            'client_id'     => config('amazon_ads.client_id'),
+            'client_id' => config('amazon_ads.client_id'),
             'client_secret' => config('amazon_ads.client_secret', ''),
         ];
 
@@ -526,7 +526,7 @@ class AmazonAdsService
         $data = json_decode($response, true);
         Log::info('DSP Token Response', [
             'http_code' => $info['http_code'],
-            'response'  => $response,
+            'response' => $response,
         ]);
 
         if (empty($data['access_token'])) {

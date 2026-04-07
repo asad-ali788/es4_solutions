@@ -75,7 +75,7 @@ class CampaignAssistant extends Component
 
         // Check URL parameter for view mode
         if (request()->has('ai')) {
-            $mode = request()->get('ai');
+            $mode = request()->input('ai');
             if (in_array($mode, ['popup', 'fullscreen'], true)) {
                 $this->viewMode = $mode;
             }

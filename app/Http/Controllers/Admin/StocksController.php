@@ -86,7 +86,7 @@ class StocksController extends Controller
             $stocksQuery->where('products.sku', 'like', '%' . $request->search . '%');
         }
 
-        $stocks = $stocksQuery->paginate($request->get('per_page', 25));
+        $stocks = $stocksQuery->paginate($request->input('per_page', 25));
 
         // --- Global last updated timestamps for other tables ---
         $lastUpdated = [
@@ -196,7 +196,7 @@ class StocksController extends Controller
             $query->where('pa.asin1', 'like', "%{$asinSearch}%");
         }
 
-        $stocks = $query->paginate($request->get('per_page', 25));
+        $stocks = $query->paginate($request->input('per_page', 25));
 
         return view('pages.admin.stocks.asin', compact('stocks', 'warehouses', 'asinSearch'));
     }

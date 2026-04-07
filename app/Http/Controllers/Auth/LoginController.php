@@ -157,7 +157,7 @@ class LoginController extends Controller
 
     public function loginHistory(Request $request)
     {
-        $search = trim((string) $request->get('search', ''));
+        $search = trim((string) $request->input('search', ''));
 
         $logs = UserLoginLogs::query()
             ->with('user')

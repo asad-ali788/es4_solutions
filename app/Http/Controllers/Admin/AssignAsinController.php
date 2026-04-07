@@ -38,7 +38,7 @@ class AssignAsinController extends Controller
                     ->orWhere('email', 'like', '%' . $searchTerm . '%');
             });
         }
-        $users = $query->paginate($request->get('per_page', 10));
+        $users = $query->paginate($request->input('per_page', 10));
         return view('pages.admin.user.assignAsin.index', compact('users'));
     }
 
@@ -62,8 +62,8 @@ class AssignAsinController extends Controller
 
     public function search(Request $request)
     {
-        $query   = $request->get('q', '');
-        $page    = max((int) $request->get('page', 1), 1);
+        $query   = $request->input('q', '');
+        $page    = max((int) $request->input('page', 1), 1);
         $perPage = 20;
         $asinsQuery = ProductAsins::query()
             ->select('asin1 as text')

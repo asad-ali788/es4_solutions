@@ -46,7 +46,7 @@ class SellingAdsItemController extends Controller
 
             $campaign          = $request->input('campaign', 'SP');
             $spTargetingType   = $request->input('sp_targeting_type', 'MANUAL');
-            $perPage           = (int) $request->get('per_page', 25);
+            $perPage           = (int) $request->input('per_page', 25);
 
             $request->merge([
                 'period'            => '1d',
@@ -102,7 +102,7 @@ class SellingAdsItemController extends Controller
                 ?? Carbon::now($marketTz)->subDay()->toDateString();
             $campaign        = $request->input('campaign', 'SP');
             $spTargetingType = $request->input('sp_targeting_type', 'MANUAL');
-            $perPage         = (int) $request->get('per_page', 25);
+            $perPage         = (int) $request->input('per_page', 25);
 
             $request->merge([
                 'period'            => '1d',

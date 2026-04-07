@@ -68,7 +68,7 @@ class OrderForecastController extends Controller
                 });
             }
 
-            $snapshots = $query->orderByDesc('last12_total_sold')->paginate($request->get('per_page', 50));
+            $snapshots = $query->orderByDesc('last12_total_sold')->paginate($request->input('per_page', 50));
             $processedSnapshots = $this->snapshotService->processSnapshots($snapshots, $forecast->order_date);
 
             $promptConfig = config('ai_forecast_prompts');

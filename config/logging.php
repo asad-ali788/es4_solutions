@@ -148,6 +148,11 @@ return [
             'days'   => 7,
         ],
 
+        'deprecations' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/php-deprecation-warnings.log'),
+        ],
+
     ],
 
 ];

@@ -22,7 +22,7 @@ class AmzAdsSearchTermsController extends Controller
             $this->authorize(AmzAdsEnum::AmazonAdsSearchTerms);
 
             $searchTerms = $this->getSearchTermsQuery($request)
-                ->paginate($request->get('per_page', 25))
+                ->paginate($request->input('per_page', 25))
                 ->appends($request->query());
             // dd($searchTerms->toArray());
             return view('pages.admin.amzAds.searchterms.index', compact('searchTerms'));
@@ -58,8 +58,8 @@ class AmzAdsSearchTermsController extends Controller
     public function productAsins(Request $request)
     {
         try {
-            $query   = $request->get('q', '');
-            $page    = max((int) $request->get('page', 1), 1);
+            $query   = $request->input('q', '');
+            $page    = max((int) $request->input('page', 1), 1);
             $perPage = 20;
             $asinsQuery = ProductAsins::query()
                 ->select('asin1 as text')
