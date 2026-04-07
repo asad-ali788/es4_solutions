@@ -18,6 +18,7 @@
         "laravel/ai": "^0.3.2",
         "laravel/framework": "^12.0",
         "laravel/nightwatch": "^1.19",
+        "laravel/octane": "^2.14",
         "laravel/pulse": "^1.5",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
