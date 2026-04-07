@@ -6,7 +6,8 @@
     <title>@yield('page_title', 'Authentication') | Itrend</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- App favicon -->
-    {{-- <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}"> --}}
+    {{--
+    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}"> --}}
 
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet">
@@ -78,7 +79,8 @@
                                             </h4>
                                             <div class="auth-review-item py-3">
                                                 <p class="font-size-16 mb-4">
-                                                    " Monitor Sponsored Products performance, optimize campaigns, and boost
+                                                    " Monitor Sponsored Products performance, optimize campaigns, and
+                                                    boost
                                                     sales with one smart Amazon ads dashboard. "
                                                 </p>
                                                 <div>
@@ -101,15 +103,18 @@
                         <div class="d-flex flex-column h-100">
                             <div class="mb-4 mb-md-5">
                                 <a href="{{ route('login') }}" class="d-block card-logo">
-                                    {{-- <img src="{{ asset('assets/images/logo-dark.png') }}" alt="" height="18" class="card-logo-dark"> --}}
-                                    {{-- <img src="{{ asset('assets/images/logo-light.png') }}" alt="" height="18" class="card-logo-light"> --}}
+                                    {{-- <img src="{{ asset('assets/images/logo-dark.png') }}" alt="" height="18"
+                                        class="card-logo-dark"> --}}
+                                    {{-- <img src="{{ asset('assets/images/es4-logo.png') }}" alt="" height="18"
+                                        class="card-logo-light"> --}}
                                 </a>
                             </div>
 
                             <div class="my-auto">
                                 <div>
                                     <h5 class="text-primary">@yield('auth_page_title', 'Welcome Back !')</h5>
-                                    <p class="text-muted mb-0">@yield('auth_page_subtitle', 'Continue to ES4 Solutions.')</p>
+                                    <p class="text-muted mb-0">
+                                        @yield('auth_page_subtitle', 'Continue to ES4 Solutions.')</p>
                                 </div>
 
                                 <div class="mt-4">
@@ -129,8 +134,8 @@
 
     <script>
         // toaster message time out
-        $(document).ready(function() {
-            setTimeout(function() {
+        $(document).ready(function () {
+            setTimeout(function () {
                 $("#flash-message").fadeOut("slow");
             }, 4000);
         });

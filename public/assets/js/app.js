@@ -345,11 +345,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const themeIcon = document.getElementById('theme-icon');
     const htmlEl = document.documentElement;
 
-    // Load saved theme from localStorage
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
         htmlEl.setAttribute('data-bs-theme', savedTheme);
         themeIcon.className = savedTheme === 'dark' ? 'bx bx-sun' : 'bx bx-moon';
+
+        // Update sidebar theme based on saved theme
+        document.body.setAttribute('data-sidebar', savedTheme === 'dark' ? 'dark' : 'light');
     }
 
     // Toggle theme on click
@@ -358,6 +360,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         htmlEl.setAttribute('data-bs-theme', newTheme);
         localStorage.setItem('theme', newTheme);
+
+        // Update sidebar theme to match
+        document.body.setAttribute('data-sidebar', newTheme === 'dark' ? 'dark' : 'light');
 
         // 🔥 Transition effect
         themeIcon.classList.add('fade-out');
